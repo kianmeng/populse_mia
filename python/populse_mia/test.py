@@ -143,7 +143,8 @@ from capsul.qt_gui.widgets.settings_editor import SettingsEditor
 from mia_processes.bricks.tools import Input_Filter
 
 # populse_mia import
-from populse_mia.data_manager.data_loader import ImportProgress, ImportWorker
+from populse_mia.data_manager.data_loader import (ImportProgress, ImportWorker)
+                                                  #read_log)
 from populse_mia.data_manager.project import (COLLECTION_BRICK,
                                               COLLECTION_CURRENT,
                                               COLLECTION_HISTORY,
@@ -201,6 +202,7 @@ os.chdir(os.path.dirname(os.path.realpath(__file__)))
 # Disables any etelemetry check.
 if 'NO_ET' not in os.environ:
     os.environ['NO_ET'] = "1"
+
 
 class TestMIACase(unittest.TestCase):
     """Parent class for the test classes of mia.
@@ -3428,8 +3430,7 @@ class TestMIAMainWindow(TestMIACase):
               projects list and launches mia.
             - test_popUpDeleteProject: creates a new project and deletes
               it.
-            - test_switch_project: create project and switches to it.
-            - test_see_all_projects: creates 2 projects and tries to 
+            - test_see_all_projects: creates 2 projects and tries to
               open them through the all projects pop-up.
             - test_software_preferences_pop_up: opens the preferences 
               pop up and changes parameters.
@@ -3439,22 +3440,19 @@ class TestMIAMainWindow(TestMIACase):
               the configuration of AFNI, ANTS, FSL, SPM and MATLAB.
             - test_software_preferences_pop_up_validate: opens the 
               preferences pop up for AFNI, ANTS, FSL, SPM and MATLAB.
+            - test_switch_project: create project and switches to it.
             - test_tab_changed: switches between data browser, data 
               viewer and pipeline manager.
     """
 
-
-
     def test_check_database(self):
-        '''
-        Checks if the database has changed since the scans were first 
+        """Checks if the database has changed since the scans were first
         imported.
-        Tests MainWindow.test_check_database.
 
-        Notes
-        -----
-        Mocks QMessageBox.exec.
-        '''
+        - Tests: MainWindow.test_check_database
+
+        - Mocks QMessageBox.exec
+        """
 
         # Creates a new project and switches to it
         test_proj_path = self.get_new_test_project()
@@ -3463,12 +3461,12 @@ class TestMIAMainWindow(TestMIACase):
         # Sets shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
 
-        # Mocks the execution of a dialog box by accpeting it
+        # Mocks the execution of a dialog box by accepting it
         QMessageBox.exec = lambda self_, *arg: self_.accept()
 
         # Gets the file path 
         ppl_manager.project.folder = test_proj_path
-        folder = os.path.join(test_proj_path,'data','raw_data')
+        folder = os.path.join(test_proj_path, 'data', 'raw_data')
         NII_FILE_1 = ('Guerbet-C6-2014-Rat-K52-Tube27-2014-02-14102317-04-G3_'
                       'Guerbet_MDEFT-MDEFTpvm-000940_800.nii')
         DOCUMENT_1 = os.path.abspath(os.path.join(folder, NII_FILE_1))
@@ -3477,29 +3475,29 @@ class TestMIAMainWindow(TestMIACase):
         os.remove(DOCUMENT_1)
 
         # Check if the files of the database have been modified
+        # Since QMessageBox.exec is mocked, the QMessageBox's text is not
+        # observed
         self.main_window.action_check_database.triggered.emit()
 
     def test_closeEvent(self):
-        '''
-        Opens a project and closes the main window.
-        Tests MainWindow.closeEvent.
-        '''
+        """Opens a project and closes the main window.
 
+        - Tests: MainWindow.closeEvent
+        """
+
+        # FIXME: Does this test really bring anything new compared to other
+        #        tests already performed?
         # Creates a new project folder and switches to it
         new_proj_path = self.get_new_test_project(light=True)
         self.main_window.switch_project(new_proj_path, 'test_light_project')
 
         # Sets shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
-        ppl_edt_tabs = ppl_manager.pipelineEditorTabs
-        ppl_edt_tab = ppl_edt_tabs.get_current_editor()
-        data_browser = self.main_window.data_browser
-        session = self.main_window.project.session
-        ppl = ppl_edt_tabs.get_current_pipeline()
 
-        # Gets the uid of the first brick from the bricks collection, which is 
-        # composed of the bricks apperaing in the histories of the scans
-        bricks_coll = ppl_manager.project.session.get_documents(COLLECTION_BRICK)
+        # Gets the UID of the first brick in the brick collection, which is
+        # composed of the bricks appearing in the scan history.
+        bricks_coll = ppl_manager.project.session.get_documents(
+                                                               COLLECTION_BRICK)
         brick = bricks_coll[0]
 
         # Appends it to the 'brick_list'
@@ -3517,26 +3515,23 @@ class TestMIAMainWindow(TestMIACase):
         print()
     
     def test_create_project_pop_up(self):
-        '''
-        Tries to create a new project with a project already open and
-        with and without setting the projects folder path.
+        """Tries to create a new project with an already open project, with and
+        without setting the projects folder path.
 
-        Tests the objects
-          - MainWindow.create_project_pop_up
-          - PopUpNewProject
+        - Tests:
+            - MainWindow.create_project_pop_up
+            - PopUpNewProject
 
-        Notes
-        -----
-        Mocks the objects
-          - PopUpQuit.exec
-          - QMessageBox.exec
-          - PopUpNewProject.exec
-        '''
+        - Mocks:
+            - PopUpQuit.exec
+            - QMessageBox.exec
+            - PopUpNewProject.exec
+        """
 
         # Sets shortcuts for often used objects
         session = self.main_window.project.session
 
-        # Creates a new project folder and switcehs to it
+        # Creates a new project folder and switches to it
         new_proj_path = self.get_new_test_project(light=True)
         folder = os.path.join(new_proj_path, 'data', 'downloaded_data')
         NII_FILE_1 = ('Guerbet-C6-2014-Rat-K52-Tube27-2014-02-14102317-01-G1_'
@@ -3565,8 +3560,7 @@ class TestMIAMainWindow(TestMIACase):
         config = Config(config_path=self.config_path)
         config.set_projects_save_path(None)
 
-        # Tries to create a new project without setting the projects 
-        # folder
+        # Tries to create a new project without setting the projects folder
         self.main_window.create_project_pop_up()
 
         self.assertTrue(hasattr(self.main_window, 'msg'))
@@ -3576,12 +3570,11 @@ class TestMIAMainWindow(TestMIACase):
         proj_folder = os.path.split(new_proj_path)[0]
         config = Config(config_path=self.config_path)
         config.set_projects_save_path(proj_folder)
-        # FIXME: triggers segmentation fault on windows build
 
         # Mocks the execution of 'PopUpNewProject
         PopUpNewProject.exec = lambda self_, *args: None
 
-        # Opens the create project pop-up
+        # Opens the "create project" pop-up
         self.main_window.create_project_pop_up()
 
         # Mocks the execution of a pop-up
@@ -3589,16 +3582,18 @@ class TestMIAMainWindow(TestMIACase):
 
         # Tries to create a new project in the same directory of an 
         # existing one
-        self.main_window.exPopup.get_filename((os.path.join(folder, NII_FILE_1),))
+        self.main_window.exPopup.get_filename((os.path.join(folder,
+                                                            NII_FILE_1),))
 
         # Creates a new project
-        self.main_window.exPopup.get_filename((os.path.join(folder, 'new_project'),))
+        self.main_window.exPopup.get_filename((os.path.join(folder,
+                                                            'new_project'),))
 
     def test_files_in_project(self):
-        '''
-        Tests whether or not a given file is part of the project.
-        Tests MainWindow.files_in_project.
-        '''
+        """Tests whether a given file is part of the project.
+
+        - Tests: MainWindow.files_in_project
+        """
 
         # Creates a now test project
         test_proj_path = self.get_new_test_project(light=True)
@@ -3608,28 +3603,28 @@ class TestMIAMainWindow(TestMIACase):
         res = self.main_window.project.files_in_project([{'mock_key': False}])
         self.assertFalse(res)
 
-        # Checks for a str type path ocated out of the project
+        # Checks for a str type path located out of the project
         res = self.main_window.project.files_in_project('/out_of_project')
         self.assertFalse(res)
 
         # Checks for a str type path within the project
-        res = self.main_window.project.files_in_project(os.path.join(test_proj_path, 'mock_file'))
-        self.assertTrue(res) # Asserts it is not empty
+        res = self.main_window.project.files_in_project(
+                                                    os.path.join(test_proj_path,
+                                                                 'mock_file'))
+        self.assertTrue(res)  # Asserts it is not empty
 
     def test_import_data(self):
-        '''
-        Opens a project and simulates importing a file from the MriConv
+        """Opens a project and simulates importing a file from the mri_conv
         java executable.
-        Tests 
-         - read_log (data_loader.py)
-         - ImportProgress
-        
-        Notes
-        -----
-        Mocks
-         - ImportWorker.start
-         - ImportProgress.exec
-        '''
+
+        - Tests:
+            - read_log (data_loader.py)
+            - ImportProgress
+
+        - Mocks:
+            - ImportWorker.start
+            - ImportProgress.exec
+        """
 
         # Opens a test project and switches to it
         test_proj_path = self.get_new_test_project(light=True)
@@ -3649,7 +3644,7 @@ class TestMIAMainWindow(TestMIACase):
         # Gets information regarding the fist scan, located in the 
         # 'derived_data' of the project
         DOCUMENT_1 = (self.main_window.project.session.
-                                             get_documents_names)("current")[0]
+                                              get_documents_names)("current")[0]
         DOCUMENT_1_NAME = os.path.split(DOCUMENT_1)[-1].split('.')[0]
         
         # Gets the 'raw_data' folder path, where the scan will be import
@@ -3660,31 +3655,32 @@ class TestMIAMainWindow(TestMIACase):
                     os.path.join(RAW_DATA_FLDR, os.path.split(DOCUMENT_1)[-1]))
 
         # Creates the .json with the tag values, in the raw data folder
-        JSON_TAG_DUMP = {'AcquisitionTime':{
-                            'format': 'HH:mm:ss.SSS',
-                            'description':'The time the acquisition of data.',
-                            'units':'mock_unit',
-                            'type':'time',
-                            'value':['00:09:40.800']
-                        },
-                        'BandWidth':{
-                            'format': None,
-                            'description': '',
-                            'units': 'MHz',
-                            'type': 'float',
-                            'value':[[50000.0]]
-                        }}
+        JSON_TAG_DUMP = {'AcquisitionTime': {
+                             'format': 'HH:mm:ss.SSS',
+                             'description': 'The time the acquisition of data.',
+                             'units': 'mock_unit',
+                             'type': 'time',
+                             'value': ['00:09:40.800']
+                                             },
+                         'BandWidth': {'format': None,
+                                       'description': '',
+                                       'units': 'MHz',
+                                       'type': 'float',
+                                       'value': [[50000.0]]
+                                       }
+                         }
         JSON_TAG = os.path.join(RAW_DATA_FLDR, DOCUMENT_1_NAME + '.json')
+
         with open(JSON_TAG, 'w') as file:
             json.dump(JSON_TAG_DUMP, file)
 
         # Creates the 'logExport*.json' file, in the raw data folder
-        JSON_EXPORT_DUMP = [{
-                               'StatusExport': 'Export ok', 
-                               'NameFile': DOCUMENT_1_NAME
-                            }]
+        JSON_EXPORT_DUMP = [{'StatusExport': 'Export ok',
+                             'NameFile': DOCUMENT_1_NAME
+                             }]
         JSON_EXPORT = os.path.join(test_proj_path, 'data', 'raw_data', 
                                    'logExportMock.json')
+
         with open(JSON_EXPORT, 'w') as file:
             json.dump(JSON_EXPORT_DUMP, file)
 
@@ -3693,34 +3689,33 @@ class TestMIAMainWindow(TestMIACase):
         ImportProgress.exec = lambda self_, *args: self_.worker.run()
 
         # Reads the scans added to the project
+        # FIXME: Try uncommenting the following line
         #scans_added = read_log(self.main_window.project, self.main_window)
 
         # Mocks importing a scan, runs a mocked java executable instead
         # of the 'MRIManager.jar'
         self.main_window.import_data()
-        
+
         new_scan = os.path.normpath(DOCUMENT_1.replace('derived_data', 
                                                        'raw_data'))
         table_data_scans = (self.main_window.data_browser.table_data.
                             scans_to_visualize)
-        table_data_scans =[os.path.normpath(path) for path in table_data_scans]
+        table_data_scans = [os.path.normpath(path) for path in table_data_scans]
         
         # Asserts that the first scan was added to the 'raw_data' folder
         self.assertIn(new_scan, table_data_scans)
 
     def test_open_project_pop_up(self):
-        '''
-        Creates a test project and opens a project, including unsaved
+        """Creates a test project and opens a project, including unsaved
         modifications.
-        Tests MainWindow.open_project_pop_up.
 
-        Notes
-        -----
-        Mocks
-         - QMessageBox.exec
-         - PopUpOpenProject.exec
-         - PopUpQuit.exec
-        '''
+        - Tests: MainWindow.open_project_pop_up
+
+        - Mocks:
+            - QMessageBox.exec
+            - PopUpOpenProject.exec
+            - PopUpQuit.exec
+        """
 
         # Creates a test project
         test_proj_path = self.get_new_test_project(light=True)
@@ -3753,26 +3748,25 @@ class TestMIAMainWindow(TestMIACase):
         data_browser.table_data.selectRow(0)
         self.main_window.data_browser.table_data.remove_scan()
 
-        # Asserts that there are unsaved modificaiton
+        # Asserts that there are unsaved modification
         self.assertTrue(self.main_window.check_unsaved_modifications())
 
         PopUpQuit.exec = lambda self_: self_.show()
 
-        # Tries to open a project with unsaved modificaitons
+        # Tries to open a project with unsaved modifications
         self.main_window.open_project_pop_up()
         self.main_window.pop_up_close.accept()
 
     def test_open_recent_project(self):
-        '''
-        Creates 2 test projects and opens one by the recent projects 
-        action.
-        Tests MainWindow.open_recent_project.
-        '''
+        """Creates 2 test projects and opens one by the recent projects action.
+
+        - Tests: MainWindow.open_recent_project
+        """
 
         # Creates 2 test projects
-        proj_test_1_path = self.get_new_test_project(name = 'test_project_1', 
+        proj_test_1_path = self.get_new_test_project(name='test_project_1',
                                                      light=True)
-        proj_test_2_path = self.get_new_test_project(name = 'test_project_2', 
+        proj_test_2_path = self.get_new_test_project(name='test_project_2',
                                                      light=True)
         
         # Switches to the first one
@@ -3800,46 +3794,48 @@ class TestMIAMainWindow(TestMIACase):
 
         # Deletes a scan from data browser
         self.main_window.data_browser.table_data.selectRow(0)
-        #self.main_window.data_browser.table_data.remove_scan()
+        self.main_window.data_browser.table_data.remove_scan()
 
-        # Asserts that there are unsaved modificaiton
-        #self.assertTrue(self.main_window.check_unsaved_modifications())
+        # Asserts that there are unsaved modification
+        self.assertTrue(self.main_window.check_unsaved_modifications())
 
         PopUpQuit.exec = lambda self_: self_.show()
 
-        # Tries to open a project with unsaved modificaitons
+        # Tries to open a project with unsaved modifications
         self.main_window.saved_projects_actions[0].triggered.emit()
-        #self.main_window.pop_up_close.accept()
 
         print()
 
     @unittest.skipUnless(sys.platform.startswith('linux'), 'requires linux')
     def test_open_shell(self):
-        '''
-        Opens a Qt console and kill it afterwards.
-        Tests MainWindow.open_shell.
-        '''
+        """Opens a Qt console and kill it afterwards.
+
+        -Tests: MainWindow.open_shell
+
+        Currently, this test is only done on linux.
+        """
 
         # Opens the Qt console
         self.main_window.action_open_shell.triggered.emit()
 
         qt_console_process = None
-
         time_elapsed = 0
-        while time_elapsed < 5:
 
+        while time_elapsed < 5:
             # Gets the current process
             current_process = psutil.Process()
             children = current_process.children(recursive=True)
 
-            # If qt_console_process os not none, the qt console process
+            # If qt_console_process is not none, the qt console process
             # was found
             if qt_console_process:
                 break
 
             if children:
+
                 # Gets the process pid (process id)
                 for child in children:
+
                     if child.name() == 'jupyter-qtconso':
                         qt_console_process = child.pid
 
@@ -3849,23 +3845,24 @@ class TestMIAMainWindow(TestMIACase):
         if qt_console_process:
             # Kills the Qt console
             os.kill(qt_console_process, 9)
+
         else:
             print('the Qt console process was not found')
 
     def test_package_library_dialog_add_pkg(self):
-        '''
-        Creates a new project folder, opens the processes library and
+        """Creates a new project folder, opens the processes library and
         adds a package.
-        Tests
-         - PackageLibraryDialog
 
-        Notes
-        -----
-        Mocks
-         - QMessageBox.exec
-         - QMessageBox.exec_
-        '''
+        - Tests: PackageLibraryDialog
 
+        - Mocks:
+            - QMessageBox.exec
+            - QMessageBox.exec_
+        """
+
+        # FIXME: We have to use a specific process_config.yml file for UTs
+        #        (as it is done for config.yml). Currently, we pollute the one
+        #        used for the classical use of mia.
         # Creates a new project folder and switches to it
         new_proj_path = self.get_new_test_project(light=True)
         self.main_window.switch_project(new_proj_path, 'test_light_project')
@@ -3877,69 +3874,76 @@ class TestMIAMainWindow(TestMIACase):
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
 
-        add_pkg_button = (pkg_lib_window.layout().children()[0].layout().
-                          children()[3].itemAt(0).widget())
+        #input('0')
 
         PKG = 'nipype.interfaces.DataGrabber'
 
-        # Mocks the execution of a dialog box
+        # Clicks on the add package button without selecting anything
         QMessageBox.exec = lambda x: None
         QMessageBox.exec_ = lambda x: None
+        pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+                                                      0).widget().clicked.emit()
 
-        '''ADD PACKAGE'''
-
-        # Clicks on the add package button
-        add_pkg_button.clicked.emit()
-
+        # Open a browser to select a package
         QFileDialog.exec_ = lambda x: True
         ppl_manager.processLibrary.process_library.pkg_library.browse_package()
 
-        # Resets the line edit back to 'PKG'
+        # Fill in the line edit to "PKG" then click on the add package button
         pkg_lib_window.line_edit.setText(PKG)
-        self.main_window.pipeline_manager.processLibrary.process_library.pkg_library.is_path = False
-
-        # Clicks on the add package button
-        add_pkg_button.clicked.emit()
+        ppl_manager.processLibrary.process_library.pkg_library.is_path = False
+        pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+                                                      0).widget().clicked.emit()
 
         # Resets the previous action
         pkg_lib_window.add_list.selectAll()
         pkg_lib_window.layout().children()[0].layout().itemAt(
-            8).widget().layout().itemAt(1).widget().clicked.emit()
+                          8).widget().layout().itemAt(1).widget().clicked.emit()
 
-        pkg_lib_window.remove_dic[PKG] = 1
-        pkg_lib_window.add_dic[PKG] = 1
+        # Apply changes, close the package library pop-up
+        pkg_lib_window.ok_clicked()
 
-        add_pkg_button.clicked.emit()
+        #input('1')
 
-        pkg_lib_window.ok_clicked()  # Apply changes
-
-        # Opens the package library pop-up
+        # Opens again the package library pop-up
         self.main_window.package_library_pop_up()
+        pkg_lib_window = self.main_window.pop_up_package_library
+        #input('2')
 
-        # Writes the name of an inexistant package on the line edit
-        pkg_lib_window.line_edit.setText('inexistant')
+        # Writes the name of a non-existent package on the line edit
+        pkg_lib_window.line_edit.setText('non-existent')
 
-        add_pkg_button.clicked.emit()  # Clicks on the remove button
-        pkg_lib_window.ok_clicked()  # Apply changes
+        #input('3')
 
-        # Resets the process library to its original state
-        pkg_lib_window.add_list.selectAll()
-        (pkg_lib_window.layout().children()[0].layout().itemAt(8).widget().
-         layout().itemAt(1).widget().clicked.emit())
+        # Clicks on the add package button
+        pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+            0).widget().clicked.emit()
+
+        #nput('4')
+        # Apply changes, close the package library pop-up
+        pkg_lib_window.ok_clicked()
+
+        #input('5')
 
         # Creates a copy of the folder (package) 'User_processes'
         config = Config(config_path=self.config_path)
         usr_proc_fldr = os.path.join(config.get_mia_path(),
                                      'processes', 'User_processes')
+
+        #print('usr_proc_fldr: ', usr_proc_fldr)
+
+        #input('6')
+
         if os.path.exists(usr_proc_fldr + '_'):
             shutil.rmtree(usr_proc_fldr + '_')
         usr_proc_fldr_copy = shutil.copytree(usr_proc_fldr,
                                              usr_proc_fldr + '_')
 
-        # Opens the install packages pop up
+        # Opens the "installation processes" (from folder) pop up
         folder_btn = (pkg_lib_window.layout().children()[0].layout().itemAt(1).
                       itemAt(3).widget())
         folder_btn.clicked.emit()
+
+        #input('7')
 
         # Creates a file in the projects path
         mock_file_path = os.path.join(new_proj_path, 'mock_file')
@@ -4337,64 +4341,6 @@ class TestMIAMainWindow(TestMIACase):
 
         print(5)
 
-    def test_switch_project(self):
-        '''
-        Creates a project and switches to it.
-        Tests MainWindow.switch_project.
-
-        Notes
-        -----
-        Mocks QMessageBox.exec.
-        '''
-
-        # Mocks the execution of a dialog window
-        QMessageBox.exec = lambda self_: None
-
-        # Creates a new project
-        test_proj_path = self.get_new_test_project()
-
-        # Switches to an existing mia project
-        res = self.main_window.switch_project(test_proj_path, 'test_project')
-        self.assertTrue(res)
-
-        self.main_window.project.folder = '' # Resets the project folder
-
-        # Tries to switch to an inexistant project
-        res = self.main_window.switch_project(test_proj_path+'_', 'test_project')
-        self.assertFalse(res)
-
-        self.main_window.project.folder = '' # Resets the project folder
-
-        # Tries to switch to a project that is already opened in another
-        # instance of the software
-        res = self.main_window.switch_project(test_proj_path, 'test_project')
-        self.assertFalse(res)
-
-        self.main_window.project.folder = '' # Resets the project folder
-
-        # Resets the opened projects list
-        config = Config(config_path=self.config_path)
-        config.set_opened_projects([])
-
-        # Deletes the 'COLLECTION_CURRENT' equivalent in 'mia.db'
-        #con = sqlite3.connect(os.path.join(test_proj_path,'database','mia.db'))
-        #cursor = con.cursor()
-        #query = "DELETE FROM '_collection' WHERE collection_name = 'current'"
-        #cursor.execute(query)
-        #con.commit()
-        #con.close()
-
-        # Tries to switch to a project that cannot be read by mia
-        #res = self.main_window.switch_project(test_proj_path, 'test_project')
-        #self.assertFalse(res)
-
-        # Deletes the 'filters' folder of the project
-        subprocess.run(['rm', '-rf', os.path.join(test_proj_path, 'filters')])
-
-        # Tries to switch to non mia project
-        res = self.main_window.switch_project(test_proj_path, 'test_project')
-        self.assertFalse(res)
-
     def test_see_all_projects(self):
         '''
         Creates 2 projects and tries to open them through the all
@@ -4745,8 +4691,6 @@ class TestMIAMainWindow(TestMIACase):
         main_wnd.pop_up_preferences.edit_capsul_config()
 
         main_wnd.pop_up_preferences.close()
-
-
 
     def test_software_preferences_pop_up_modules_config(self):
         """
@@ -5330,6 +5274,64 @@ class TestMIAMainWindow(TestMIACase):
         config = Config(config_path=self.config_path)
         self.assertEqual(config.get_projects_save_path(), tmp_path)
 
+    def test_switch_project(self):
+        '''
+        Creates a project and switches to it.
+        Tests MainWindow.switch_project.
+
+        Notes
+        -----
+        Mocks QMessageBox.exec.
+        '''
+
+        # Mocks the execution of a dialog window
+        QMessageBox.exec = lambda self_: None
+
+        # Creates a new project
+        test_proj_path = self.get_new_test_project()
+
+        # Switches to an existing mia project
+        res = self.main_window.switch_project(test_proj_path, 'test_project')
+        self.assertTrue(res)
+
+        self.main_window.project.folder = '' # Resets the project folder
+
+        # Tries to switch to an inexistant project
+        res = self.main_window.switch_project(test_proj_path+'_', 'test_project')
+        self.assertFalse(res)
+
+        self.main_window.project.folder = '' # Resets the project folder
+
+        # Tries to switch to a project that is already opened in another
+        # instance of the software
+        res = self.main_window.switch_project(test_proj_path, 'test_project')
+        self.assertFalse(res)
+
+        self.main_window.project.folder = '' # Resets the project folder
+
+        # Resets the opened projects list
+        config = Config(config_path=self.config_path)
+        config.set_opened_projects([])
+
+        # Deletes the 'COLLECTION_CURRENT' equivalent in 'mia.db'
+        #con = sqlite3.connect(os.path.join(test_proj_path,'database','mia.db'))
+        #cursor = con.cursor()
+        #query = "DELETE FROM '_collection' WHERE collection_name = 'current'"
+        #cursor.execute(query)
+        #con.commit()
+        #con.close()
+
+        # Tries to switch to a project that cannot be read by mia
+        #res = self.main_window.switch_project(test_proj_path, 'test_project')
+        #self.assertFalse(res)
+
+        # Deletes the 'filters' folder of the project
+        subprocess.run(['rm', '-rf', os.path.join(test_proj_path, 'filters')])
+
+        # Tries to switch to non mia project
+        res = self.main_window.switch_project(test_proj_path, 'test_project')
+        self.assertFalse(res)
+
     def test_tab_changed(self):
         '''
         Switches between data browser, data viewer and pipeline manager.
@@ -5368,6 +5370,7 @@ class TestMIAMainWindow(TestMIACase):
         # Switches to data browser
         self.main_window.tabs.setCurrentIndex(0) # Calls tab_changed()
         self.assertEqual(self.main_window.tabs.currentIndex(), 0)
+
 
 class TestMIANodeController(TestMIACase):
     '''

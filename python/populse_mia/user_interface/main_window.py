@@ -225,7 +225,7 @@ class MainWindow(QMainWindow):
         self.action_import = QAction(QIcon(os.path.join(sources_images_dir,
                                                         'Blue.png')),
                                      'Import', self)
-        self.action_check_database = QAction('Check the wole database', self)
+        self.action_check_database = QAction('Check the whole database', self)
         self.action_see_all_projects = QAction('See all projects', self)
         self.action_project_properties = QAction('Project properties', self)
         self.action_software_preferences = QAction('MIA preferences', self)
@@ -1222,12 +1222,12 @@ class MainWindow(QMainWindow):
         #     self.update_package_library_action)
 
     def open_shell(self):
-        """ Open a Qt console shell with an IPython kernel seing the program
+        """ Open a Qt console shell with an IPython kernel seeing the program
         internals
         """
         from soma.qt_gui import qt_backend
         ipfunc = None
-        mode='qtconsole'
+        mode = 'qtconsole'
         print('startShell')
         try:
             import qtconsole  # to check it is installed
