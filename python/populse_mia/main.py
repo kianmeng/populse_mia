@@ -218,7 +218,14 @@ if not os.path.dirname(os.path.dirname(
                     '  . Using {0} package from {1}...'.format(elt, mia_proc))
 
         del mia_proc_dir
-        del elt
+
+        try:
+            del elt
+
+        except NameError:
+            # there is nothing in the "processes" directory!
+            pass
+
 
     del mia_proc
     del root_dev_dir

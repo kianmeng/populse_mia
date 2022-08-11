@@ -3860,21 +3860,16 @@ class TestMIAMainWindow(TestMIACase):
             - QMessageBox.exec_
         """
 
-        # FIXME: We have to use a specific process_config.yml file for UTs
-        #        (as it is done for config.yml). Currently, we pollute the one
-        #        used for the classical use of mia.
         # Creates a new project folder and switches to it
         new_proj_path = self.get_new_test_project(light=True)
         self.main_window.switch_project(new_proj_path, 'test_light_project')
 
-        # Sets shortcuts for objects that are often used
+        # Set shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
 
         # Opens the package library pop-up
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
-
-        #input('0')
 
         PKG = 'nipype.interfaces.DataGrabber'
 
@@ -3902,87 +3897,110 @@ class TestMIAMainWindow(TestMIACase):
         # Apply changes, close the package library pop-up
         pkg_lib_window.ok_clicked()
 
-        #input('1')
-
         # Opens again the package library pop-up
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
-        #input('2')
 
         # Writes the name of a non-existent package on the line edit
         pkg_lib_window.line_edit.setText('non-existent')
 
-        #input('3')
-
         # Clicks on the add package button
         pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
-            0).widget().clicked.emit()
+                                                      0).widget().clicked.emit()
 
-        #nput('4')
         # Apply changes, close the package library pop-up
         pkg_lib_window.ok_clicked()
 
-        #input('5')
+        # Makes a mocked process folder "Mock_process" in the temporary
+        # project path
+        mock_proc_fldr = os.path.join(new_proj_path, 'processes',
+                                      'Mock_process')
+        os.makedirs(mock_proc_fldr, exist_ok=True)
 
-        # Creates a copy of the folder (package) 'User_processes'
-        config = Config(config_path=self.config_path)
-        usr_proc_fldr = os.path.join(config.get_mia_path(),
-                                     'processes', 'User_processes')
+        # Make a '__init__.py' in the mock_proc_fldr that raise an 'ImportError'
+        init_file = open(os.path.join(mock_proc_fldr, '__init__.py'), 'w')
+        init_file.write("raise ImportError('mock_import_error')")
+        init_file.close()
 
-        #print('usr_proc_fldr: ', usr_proc_fldr)
+        # Make a 'test_unit_test.py' in the mock_proc_fldr with a real process
+        unit_test = open(os.path.join(mock_proc_fldr, 'unit_test.py'), 'w')
+        unit_test.writelines([
+"from capsul.api import Pipeline\n",
+"import traits.api as traits\n",
+"class Unit_test(Pipeline):\n",
+"    def pipeline_definition(self):\n",
+"        self.add_process('smooth_1', 'mia_processes.bricks.preprocess.spm."
+                                             "spatial_preprocessing.Smooth')\n",
+"        self.export_parameter('smooth_1', 'in_files', is_optional=False)\n",
+"        self.export_parameter('smooth_1', 'fwhm', is_optional=True)\n",
+"        self.export_parameter('smooth_1', 'data_type', is_optional=True)\n",
+"        self.export_parameter('smooth_1', 'implicit_masking', "
+                                                          "is_optional=True)\n",
+"        self.export_parameter('smooth_1', 'out_prefix', is_optional=True)\n",
+"        self.export_parameter('smooth_1', 'smoothed_files', "
+                                                         "is_optional=False)\n",
+"        self.reorder_traits(('in_files', 'fwhm', 'data_type', "
+                       "'implicit_masking', 'out_prefix', 'smoothed_files'))\n",
+"        self.node_position = {\n",
+"            'smooth_1': (-119.0, -73.0),\n",
+"            'inputs': (-373.26518439966446, -73.0),\n",
+"            'outputs': (227.03404291855725, -73.0),\n",
+"        }\n",
+"        self.node_dimension = {\n",
+"            'smooth_1': (221.046875, 215.0),\n",
+"            'inputs': (137.3125, 161.0),\n",
+"            'outputs': (111.25867003946317, 61.0),\n",
+"        }\n",
+"        self.do_autoexport_nodes_parameters = False\n"])
+        unit_test.close()
 
-        #input('6')
-
-        if os.path.exists(usr_proc_fldr + '_'):
-            shutil.rmtree(usr_proc_fldr + '_')
-        usr_proc_fldr_copy = shutil.copytree(usr_proc_fldr,
-                                             usr_proc_fldr + '_')
-
-        # Opens the "installation processes" (from folder) pop up
-        folder_btn = (pkg_lib_window.layout().children()[0].layout().itemAt(1).
-                      itemAt(3).widget())
-        folder_btn.clicked.emit()
-
-        #input('7')
-
-        # Creates a file in the projects path
+        # Makes a file "mock_file_path" in the temporary projects path
         mock_file_path = os.path.join(new_proj_path, 'mock_file')
         mock_file = open(mock_file_path, 'w')
         mock_file.close()
 
-        # Sets the folder to an inexistant file path
-        (pkg_lib_window.pop_up_install_processes.path_edit.
-         setText(mock_file_path + '_'))
+        # Opens again the package library pop-up
+        self.main_window.package_library_pop_up()
+        pkg_lib_window = self.main_window.pop_up_package_library
 
-        # Clicks on install package
+        # Opens the "installation processes" (from folder) pop up
+        folder_btn = pkg_lib_window.layout().children()[0].layout().itemAt(
+                                                           1).itemAt(3).widget()
+        folder_btn.clicked.emit()
+
+        # Sets the folder to a non-existent file path
+        (pkg_lib_window.pop_up_install_processes.path_edit.
+                                                  setText(mock_file_path + '_'))
+
+        # Clicks on "install package" button of "installation processes" pup-up
         instl_pkg_btn = (pkg_lib_window.pop_up_install_processes.layout().
-                         children()[1].itemAt(0).widget())
+                                               children()[1].itemAt(0).widget())
         instl_pkg_btn.clicked.emit()  # Displays an error dialog box
 
-        # Sets the folder to an existing file path, but not a .zip
+        # Sets the folder to an existing file path
         (pkg_lib_window.pop_up_install_processes.path_edit.
-         setText(mock_file_path))
+                                                        setText(mock_file_path))
 
-        # Clicks on install package
+        # Clicks on "install package" button of "installation processes" pup-up
         instl_pkg_btn.clicked.emit()  # Displays an error dialog box
 
         # Sets the folder to be a valid package
         (pkg_lib_window.pop_up_install_processes.path_edit.
-         setText(usr_proc_fldr_copy))
+                                                        setText(mock_proc_fldr))
 
-        # Mocks the '__init__.py' file to raise an 'ImportError'
-        mock_init_file = open(os.path.join(usr_proc_fldr_copy, '__init__.py'),
-                              'w')
-        mock_init_file.write("raise ImportError('mock_import_error')")
-        mock_init_file.close()
-
-        # Clicks on install package
+        # Clicks on "install package" button of "installation processes" pup-up
+        # Displays an error dialog box since __init__.py raise ImportError
         instl_pkg_btn.clicked.emit()
 
-        # Removes the copy of the folder (package)
-        shutil.rmtree(usr_proc_fldr_copy)
+        # Make a proper '__init__.py
+        init_file = open(os.path.join(mock_proc_fldr, '__init__.py'), 'w')
+        init_file.write("from .unit_test import Unit_test")
+        init_file.close()
 
-        # Closes the install packages pop up
+        # Clicks again on "install package" button
+        instl_pkg_btn.clicked.emit()
+
+        # Closes the "installation processes" (from folder) pop up
         pkg_lib_window.pop_up_install_processes.close()
 
         # Closes the package library pop-up

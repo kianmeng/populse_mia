@@ -615,11 +615,15 @@ class InstallProcesses(QDialog):
                                              'processes'), members_to_extract)
 
                     elif os.path.isdir(filename):
-                        distutils.dir_util.copy_tree(os.path.join(filename),
-                                                     os.path.join(
-                                                         config.get_mia_path(),
-                                                         'processes',
-                                                         package_name))
+                        #distutils.dir_util.copy_tree(os.path.join(filename),
+                        #                             os.path.join(
+                        #                                 config.get_mia_path(),
+                        #                                 'processes',
+                        #                                 package_name))
+                        shutil.copytree(os.path.join(filename),
+                                        os.path.join(config.get_mia_path(),
+                                                     'processes',
+                                                     package_name))
 
                 else:
                     date = datetime.now().strftime("%Y%m%d%H%M%S")
