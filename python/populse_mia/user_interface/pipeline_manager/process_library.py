@@ -1730,7 +1730,8 @@ class PackageLibraryDialog(QDialog):
             self.is_path = True
             self.line_edit.setText(file_name)
 
-    def delete_package(self, index=1, to_delete=None, remove=True, loop=False):
+    def delete_package(self, index=1, to_delete=None, remove=True, loop=False,
+                       from_pipeline_manager=False):
         """Delete a package, only available to administrators.
 
         Remove the package from the package library tree, update the
@@ -1769,13 +1770,23 @@ class PackageLibraryDialog(QDialog):
             return deleted_packages
 
         if to_delete.split(".")[0] in ["nipype", "mia_processes", "capsul"]:
+
+            if from_pipeline_manager:
+                inform_text = ("This package belongs to " +
+                               to_delete.split(".")[0] + " which is required "
+                               "by populse mia.\n You can still hide it in the "
+                               "package library manager.")
+
+            else:
+                inform_text = ("This package belongs to " +
+                               to_delete.split(".")[0] + " which is required "
+                               "by populse_mia.\nTherefore, it has only been "
+                               "hidden (removed).")
+
             self.msg = QMessageBox()
             self.msg.setIcon(QMessageBox.Critical)
             self.msg.setText("This package can not be deleted.")
-            self.msg.setInformativeText(
-                "This package belongs to " + to_delete.split(".")[0] + " which"
-                " is required by populse mia.\n You can still hide it in the "
-                "package library manager.")
+            self.msg.setInformativeText(inform_text)
             self.msg.setWindowTitle("Error")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.buttonClicked.connect(self.msg.close)
@@ -1800,8 +1811,10 @@ class PackageLibraryDialog(QDialog):
                 path = os.path.abspath(os.path.join(config.get_mia_path(),
                                                     'processes',
                                                     *pkg_list[0:index]))
-                sub_deleted_packages = self.delete_package(index + 1,
-                                                           to_delete)
+                sub_deleted_packages = self.delete_package(
+                                    index + 1,
+                                    to_delete,
+                                    from_pipeline_manager=from_pipeline_manager)
 
                 for sub_pkg in sub_deleted_packages:
 
@@ -2450,7 +2463,9 @@ class ProcessLibrary(QTreeView):
                              package_library.
                                  package_tree) = (self.pkg_library.
                                                       load_config)()['Packages']
-                        self.pkg_library.delete_package(to_delete=txt)
+                        self.pkg_library.delete_package(
+                                                     to_delete=txt,
+                                                     from_pipeline_manager=True)
 
     def load_dictionary(self, d):
         """Load a dictionary to the tree.
@@ -2513,7 +2528,9 @@ class ProcessLibrary(QTreeView):
                          package_library.
                          package_tree) = self.pkg_library.load_config()[
                                                                      'Packages']
-                        self.pkg_library.delete_package(to_delete=txt)
+                        self.pkg_library.delete_package(
+                                                     to_delete=txt,
+                                                     from_pipeline_manager=True)
                 # print('dictionary ',path.decode('utf8'))
                 # self.item_library_clicked.emit(model.itemData(idx)[0])
 

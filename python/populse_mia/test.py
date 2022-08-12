@@ -4007,18 +4007,15 @@ class TestMIAMainWindow(TestMIACase):
         pkg_lib_window.close()
 
     def test_package_library_dialog_del_pkg(self):
-        '''
-        Creates a new project folder, opens the processes library and
+        """Creates a new project folder, opens the processes library and
         deletes a package.
-        Tests
-         - PackageLibraryDialog
 
-        Notes
-        -----
-        Mocks
-         - QMessageBox.exec
-         - QMessageBox.exec_
-        '''
+        - Tests: PackageLibraryDialog
+
+        - Mocks:
+            - QMessageBox.exec
+            - QMessageBox.exec_
+        """
 
         # Creates a new project folder and switches to it
         new_proj_path = self.get_new_test_project(light=True)
@@ -4030,86 +4027,170 @@ class TestMIAMainWindow(TestMIACase):
         ppl_edt_tab = ppl_edt_tabs.get_current_editor()
         ppl = ppl_edt_tabs.get_current_pipeline()
         proc_lib_view = ppl_manager.processLibrary.process_library
-        pkg_lib_window = proc_lib_view.pkg_library
+        #pkg_lib_window = proc_lib_view.pkg_library
 
         # Opens the package library pop-up
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
 
-        del_pkg_button = (pkg_lib_window.layout().children()[0].layout().
-                          children()[3].itemAt(2).widget())
-
         PKG = 'nipype.interfaces.DataGrabber'
 
-        # Mocks the execution of a dialog box
-        QMessageBox.exec = lambda x: None
-        QMessageBox.exec_ = lambda x: None
 
-        '''Delete package'''
 
-        # Tries to delete a package which is part of nipype
+        # Make sure that PKG is already installed
         pkg_lib_window.line_edit.setText(PKG)
 
-        del_pkg_button.clicked.emit()  # Clicks on delete package
+
+        ppl_manager.processLibrary.process_library.pkg_library.is_path = False
+        pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+                             0).widget().clicked.emit() #  Clicks on add package
+
+        # Apply changes, close the package library pop-up
+        pkg_lib_window.ok_clicked()
+
+
+
+        # Opens again the package library pop-up
+        self.main_window.package_library_pop_up()
+        pkg_lib_window = self.main_window.pop_up_package_library
+
+
+
+
+        #del_pkg_button = (pkg_lib_window.layout().children()[0].layout().
+        #                                       children()[3].itemAt(2).widget())
+
+
+
+
+
+
+
+        # Tries to delete PKG
+        pkg_lib_window.line_edit.setText(PKG)
+
+
+
+        #del_pkg_button.clicked.emit()  # Clicks on delete package
+        pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+                          2).widget().clicked.emit()  # Clicks on delete package
+
 
         # Resets the previous action
         pkg_lib_window.del_list.selectAll()
+
+
+
         (pkg_lib_window.layout().children()[0].layout().itemAt(12).widget().
-         layout().itemAt(1).widget().clicked.emit())
+         layout().itemAt(1).widget().clicked.emit())  #clicks on Reset
 
-        del_pkg_button.clicked.emit()  # Clicks on delete package
 
+        # Tries to delete again PKG
+        pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+            2).widget().clicked.emit()  # Clicks on delete package
+
+
+
+        # Close the package library pop-up
         QMessageBox.question = Mock(return_value=QMessageBox.No)
-        pkg_lib_window.ok_clicked()  # Apply changes
+        pkg_lib_window.ok_clicked()  # Do not apply the modification
+
+
+
+        # Opens again the package library pop-up
+        self.main_window.package_library_pop_up()
+        pkg_lib_window = self.main_window.pop_up_package_library
+
+
+        # Tries to delete PKG
+        pkg_lib_window.line_edit.setText(PKG)
+        pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+            2).widget().clicked.emit()  # Clicks on delete package
+
+        # Close the package library pop-up, apply changes for a package which
+        # is part of nipype, the package is only removed.
 
         QMessageBox.question = Mock(return_value=QMessageBox.Yes)
-        pkg_lib_window.ok_clicked()  # Apply changes
 
+        # Mocks the execution of a dialog box
+        #QMessageBox.exec = lambda x: None
+        #QMessageBox.exec_ = lambda x: None
+
+        pkg_lib_window.ok_clicked()
+        pkg_lib_window.msg.close()  # Closes the warning message
+
+        #pkg_lib_window.line_edit.setText(PKG)
+
+        # Add again PKG
+        self.main_window.package_library_pop_up()
+        pkg_lib_window = self.main_window.pop_up_package_library
         pkg_lib_window.line_edit.setText(PKG)
+        pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+                                                      0).widget().clicked.emit()
+        pkg_lib_window.ok_clicked()
 
-        # Selects the 'DataGrabber' package
+
+        # Selects the 'DataGrabber' package in Pipeline Manager
         pkg_index = self.find_item_by_data(proc_lib_view, 'DataGrabber')
         (proc_lib_view.selectionModel().
          select(pkg_index, QItemSelectionModel.SelectCurrent))
 
-        # Tries to delete a package that cannot be deleted, selecting it
-        # and pressing the del key
+
+        # Tries to delete a package that cannot be deleted (is part of nipype),
+        # selecting it and pressing the del key
         event = Mock()
         event.key = lambda: Qt.Key_Delete
         proc_lib_view.keyPressEvent(event)
+        proc_lib_view.pkg_library.msg.close()
+
+
 
         # pkg_lib_window.msg.close() # Closes the warning message
 
         # Tries to delete a package that cannot be deleted, calling the
         # function
         pkg_lib_window.delete_package()
+
+
         pkg_lib_window.msg.close()  # Closes the warning message
+
 
         # Tries to delete a package corresponding to an empty string
         pkg_lib_window.line_edit.setText('')
         pkg_lib_window.delete_package()
 
+
         pkg_lib_window.msg.close()  # Closes the warning message
+
 
         # Switches to the pipeline manager tab
         self.main_window.tabs.setCurrentIndex(2)
 
+
         # Adds the processes Rename, creates the "rename_1" node
         ppl_edt_tab.click_pos = QPoint(450, 500)
         ppl_edt_tab.add_named_process(Rename)
+
 
         # Exports the mandatory input and output plugs for "rename_1"
         ppl_edt_tab.current_node_name = 'rename_1'
         ppl_edt_tab.export_unconnected_mandatory_inputs()
         ppl_edt_tab.export_all_unconnected_outputs()
 
-        # Saves the pipeline as the package 'Test_pipeline'
+
+        # Saves the pipeline as the package 'Unit_test_pipeline'
         config = Config(config_path=self.config_path)
         filename = os.path.join(config.get_mia_path(), 'processes',
-                                'User_processes', 'test_pipeline.py')
+                                'User_processes', 'unit_test_pipeline.py')
+
+
         save_pipeline(ppl, filename)
+
+
         self.main_window.pipeline_manager.updateProcessLibrary(filename)
 
+        ##############################################
+        """
         # Gets the mia path
         config = Config(config_path=self.config_path)
         mia_path = config.get_mia_path()
@@ -4126,7 +4207,8 @@ class TestMIAMainWindow(TestMIACase):
         pkg_lib_window.pop_up_install_processes.close()
 
         # Gets the 'test_pipeline' index and selects it
-        test_ppl_index = self.find_item_by_data(proc_lib_view, 'Test_pipeline')
+        test_ppl_index = self.find_item_by_data(proc_lib_view,
+                                                'Unit_test_pipeline')
         (proc_lib_view.selectionModel().
          select(test_ppl_index, QItemSelectionModel.SelectCurrent))
 
@@ -4141,6 +4223,7 @@ class TestMIAMainWindow(TestMIACase):
         proc_lib_view.keyPressEvent(event)
 
         pkg_lib_window.close()
+        """
 
     def test_package_library_dialog_rmv_pkg(self):
         '''

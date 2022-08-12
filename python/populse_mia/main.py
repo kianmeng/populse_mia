@@ -31,6 +31,7 @@ import sys
 import yaml
 from functools import partial
 from packaging import version
+from pathlib import Path
 
 # PyQt5 imports
 from PyQt5.QtCore import QDir, QLockFile, Qt
@@ -224,8 +225,9 @@ if not os.path.dirname(os.path.dirname(
 
         except NameError:
             # there is nothing in the "processes" directory!
-            pass
-
+            os.mkdir(os.path.join(mia_proc, 'User_processes'))
+            Path(os.path.join(mia_proc, 'User_processes',
+                              '__init__.py')).touch()
 
     del mia_proc
     del root_dev_dir
