@@ -4006,7 +4006,7 @@ class PopUpPreferences(QDialog):
 
 class PopUpProperties(QDialog):
     """Is called when the user wants to change the current project's
-       properties.
+       properties (File > properties).
 
     .. Methods:
         - ok_clicked: saves the modifications and updates the data browser

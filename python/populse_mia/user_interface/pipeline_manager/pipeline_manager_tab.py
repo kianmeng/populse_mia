@@ -1065,7 +1065,9 @@ class PipelineManagerTab(QWidget):
         """
         Update history when a pipeline node is changed
 
-        :param signal_list: list of the needed parameters to update history
+        :param signal_list: list of the needed parameters to update history.
+                            ["plug_value" or "node_name", node_name, old_value,
+                            plug_name, plug_name_type, new_value]
         """
 
         case = signal_list.pop(0)
@@ -1090,9 +1092,10 @@ class PipelineManagerTab(QWidget):
             if (signal_list[2] in ['protected_parameters',
                                    'protected_parameters_items',
                                    'selection_changed',
-                                   'trait_added','user_traits_changed'] or
-                                                   signal_list[1] == '' or
-                        (signal_list[1] == [] and signal_list[4] is Undefined)):
+                                   'trait_added',
+                                   'user_traits_changed'] or
+                signal_list[1] == '' or
+                (signal_list[1] == [] and signal_list[4] is Undefined)):
                 return
 
             history_maker.append("update_plug_value")
