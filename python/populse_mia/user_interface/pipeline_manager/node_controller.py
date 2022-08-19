@@ -464,6 +464,8 @@ class CapsulNodeController(QWidget):
 
         if self.process_widget:
             item = self.layout().takeAt(1)
+            self.static_release(self.process_widget.attributed_process,
+                                self.parameters_changed)
             self.process_widget.deleteLater()
             del item
             self.process_widget = None
@@ -518,8 +520,8 @@ class CapsulNodeController(QWidget):
         # However this signal seems never to be emitted, and I don't understand
         # why. So release_process() has to be called manually from the
         # pipeline manager. Sigh.
-        self.destroyed.connect(partial(self.static_release, process,
-                                       self.parameters_changed))
+        #self.process_widget.destroyed.connect(partial(self.static_release, process,
+        #                               self.parameters_changed))
 
     @staticmethod
     def static_release(process, param_changed):
@@ -548,6 +550,7 @@ class CapsulNodeController(QWidget):
 
     def parameters_changed(self, _, plug_name, old_value, new_value):
         """Emit the value_changed signal."""
+
         plug_name_type = type(plug_name)
         self.value_changed.emit(["plug_value", self.node_name, old_value,
                                  plug_name, plug_name_type, new_value])
@@ -1004,6 +1007,7 @@ class NodeController(QWidget):
         self.pop_up.plug_value_changed.connect(
             partial(self.update_plug_value_from_filter, plug_name, parameters))
 
+    #def display_parameters(self, node_name: object, process: object, pipeline: object) -> object:
     def display_parameters(self, node_name, process, pipeline):
         """Display the parameters of the selected node.
 
