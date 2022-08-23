@@ -3899,7 +3899,10 @@ class TestMIAMainWindow(TestMIACase):
         - Mocks:
             - QMessageBox.exec
             - QMessageBox.exec_
+            - QFileDialog.exec_
         """
+
+        PKG = 'nipype.interfaces.DataGrabber'
 
         # Creates a new project folder and switches to it
         new_proj_path = self.get_new_test_project(light=True)
@@ -3915,8 +3918,6 @@ class TestMIAMainWindow(TestMIACase):
         # Opens the package library pop-up
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
-
-        PKG = 'nipype.interfaces.DataGrabber'
 
         # Clicks on the add package button without selecting anything
         QMessageBox.exec = lambda x: None
@@ -4084,7 +4085,7 @@ class TestMIAMainWindow(TestMIACase):
 
         - Mocks:
             - QMessageBox.exec
-            - QMessageBox.exec_
+            - QMessageBox.question
         """
 
         PKG = 'nipype.interfaces.DataGrabber'
@@ -4100,20 +4101,22 @@ class TestMIAMainWindow(TestMIACase):
         ppl = ppl_edt_tabs.get_current_pipeline()
         proc_lib_view = ppl_manager.processLibrary.process_library
 
-        # Opens the package library pop-up
-        self.main_window.package_library_pop_up()
-        pkg_lib_window = self.main_window.pop_up_package_library
-
         # Make sure that PKG is already installed
-        pkg_lib_window.line_edit.setText(PKG)
-        ppl_manager.processLibrary.process_library.pkg_library.is_path = False
-        pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
-                             0).widget().clicked.emit()  # Clicks on add package
+        init_state = proc_lib_view.to_dict().get('nipype').get(
+                                          'interfaces').get('DataGrabber', None)
 
-        # Apply changes, close the package library pop-up
-        pkg_lib_window.ok_clicked()
+        if init_state != 'process_enabled':
+            # Opens the package library pop-up
+            self.main_window.package_library_pop_up()
+            pkg_lib_window = self.main_window.pop_up_package_library
+            pkg_lib_window.line_edit.setText(PKG)
+            (ppl_manager.processLibrary.process_library.
+                                                    pkg_library.is_path) = False
+            pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+                                                      0).widget().clicked.emit()  # Clicks on add package
+            pkg_lib_window.ok_clicked()
 
-        # Opens again the package library pop-up
+        # Opens the package library pop-up
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
 
@@ -4254,23 +4257,40 @@ class TestMIAMainWindow(TestMIACase):
         QMessageBox.question = Mock(return_value=QMessageBox.Yes)
         proc_lib_view.keyPressEvent(event)
 
+        # Resets the process library to its original state
+        self.main_window.package_library_pop_up()
+        pkg_lib_window = self.main_window.pop_up_package_library
+        pkg_lib_window.line_edit.setText(PKG)
+        (ppl_manager.processLibrary.process_library.pkg_library.is_path) = False
+
+        if init_state is not None:
+            # Clicks on add package
+            pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+                                                      0).widget().clicked.emit()
+
+        else:
+            #Clicks on remove package
+            pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+                                                     1).widget().clicked.emit()
+
+        pkg_lib_window.ok_clicked()
+
         # Cleaning the process library in pipeline manager tab (deleting the
         # package added in this test, or old one still existing)
         self.clean_uts_packages(proc_lib_view)
 
     def test_package_library_dialog_rmv_pkg(self):
-        '''
-        Creates a new project folder, opens the processes library and
+        """Creates a new project folder, opens the processes library and
         removes a package. Also saves the current configuration.
-        Tests
-         - PackageLibraryDialog
 
-        Notes
-        -----
-        Mocks
-         - QMessageBox.exec
-         - QMessageBox.exec_
-        '''
+        - Tests: PackageLibraryDialog
+
+        - Mocks:
+            - QMessageBox.exec
+            - QMessageBox.exec_
+        """
+
+        PKG = 'nipype.interfaces.DataGrabber'
 
         # Creates a new project folder and switches to it
         new_proj_path = self.get_new_test_project(light=True)
@@ -4278,39 +4298,47 @@ class TestMIAMainWindow(TestMIACase):
 
         # Sets shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
+        proc_lib_view = ppl_manager.processLibrary.process_library
 
-        # Opens the package library pop-up
+        init_state = proc_lib_view.to_dict().get('nipype').get(
+                                          'interfaces').get('DataGrabber', None)
+
+        if init_state != 'process_enabled':
+            # Opens the package library pop-up
+            self.main_window.package_library_pop_up()
+            pkg_lib_window = self.main_window.pop_up_package_library
+            pkg_lib_window.line_edit.setText(PKG)
+            (ppl_manager.processLibrary.process_library.
+                                                    pkg_library.is_path) = False
+            # Clicks on add package
+            pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+                                                      0).widget().clicked.emit()
+            pkg_lib_window.ok_clicked()
+
+        # Opens again the package library pop-up
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
-
-        # Does not open the packages library ito avoid thread deadlock
-        # ppl_manager.processLibrary.open_pkg_lib()
-
-        rmv_pkg_button = (pkg_lib_window.layout().children()[0].layout().
-                          children()[3].itemAt(1).widget())
-
-        PKG = 'nipype.interfaces.DataGrabber'
 
         # Mocks the execution of a dialog box
         QMessageBox.exec = lambda x: None
         QMessageBox.exec_ = lambda x: None
 
-        '''REMOVE PACKAGE'''
-
         # Mocks deleting a package that is not specified
         res = pkg_lib_window.remove_package('')
         self.assertFalse(res)
 
-        # Tries removing an inexistant package
-        res = pkg_lib_window.remove_package('inexistant_package')
+        # Tries removing a non-existent package
+        res = pkg_lib_window.remove_package('non_existent_package')
         self.assertIsNone(res)
 
         # Clicks on the remove package button without selecting package
+        rmv_pkg_button = (pkg_lib_window.layout().children()[0].layout().
+                                               children()[3].itemAt(1).widget())
         rmv_pkg_button.clicked.emit()
 
-        # Writes the name of an existing package on the line edit
+        # Writes the name of an existing package on the line edit and clicks on
+        # the remove package button
         pkg_lib_window.line_edit.setText(PKG)
-
         rmv_pkg_button.clicked.emit()
 
         # Resets the previous action
@@ -4318,9 +4346,11 @@ class TestMIAMainWindow(TestMIACase):
         (pkg_lib_window.layout().children()[0].layout().itemAt(10).widget().
          layout().itemAt(1).widget().clicked.emit())
 
+        # Click again on the remove package button
         rmv_pkg_button.clicked.emit()
 
-        pkg_lib_window.ok_clicked()  # Apply changes
+        # Apply changes
+        pkg_lib_window.ok_clicked()
 
         # Mocks removing a package with text and from the tree
         pkg_lib_window.remove_dic[PKG] = 1
@@ -4330,31 +4360,36 @@ class TestMIAMainWindow(TestMIACase):
                                                 tree_remove=False)
 
         # Resets the process library to its original state
-        pkg_lib_window.remove_list.selectAll()
-        (pkg_lib_window.layout().children()[0].layout().itemAt(10).widget().
-         layout().itemAt(1).widget().clicked.emit())
+        current_state = proc_lib_view.to_dict().get('nipype').get(
+                                          'interfaces').get('DataGrabber', None)
+
+        if current_state != init_state:
+            self.main_window.package_library_pop_up()
+            pkg_lib_window = self.main_window.pop_up_package_library
+            pkg_lib_window.line_edit.setText(PKG)
+            (ppl_manager.processLibrary.process_library.
+                                                    pkg_library.is_path) = False
+            # Clicks on add package
+            pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+                                                      0).widget().clicked.emit()
+            pkg_lib_window.ok_clicked()
 
         # Saves the config to 'process_config.yml'
         ppl_manager.processLibrary.save_config()
 
     def test_package_library_others(self):
-        '''
-        Creates a new project folder, opens the processes library and
+        """Creates a new project folder, opens the processes library and
         adds a package.
-        Tests
-         - PackageLibraryDialog
 
-        Notes
-        -----
         The package library object opens up as a pop-up when
         File > Package library manager is clicked.
 
-        Mocks
-         - QMessageBox.exec
-         - QMessageBox.exec_
+        - Tests: PackageLibraryDialog
 
-         +> docstring to check !!!!!!!
-        '''
+        - Mocks
+            - QMessageBox.exec
+            - QMessageBox.exec_
+        """
 
         # Creates a new project folder and switches to it
         new_proj_path = self.get_new_test_project(light=True)
@@ -4380,14 +4415,15 @@ class TestMIAMainWindow(TestMIACase):
         pkg_lib_window.close()
 
     def test_popUpDeletedProject(self):
-        '''
-        Adds a deleted projects to the projects list and launches mia.
-        Tests PopUpDeletedProject.
-        '''
+        """Adds a deleted projects to the projects list and launches mia.
+
+        - Tests: PopUpDeletedProject.
+        """
 
         # Sets a projects save directory
-        config = Config()
-        projects_save_path = os.path.join(config.get_mia_path(), 'projects')
+        #config = Config()
+        config = Config(config_path=self.config_path)
+        projects_save_path = os.path.join(self.config_path, 'projects')
         config.set_projects_save_path(projects_save_path)
 
         # Mocks a project filepath that does not exist in the filesystem
@@ -4397,7 +4433,7 @@ class TestMIAMainWindow(TestMIACase):
         savedProjects.addSavedProject(del_prjct)
 
         # Asserts that 'saved_projects.yml' contains the filepath
-        # self.assertIn(del_prjct, savedProjects.loadSavedProjects()['paths'])
+        self.assertIn(del_prjct, savedProjects.loadSavedProjects()['paths'])
 
         # Mocks the execution of a dialog box
         PopUpDeletedProject.exec = Mock()
@@ -4415,9 +4451,7 @@ class TestMIAMainWindow(TestMIACase):
             self.msg = PopUpDeletedProject(deleted_projects)
 
         # Asserts that 'saved_projects.yml' no longer contains it
-        # self.assertNotIn(del_prjct, savedProjects.loadSavedProjects()['paths'])
-
-        print()
+        self.assertNotIn(del_prjct, savedProjects.loadSavedProjects()['paths'])
 
     def test_popUpDeleteProject(self):
         '''
