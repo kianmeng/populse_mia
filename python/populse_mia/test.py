@@ -211,6 +211,8 @@ class TestMIACase(unittest.TestCase):
         :Method:
             - add_visualized_tag: selects a tag to display with the
               "Visualized tags" pop-up
+            - clean_uts_packages: deleting the package added during the UTs or
+              old one still existing
             - create_mock_jar: creates a mocked java (.jar) executable
             - edit_databrowser_list: change value for a tag in DataBrowser
             - execute_QDialogAccept: accept (close) a QDialog instance
@@ -260,6 +262,31 @@ class TestMIACase(unittest.TestCase):
 
             tags_list.setCurrentItem(found_item[0])
             visualized_tags.click_select_tag()
+
+    def clean_uts_packages(self, proc_lib_view):
+        """Deleting the packages added during the UTs."""
+
+        pck2remove = [k for (k, v) in proc_lib_view.to_dict().items() if
+                                                        'UTs_processes' in k]
+        user_proc = proc_lib_view.to_dict().get('User_processes', None)
+
+        if user_proc is not None and 'Unit_test_pipeline' in user_proc:
+            pck2remove.append('Unit_test_pipeline')
+
+        # Mocks the MessageBox().question() for populse_mia.user_interface.
+        # pipeline_manager.process_library.PackageLibraryDialog.delete_package()
+        QMessageBox.question = Mock(return_value=QMessageBox.Yes)
+
+        # Mocks the event.key
+        event = Mock()
+        event.key = lambda: Qt.Key_Delete
+
+        # Remove
+        for k in pck2remove:
+            pkg_index = self.find_item_by_data(proc_lib_view, k)
+            (proc_lib_view.selectionModel().
+                           select(pkg_index, QItemSelectionModel.SelectCurrent))
+            proc_lib_view.keyPressEvent(event)
 
     def create_mock_jar(self, path):
         """Creates a mocked java (.jar) executable.
@@ -379,13 +406,12 @@ class TestMIACase(unittest.TestCase):
 
         assert isinstance(q_tree_view, QTreeView), ('first argument is not a '
                                                     'QTreeView instance!')
-
         q_tree_view.expandAll()
         index = q_tree_view.indexAt(QPoint(0, 0))
 
         while index.data() and index.data() != data:
             index = q_tree_view.indexBelow(index)
-            
+
         return index
 
     def get_new_test_project(self, name='test_project', light=False):
@@ -3881,6 +3907,10 @@ class TestMIAMainWindow(TestMIACase):
 
         # Set shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
+        ppl_edt_tabs = ppl_manager.pipelineEditorTabs
+        ppl_edt_tab = ppl_edt_tabs.get_current_editor()
+        ppl = ppl_edt_tabs.get_current_pipeline()
+        proc_lib_view = ppl_manager.processLibrary.process_library
 
         # Opens the package library pop-up
         self.main_window.package_library_pop_up()
@@ -3896,11 +3926,11 @@ class TestMIAMainWindow(TestMIACase):
 
         # Open a browser to select a package
         QFileDialog.exec_ = lambda x: True
-        ppl_manager.processLibrary.process_library.pkg_library.browse_package()
+        proc_lib_view.pkg_library.browse_package()
 
         # Fill in the line edit to "PKG" then click on the add package button
         pkg_lib_window.line_edit.setText(PKG)
-        ppl_manager.processLibrary.process_library.pkg_library.is_path = False
+        proc_lib_view.pkg_library.is_path = False
         pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
                                                       0).widget().clicked.emit()
 
@@ -3929,7 +3959,7 @@ class TestMIAMainWindow(TestMIACase):
         # Makes a mocked process folder "Mock_process" in the temporary
         # project path
         mock_proc_fldr = os.path.join(new_proj_path, 'processes',
-                                      'Mock_process')
+                                      'UTs_processes')
         os.makedirs(mock_proc_fldr, exist_ok=True)
 
         # Make a '__init__.py' in the mock_proc_fldr that raise an 'ImportError'
@@ -3937,12 +3967,12 @@ class TestMIAMainWindow(TestMIACase):
         init_file.write("raise ImportError('mock_import_error')")
         init_file.close()
 
-        # Make a 'test_unit_test.py' in the mock_proc_fldr with a real process
-        unit_test = open(os.path.join(mock_proc_fldr, 'unit_test.py'), 'w')
+        # Make a 'test_unit_test_1.py' in the mock_proc_fldr with a real process
+        unit_test = open(os.path.join(mock_proc_fldr, 'unit_test_1.py'), 'w')
         unit_test.writelines([
 "from capsul.api import Pipeline\n",
 "import traits.api as traits\n",
-"class Unit_test(Pipeline):\n",
+"class Unit_test_1(Pipeline):\n",
 "    def pipeline_definition(self):\n",
 "        self.add_process('smooth_1', 'mia_processes.bricks.preprocess.spm."
                                              "spatial_preprocessing.Smooth')\n",
@@ -4009,7 +4039,7 @@ class TestMIAMainWindow(TestMIACase):
 
         # Make a proper '__init__.py
         init_file = open(os.path.join(mock_proc_fldr, '__init__.py'), 'w')
-        init_file.write("from .unit_test import Unit_test")
+        init_file.write("from .unit_test_1 import Unit_test_1")
         init_file.close()
 
         # Clicks again on "install package" button
@@ -4018,8 +4048,33 @@ class TestMIAMainWindow(TestMIACase):
         # Closes the "installation processes" (from folder) pop up
         pkg_lib_window.pop_up_install_processes.close()
 
-        # Closes the package library pop-up
-        pkg_lib_window.close()
+        # Apply changes, close the package library pop-up
+        pkg_lib_window.ok_clicked()
+
+        # Switches to the pipeline manager tab
+        self.main_window.tabs.setCurrentIndex(2)
+
+        # Adds the processes Rename, creates the "rename_1" node
+        ppl_edt_tab.click_pos = QPoint(450, 500)
+        ppl_edt_tab.add_named_process(Rename)
+
+        # Exports the mandatory input and output plugs for "rename_1"
+        ppl_edt_tab.current_node_name = 'rename_1'
+        ppl_edt_tab.export_unconnected_mandatory_inputs()
+        ppl_edt_tab.export_all_unconnected_outputs()
+
+        # Saves the pipeline as the package 'Unit_test_pipeline' in
+        # User_processes
+        config = Config(config_path=self.config_path)
+        filename = os.path.join(config.get_mia_path(), 'processes',
+                                'User_processes', 'unit_test_pipeline.py')
+
+        save_pipeline(ppl, filename)
+        self.main_window.pipeline_manager.updateProcessLibrary(filename)
+
+        # Cleaning the process library in pipeline manager tab (deleting the
+        # package added in this test, or old one still existing)
+        self.clean_uts_packages(proc_lib_view)
 
     def test_package_library_dialog_del_pkg(self):
         """Creates a new project folder, opens the processes library and
@@ -4031,6 +4086,8 @@ class TestMIAMainWindow(TestMIACase):
             - QMessageBox.exec
             - QMessageBox.exec_
         """
+
+        PKG = 'nipype.interfaces.DataGrabber'
 
         # Creates a new project folder and switches to it
         new_proj_path = self.get_new_test_project(light=True)
@@ -4048,74 +4105,40 @@ class TestMIAMainWindow(TestMIACase):
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
 
-        PKG = 'nipype.interfaces.DataGrabber'
-
-
-
         # Make sure that PKG is already installed
         pkg_lib_window.line_edit.setText(PKG)
-
-
         ppl_manager.processLibrary.process_library.pkg_library.is_path = False
         pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
-                             0).widget().clicked.emit() #  Clicks on add package
+                             0).widget().clicked.emit()  # Clicks on add package
 
         # Apply changes, close the package library pop-up
         pkg_lib_window.ok_clicked()
-
-
 
         # Opens again the package library pop-up
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
 
-
-
-
-        #del_pkg_button = (pkg_lib_window.layout().children()[0].layout().
-        #                                       children()[3].itemAt(2).widget())
-
-
-
-
-
-
-
         # Tries to delete PKG
         pkg_lib_window.line_edit.setText(PKG)
-
-
-
-        #del_pkg_button.clicked.emit()  # Clicks on delete package
         pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
                           2).widget().clicked.emit()  # Clicks on delete package
 
-
         # Resets the previous action
         pkg_lib_window.del_list.selectAll()
-
-
-
         (pkg_lib_window.layout().children()[0].layout().itemAt(12).widget().
-         layout().itemAt(1).widget().clicked.emit())  #clicks on Reset
-
+                   layout().itemAt(1).widget().clicked.emit())  #clicks on Reset
 
         # Tries to delete again PKG
         pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
             2).widget().clicked.emit()  # Clicks on delete package
 
-
-
         # Close the package library pop-up
         QMessageBox.question = Mock(return_value=QMessageBox.No)
         pkg_lib_window.ok_clicked()  # Do not apply the modification
 
-
-
         # Opens again the package library pop-up
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
-
 
         # Tries to delete PKG
         pkg_lib_window.line_edit.setText(PKG)
@@ -4124,32 +4147,25 @@ class TestMIAMainWindow(TestMIACase):
 
         # Close the package library pop-up, apply changes for a package which
         # is part of nipype, the package is only removed.
-
         QMessageBox.question = Mock(return_value=QMessageBox.Yes)
-
-        # Mocks the execution of a dialog box
-        #QMessageBox.exec = lambda x: None
-        #QMessageBox.exec_ = lambda x: None
-
         pkg_lib_window.ok_clicked()
         pkg_lib_window.msg.close()  # Closes the warning message
-
-        #pkg_lib_window.line_edit.setText(PKG)
 
         # Add again PKG
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
         pkg_lib_window.line_edit.setText(PKG)
         pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
-                                                      0).widget().clicked.emit()
+                            0).widget().clicked.emit()  #  Clicks on add package
         pkg_lib_window.ok_clicked()
 
+        # Switches to the pipeline manager tab
+        self.main_window.tabs.setCurrentIndex(2)
 
-        # Selects the 'DataGrabber' package in Pipeline Manager
+        # Selects the 'DataGrabber' package in Pipeline Manager tab
         pkg_index = self.find_item_by_data(proc_lib_view, 'DataGrabber')
         (proc_lib_view.selectionModel().
-         select(pkg_index, QItemSelectionModel.SelectCurrent))
-
+                           select(pkg_index, QItemSelectionModel.SelectCurrent))
 
         # Tries to delete a package that cannot be deleted (is part of nipype),
         # selecting it and pressing the del key
@@ -4158,87 +4174,88 @@ class TestMIAMainWindow(TestMIACase):
         proc_lib_view.keyPressEvent(event)
         proc_lib_view.pkg_library.msg.close()
 
-
-
-        # pkg_lib_window.msg.close() # Closes the warning message
-
         # Tries to delete a package that cannot be deleted, calling the
         # function
         pkg_lib_window.delete_package()
-
-
         pkg_lib_window.msg.close()  # Closes the warning message
-
 
         # Tries to delete a package corresponding to an empty string
         pkg_lib_window.line_edit.setText('')
         pkg_lib_window.delete_package()
-
-
         pkg_lib_window.msg.close()  # Closes the warning message
-
-
-        # Switches to the pipeline manager tab
-        self.main_window.tabs.setCurrentIndex(2)
-
 
         # Adds the processes Rename, creates the "rename_1" node
         ppl_edt_tab.click_pos = QPoint(450, 500)
         ppl_edt_tab.add_named_process(Rename)
-
 
         # Exports the mandatory input and output plugs for "rename_1"
         ppl_edt_tab.current_node_name = 'rename_1'
         ppl_edt_tab.export_unconnected_mandatory_inputs()
         ppl_edt_tab.export_all_unconnected_outputs()
 
-
-        # Saves the pipeline as the package 'Unit_test_pipeline'
+        # Saves the pipeline as the package 'Unit_test_pipeline' in
+        # User_processes
         config = Config(config_path=self.config_path)
         filename = os.path.join(config.get_mia_path(), 'processes',
                                 'User_processes', 'unit_test_pipeline.py')
-
-
         save_pipeline(ppl, filename)
-
-
         self.main_window.pipeline_manager.updateProcessLibrary(filename)
 
-        ##############################################
-        """
-        # Gets the mia path
-        config = Config(config_path=self.config_path)
-        mia_path = config.get_mia_path()
+        # Makes a mocked process folder "Mock_process" in the temporary
+        # project path
+        mock_proc_fldr = os.path.join(new_proj_path, 'processes',
+                                      'UTs_processes')
+        os.makedirs(mock_proc_fldr, exist_ok=True)
 
-        # Mocks 'InstallProcesses.show'
-        # InstallProcesses.show = lambda x: None
+        if os.path.exists(os.path.join(config.get_mia_path(), 'processes',
+                                    'User_processes', 'unit_test_pipeline.py')):
+            shutil.copy(os.path.join(config.get_mia_path(),
+                                     'processes',
+                                     'User_processes',
+                                     'unit_test_pipeline.py'),
+                        os.path.join(mock_proc_fldr, 'unit_test_2.py'))
 
-        # Imports the user processes folder as a package
+            with open(os.path.join(mock_proc_fldr, 'unit_test_2.py'), 'r') as file:
+                filedata = file.read()
+                filedata = filedata.replace('Unit_test_pipeline', 'Unit_test_2')
+
+            with open(os.path.join(mock_proc_fldr, 'unit_test_2.py'), 'w') as file:
+                file.write(filedata)
+
+            init_file = open(os.path.join(mock_proc_fldr, '__init__.py'), 'w')
+            init_file.write("from .unit_test_2 import "
+                            "Unit_test_2")
+            init_file.close()
+
+        # Imports the UTs_processes processes folder as a package
         pkg_lib_window.install_processes_pop_up()
-        pkg_folder = os.path.join(mia_path, 'processes', 'User_processes')
-        pkg_lib_window.pop_up_install_processes.path_edit.setText(pkg_folder)
+        pkg_lib_window.pop_up_install_processes.path_edit.setText(
+                                                                 mock_proc_fldr)
+        QMessageBox.exec = lambda x: QMessageBox.Ok
         (pkg_lib_window.pop_up_install_processes.layout().children()[-1].
          itemAt(0).widget().clicked.emit())
         pkg_lib_window.pop_up_install_processes.close()
+        pkg_lib_window.ok_clicked()
 
-        # Gets the 'test_pipeline' index and selects it
+        # Gets the 'Unit_test_2' index and selects it
         test_ppl_index = self.find_item_by_data(proc_lib_view,
-                                                'Unit_test_pipeline')
+                                                'Unit_test_2')
         (proc_lib_view.selectionModel().
          select(test_ppl_index, QItemSelectionModel.SelectCurrent))
 
-        # Tries to delete the package 'test_pipeline', rejects the
+        # Tries to delete the package 'Unit_test_2', rejects the
         # dialog box
         QMessageBox.question = Mock(return_value=QMessageBox.No)
         proc_lib_view.keyPressEvent(event)
 
-        # Effectively deletes the package 'test_pipeline', accepting the
+        # Effectively deletes the package 'Unit_test_2', accepting the
         # dialog box
         QMessageBox.question = Mock(return_value=QMessageBox.Yes)
         proc_lib_view.keyPressEvent(event)
 
-        pkg_lib_window.close()
-        """
+        # Cleaning the process library in pipeline manager tab (deleting the
+        # package added in this test, or old one still existing)
+        self.clean_uts_packages(proc_lib_view)
 
     def test_package_library_dialog_rmv_pkg(self):
         '''
@@ -6473,6 +6490,9 @@ class TestMIAPipelineEditor(TestMIACase):
         - QMessageBox.exec
         - QFileDialog.getSaveFileName
         '''
+
+        # FIXME: this method removes the User_processes and so we lose all
+        #        the user's packages!
 
         # Sets often used shortcuts
         ppl_edt_tabs = self.main_window.pipeline_manager.pipelineEditorTabs

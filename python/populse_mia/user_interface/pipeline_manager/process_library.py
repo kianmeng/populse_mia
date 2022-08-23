@@ -392,7 +392,7 @@ class InstallProcesses(QDialog):
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Critical)
                     msg.setText(('During the installation of {0}, '
-                                 'the folllowing exception was raised:'
+                                 'the following exception was raised:'
                                  '\n{1}: {2}.\nThis exception maybe '
                                  'prevented the installation ...').format(
                         module_name, er.__class__, er))
