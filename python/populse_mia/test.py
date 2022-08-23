@@ -4099,7 +4099,6 @@ class TestMIAMainWindow(TestMIACase):
         ppl_edt_tab = ppl_edt_tabs.get_current_editor()
         ppl = ppl_edt_tabs.get_current_pipeline()
         proc_lib_view = ppl_manager.processLibrary.process_library
-        #pkg_lib_window = proc_lib_view.pkg_library
 
         # Opens the package library pop-up
         self.main_window.package_library_pop_up()
@@ -4215,11 +4214,13 @@ class TestMIAMainWindow(TestMIACase):
                                      'unit_test_pipeline.py'),
                         os.path.join(mock_proc_fldr, 'unit_test_2.py'))
 
-            with open(os.path.join(mock_proc_fldr, 'unit_test_2.py'), 'r') as file:
+            with open(os.path.join(mock_proc_fldr, 'unit_test_2.py'),
+                      'r') as file:
                 filedata = file.read()
                 filedata = filedata.replace('Unit_test_pipeline', 'Unit_test_2')
 
-            with open(os.path.join(mock_proc_fldr, 'unit_test_2.py'), 'w') as file:
+            with open(os.path.join(mock_proc_fldr, 'unit_test_2.py'),
+                      'w') as file:
                 file.write(filedata)
 
             init_file = open(os.path.join(mock_proc_fldr, '__init__.py'), 'w')
