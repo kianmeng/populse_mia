@@ -4458,7 +4458,7 @@ class TestMIAMainWindow(TestMIACase):
 
         - Tests: PackageLibraryDialog
 
-        - Mocks
+        - Mocks:
             - QMessageBox.exec
             - QMessageBox.exec_
         """
@@ -4531,23 +4531,21 @@ class TestMIAMainWindow(TestMIACase):
         #self.assertNotIn(del_prjct, savedProjects.loadSavedProjects()['paths'])
 
     def test_popUpDeleteProject(self):
-        '''
-        Creates a new project and deletes it.
-        Tests
-         - MainWindow.delete_project
-         - PopUpDeleteProject.
+        """Creates a new project and deletes it.
 
-        Notes
-        -----
-        Not to be confused with PopUpDeletedProject.
-        '''
+        Not to be confused with test_PopUpDeletedProject!
+
+        - Tests:
+            - MainWindow.delete_project
+            - PopUpDeleteProject.
+        """
 
         # Gets a new project
         test_proj_path = self.get_new_test_project()
         self.main_window.switch_project(test_proj_path, 'test_project')
 
         # Instead of executing the pop-up, only shows it
-        # This avoid thread deadlocking
+        # This avoids thread deadlocking
         QMessageBox.exec = lambda self_: self_.show()
 
         # Resets the projects folder
@@ -4559,14 +4557,13 @@ class TestMIAMainWindow(TestMIACase):
 
         # Sets a projects save directory
         config = Config(config_path=self.config_path)
-        proj_save_path = os.path.join(config.get_mia_path(),
-                                      os.path.split(test_proj_path)[0])
+        proj_save_path = os.path.split(test_proj_path)[0]
         config.set_projects_save_path(proj_save_path)
 
         # Append 'test_proj_path' to 'saved_projects.pathsList' and
         # 'opened_projects', to increase coverage
-        (self.main_window.saved_projects.pathsList.
-         append(os.path.relpath(test_proj_path)))
+        self.main_window.saved_projects.pathsList.append(os.path.relpath(
+                                                                test_proj_path))
         config.set_opened_projects([os.path.relpath(test_proj_path)])
 
         # PopUpDeleteProject.exec = lambda self_: self_.show()
@@ -4584,33 +4581,28 @@ class TestMIAMainWindow(TestMIACase):
         QMessageBox.question = Mock(return_value=QMessageBox.YesToAll)
         exPopup.ok_clicked()
 
-        print(5)
-
     def test_see_all_projects(self):
-        '''
-        Creates 2 projects and tries to open them through the all
-        projects pop-up.
-        Tests
-        - MainWindow.see_all_projects
-        - PopUpSeeAllProjects
+        """Creates 2 projects and tries to open them through the all projects pop-up.
 
-        Notes
-        -----
-        Mocks
-        - PopUpSeeAllProjects.exec
-        - QMessageBox.exec
-        '''
+        - Tests:
+            - MainWindow.see_all_projects
+            - PopUpSeeAllProjects
+
+        - Mocks:
+            - PopUpSeeAllProjects.exec
+            - QMessageBox.exec
+        """
 
         # Sets shortcuts for objects that are often used
         main_wnd = self.main_window
 
         # Creates 2 new project folders
-        project_8_path = self.get_new_test_project(name = 'project_8')
-        project_9_path = self.get_new_test_project(name = 'project_9')
+        project_8_path = self.get_new_test_project(name='project_8')
+        project_9_path = self.get_new_test_project(name='project_9')
 
         # Sets the projects save path
         config = Config(config_path=self.config_path)
-        config.set_projects_save_path(os.path.split(project_8_path)[0])
+        config.set_projects_save_path(self.config_path)
 
         # Adds the projects to the 'pathsList'
         main_wnd.saved_projects.pathsList.append(project_8_path)
@@ -4626,10 +4618,15 @@ class TestMIAMainWindow(TestMIACase):
         # Show the projects pop-up
         main_wnd.see_all_projects()
 
-        item_0 = self.main_window.exPopup.treeWidget.itemAt(0,0)
+        item_0 = self.main_window.exPopup.treeWidget.itemAt(0, 0)
         self.assertEqual(item_0.text(0), 'project_8')
         self.assertEqual(main_wnd.exPopup.treeWidget.itemBelow(item_0).text(0),
                          'project_9')
+
+        # Asserts that project 8 is not opened:
+        config = Config(config_path=self.config_path)
+        self.assertNotEqual(os.path.abspath(config.get_opened_projects()[0]),
+                            project_8_path)
 
         # Tries to open a project with no projects selected
         main_wnd.exPopup.open_project()
@@ -4642,6 +4639,8 @@ class TestMIAMainWindow(TestMIACase):
 
         # Asserts that project 8 is now opened
         config = Config(config_path=self.config_path)
+        self.assertEqual(os.path.abspath(config.get_opened_projects()[0]),
+                         project_8_path)
 
     def test_software_preferences_pop_up(self):
         """

@@ -1176,7 +1176,7 @@ class PopUpDeletedProject(QMessageBox):
 
 
 class PopUpDeleteProject(QDialog):
-    """Is called when the user wants to run an delete a project.
+    """Is called when the user wants to delete a project.
 
     .. Methods:
         - ok_clicked: delete the selected projects after confirmation
