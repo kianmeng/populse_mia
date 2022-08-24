@@ -227,6 +227,9 @@ class TestMIACase(unittest.TestCase):
               correspond to the argument data
             - get_new_test_project: create a temporary project that can 
               be safely modified
+            - proclibview_nipype_state: give the state of nipype in the process
+            - proclibview_nipype_reset_state: reset nipype to its initial state
+              (before the start of the current test) in the process library view
             - restart_MIA: restarts MIA within a unit test
             - setUp: called automatically before each test method
             - setUpClass: called before tests in the individual class
@@ -436,6 +439,93 @@ class TestMIACase(unittest.TestCase):
         
         shutil.copytree(test_proj, new_test_proj)
         return new_test_proj
+
+    def proclibview_nipype_state(self, proc_lib_view):
+        """Give the state of nipype proc_lib_view.
+
+        :param proc_lib_view: the process library view object
+
+        :returns: the state of nipype proc_lib_view:
+                  - None: proc_lib_view is empty or nipype is not loaded.
+                  - 'nipype': 'nipype' is loaded but 'interfaces' not.
+                  - 'nipype.interface': 'nipype.interface' is loaded but
+                                        'DataGrabber' not.
+                  - 'process_enabled': 'nipype.interface.DataGrabber' is loaded.
+        """
+
+        if proc_lib_view.to_dict():
+
+            if proc_lib_view.to_dict().get('nipype'):
+
+                if proc_lib_view.to_dict().get('nipype').get('interfaces'):
+
+                    if proc_lib_view.to_dict().get(
+                                                 'nipype').get(
+                                                       'interfaces').get(
+                                                                 'DataGrabber'):
+                        state = proc_lib_view.to_dict().get(
+                                                     'nipype').get(
+                                                         'interfaces').get(
+                                                                  'DataGrabber')
+
+                    else:
+                        state = 'nipype.interfaces'
+
+                else:
+                    state = 'nipype'
+
+            else:
+                state = None
+
+        else:
+            state = None
+
+        return state
+
+    def proclibview_nipype_reset_state(self, main_window, ppl_manager,
+                                       init_state):
+        """Reset the process library view to its initial state.
+
+         :param main_window: the main window object
+         :param ppl_manager: the pipeline manager object
+         :param init_state: the initial state of nipype proc_lib_view:
+                            - None: proc_lib_view is empty or nipype is not
+                                    loaded.
+                            - 'nipype': 'nipype' is loaded but 'interfaces' not.
+                            - 'nipype.interface': 'nipype.interface' is loaded
+                                                  but 'DataGrabber' not.
+                            - 'process_enabled': 'nipype.interface.DataGrabber'
+                                                 is loaded.
+         """
+        main_window.package_library_pop_up()
+        pkg_lib_window = main_window.pop_up_package_library
+        ppl_manager.processLibrary.process_library.pkg_library.is_path = False
+
+        if init_state is None:
+            pkg_lib_window.line_edit.setText('nipype')
+            # Clicks on remove package
+            pkg_lib_window.layout().children()[0].layout().children(
+            )[3].itemAt(1).widget().clicked.emit()
+
+        elif init_state == 'nipype':
+            pkg_lib_window.line_edit.setText('nipype.interfaces')
+            # Clicks on remove package
+            pkg_lib_window.layout().children()[0].layout().children(
+            )[3].itemAt(1).widget().clicked.emit()
+
+        elif init_state == 'nipype.interfaces':
+            pkg_lib_window.line_edit.setText('nipype.interfaces.DataGrabber')
+            # Clicks on remove package
+            pkg_lib_window.layout().children()[0].layout().children(
+            )[3].itemAt(1).widget().clicked.emit()
+
+        else:
+            pkg_lib_window.line_edit.setText('nipype.interfaces.DataGrabber')
+            # Clicks on add package
+            pkg_lib_window.layout().children()[0].layout().children(
+            )[3].itemAt(0).widget().clicked.emit()
+
+        pkg_lib_window.ok_clicked()
 
     def restart_MIA(self):
         """Restarts MIA within a unit test.
@@ -4101,19 +4191,20 @@ class TestMIAMainWindow(TestMIACase):
         ppl = ppl_edt_tabs.get_current_pipeline()
         proc_lib_view = ppl_manager.processLibrary.process_library
 
-        # Make sure that PKG is already installed
-        init_state = proc_lib_view.to_dict().get('nipype').get(
-                                          'interfaces').get('DataGrabber', None)
+        # Takes the initial state of nipype proc_lib_view and makes sure that
+        # PKG is already installed
+
+        init_state = self.proclibview_nipype_state(proc_lib_view)
 
         if init_state != 'process_enabled':
-            # Opens the package library pop-up
             self.main_window.package_library_pop_up()
             pkg_lib_window = self.main_window.pop_up_package_library
             pkg_lib_window.line_edit.setText(PKG)
             (ppl_manager.processLibrary.process_library.
                                                     pkg_library.is_path) = False
+            # Clicks on add package
             pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
-                                                      0).widget().clicked.emit()  # Clicks on add package
+                                                      0).widget().clicked.emit()
             pkg_lib_window.ok_clicked()
 
         # Opens the package library pop-up
@@ -4257,23 +4348,12 @@ class TestMIAMainWindow(TestMIACase):
         QMessageBox.question = Mock(return_value=QMessageBox.Yes)
         proc_lib_view.keyPressEvent(event)
 
-        # Resets the process library to its original state
-        self.main_window.package_library_pop_up()
-        pkg_lib_window = self.main_window.pop_up_package_library
-        pkg_lib_window.line_edit.setText(PKG)
-        (ppl_manager.processLibrary.process_library.pkg_library.is_path) = False
+        # Resets the process library to its original state for nipype
+        cur_state = self.proclibview_nipype_state(proc_lib_view)
 
-        if init_state is not None:
-            # Clicks on add package
-            pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
-                                                      0).widget().clicked.emit()
-
-        else:
-            #Clicks on remove package
-            pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
-                                                     1).widget().clicked.emit()
-
-        pkg_lib_window.ok_clicked()
+        if cur_state != init_state:
+            self.proclibview_nipype_reset_state(self.main_window, ppl_manager,
+                                                init_state)
 
         # Cleaning the process library in pipeline manager tab (deleting the
         # package added in this test, or old one still existing)
@@ -4300,11 +4380,11 @@ class TestMIAMainWindow(TestMIACase):
         ppl_manager = self.main_window.pipeline_manager
         proc_lib_view = ppl_manager.processLibrary.process_library
 
-        init_state = proc_lib_view.to_dict().get('nipype').get(
-                                          'interfaces').get('DataGrabber', None)
+        # Takes the initial state of nipype proc_lib_view and makes sure that
+        # PKG is already installed
+        init_state = self.proclibview_nipype_state(proc_lib_view)
 
         if init_state != 'process_enabled':
-            # Opens the package library pop-up
             self.main_window.package_library_pop_up()
             pkg_lib_window = self.main_window.pop_up_package_library
             pkg_lib_window.line_edit.setText(PKG)
@@ -4315,7 +4395,7 @@ class TestMIAMainWindow(TestMIACase):
                                                       0).widget().clicked.emit()
             pkg_lib_window.ok_clicked()
 
-        # Opens again the package library pop-up
+        # Opens the package library pop-up
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
 
@@ -4359,20 +4439,12 @@ class TestMIAMainWindow(TestMIACase):
         pkg_lib_window.remove_package_with_text(_2rem=PKG,
                                                 tree_remove=False)
 
-        # Resets the process library to its original state
-        current_state = proc_lib_view.to_dict().get('nipype').get(
-                                          'interfaces').get('DataGrabber', None)
+        # Resets the process library to its original state for nipype
+        cur_state = self.proclibview_nipype_state(proc_lib_view)
 
-        if current_state != init_state:
-            self.main_window.package_library_pop_up()
-            pkg_lib_window = self.main_window.pop_up_package_library
-            pkg_lib_window.line_edit.setText(PKG)
-            (ppl_manager.processLibrary.process_library.
-                                                    pkg_library.is_path) = False
-            # Clicks on add package
-            pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
-                                                      0).widget().clicked.emit()
-            pkg_lib_window.ok_clicked()
+        if cur_state != init_state:
+            self.proclibview_nipype_reset_state(self.main_window, ppl_manager,
+                                                init_state)
 
         # Saves the config to 'process_config.yml'
         ppl_manager.processLibrary.save_config()
