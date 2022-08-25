@@ -3344,11 +3344,11 @@ class PopUpPreferences(QDialog):
                                     err = err.decode('utf-8')
 
                                 print("\nWarning: The configuration for Matlab"
-                                      "MCR and SPM standalone as defined in"
-                                      "Mia's preferences seems to be valid but "
-                                      "the following issue has been detected:\n"
-                                      "{}\nPlease fix this problem to avoid a "
-                                      "malfunction ...".format(err))
+                                      " MCR and SPM standalone as defined in"
+                                      " Mia's preferences seems to be valid "
+                                      "but the following issue has been "
+                                      "detected:\n{}\nPlease fix this issue"
+                                      " to avoid a malfunction ...".format(err))
 
                             elif err != b'':
 
