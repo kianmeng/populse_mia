@@ -4643,32 +4643,30 @@ class TestMIAMainWindow(TestMIACase):
                          project_8_path)
 
     def test_software_preferences_pop_up(self):
-        """
-        Opens the preferences pop up and changes parameters.
-        Tests
-          - MainWindow.software_preferences_pop_up
-          - PopUpPreferences
+        """Opens the preferences pop up and changes parameters.
 
-        Notes
-        -----
-        Mocks
-          - QFileDialog.getOpenFileName
-          - QFileDialog.getExistingDirectory
-          - QLineEdit.text
-          - QDialog.exec
-          - QMessageBox.exec
-          - QPlainTextEdit.toPlainText
+        - Tests:
+            - MainWindow.software_preferences_pop_up
+            - PopUpPreferences
+
+        - Mocks
+            - QFileDialog.getOpenFileName
+            - QFileDialog.getExistingDirectory
+            - QLineEdit.text
+            - QDialog.exec
+            - QMessageBox.exec
+            - QPlainTextEdit.toPlainText
         """
 
         # Sets shortcuts for objects that are often used
         main_wnd = self.main_window
         ppl_manager = main_wnd.pipeline_manager
 
-        # Creates a new project folder and adds one document to the 
-        # project, sets the plug value that is added to the database
+        # Creates a new project folder and adds one document to the project
         project_8_path = self.get_new_test_project()
         ppl_manager.project.folder = project_8_path
 
+        # Modification of some configuration parameters
         config = Config(config_path=self.config_path)
         config.setControlV1(True)
         config.setAutoSave(True)
@@ -4678,49 +4676,63 @@ class TestMIAMainWindow(TestMIACase):
         config.set_use_ants(True)
         config.set_mainwindow_size([100, 100, 100])
 
+        # Open and close the software preferences window
         main_wnd.software_preferences_pop_up()
-        
         main_wnd.pop_up_preferences.close()
 
+        # Activate the V1 controller GUI and the user mode
         config.setControlV1(False)
-
-        # Enables the user mode
         config.set_user_mode(True)
         
-        # Enables Matbalb Standalone
+        # Enables Matlab MCR
         config.set_use_matlab_standalone(True)
+
+        # Check that matlab MCR is selected
         main_wnd.software_preferences_pop_up()
         self.assertTrue(main_wnd.pop_up_preferences
-                        .use_matlab_standalone_checkbox.isChecked())
+                                    .use_matlab_standalone_checkbox.isChecked())
         main_wnd.pop_up_preferences.close()
 
-        # Enables Matbalb
+        # Enables Matlab
         config.set_use_matlab(True)
+
+        # Check that matlab is selected and matlab MCR not
         main_wnd.software_preferences_pop_up()
         self.assertTrue(main_wnd.pop_up_preferences
-                        .use_matlab_checkbox.isChecked())
+                                               .use_matlab_checkbox.isChecked())
+        self.assertFalse(main_wnd.pop_up_preferences
+                                    .use_matlab_standalone_checkbox.isChecked())
         main_wnd.pop_up_preferences.close()
 
         # Enables SPM
         config.set_use_spm(True)
+
+        # Check that SPM and matlab are selected
         main_wnd.software_preferences_pop_up()
         self.assertTrue(main_wnd.pop_up_preferences
-                        .use_matlab_checkbox.isChecked())
+                                               .use_matlab_checkbox.isChecked())
         self.assertTrue(main_wnd.pop_up_preferences
-                        .use_spm_checkbox.isChecked())
+                                               .use_spm_checkbox.isChecked())
         main_wnd.pop_up_preferences.close()
 
         # Enables SPM standalone
         config.set_use_spm_standalone(True)
-        #if 'Windows' not in architecture()[1]: 
-        #    self.assertTrue(main_wnd.pop_up_preferences
-        #                    .use_matlab_standalone_checkbox.isChecked())
-        #self.assertTrue(main_wnd.pop_up_preferences
-        #                .use_spm_standalone_checkbox.isChecked())
+
+        # Check that SPM standalone and matlab MCR are selected,
+        # SPM and matlab not
         main_wnd.software_preferences_pop_up()
+        if 'Windows' not in platform.architecture()[1]:
+            self.assertTrue(main_wnd.pop_up_preferences
+                                    .use_matlab_standalone_checkbox.isChecked())
+            self.assertTrue(main_wnd.pop_up_preferences
+                                       .use_spm_standalone_checkbox.isChecked())
+            self.assertFalse(main_wnd.pop_up_preferences
+                                               .use_matlab_checkbox.isChecked())
+            self.assertFalse(main_wnd.pop_up_preferences
+                                                  .use_spm_checkbox.isChecked())
         main_wnd.pop_up_preferences.close()
 
-        # Mocks 'QFileDialog.getOpenFileName' (returns an exising file)
+        # Mocks 'QFileDialog.getOpenFileName' (returns an existing file)
         # This method returns a tuple (filename, file_types), where file_types
         # is the allowed file type (eg. 'All Files (*)')
         mock_path = os.path.split(project_8_path)[0]
@@ -4729,6 +4741,7 @@ class TestMIAMainWindow(TestMIACase):
         # Mocks 'QFileDialog.getExistingDirectory'
         QFileDialog.getExistingDirectory = lambda x, y, z: mock_path
 
+        # Open the software preferences window
         main_wnd.software_preferences_pop_up()
 
         # Browses the FSL path
@@ -4751,9 +4764,20 @@ class TestMIAMainWindow(TestMIACase):
         self.assertEqual(main_wnd.pop_up_preferences.matlab_choice.text(),
                          mock_path)
 
-        # Browses the MATLAB Standalone path
+        # Browses the MATLAB MCR path
         main_wnd.pop_up_preferences.browse_matlab_standalone()
         self.assertEqual(main_wnd.pop_up_preferences.matlab_standalone_choice.
+                                                                         text(),
+                         mock_path)
+
+        # Browses the SPM path
+        main_wnd.pop_up_preferences.browse_spm()
+        self.assertEqual(main_wnd.pop_up_preferences.spm_choice.text(),
+                         mock_path)
+
+        # Browses the SPM Standalone path
+        main_wnd.pop_up_preferences.browse_spm_standalone()
+        self.assertEqual(main_wnd.pop_up_preferences.spm_standalone_choice.
                                                                          text(),
                          mock_path)
 
@@ -4767,17 +4791,6 @@ class TestMIAMainWindow(TestMIACase):
         main_wnd.pop_up_preferences.browse_projects_save_path()
         self.assertEqual(main_wnd.pop_up_preferences.
                                             projects_save_path_line_edit.text(),
-                         mock_path)
-
-        # Browses the SPM path
-        main_wnd.pop_up_preferences.browse_spm()
-        self.assertEqual(main_wnd.pop_up_preferences.spm_choice.text(), 
-                         mock_path)
-
-        # Browses the SPM Standalone path
-        main_wnd.pop_up_preferences.browse_spm_standalone()
-        self.assertEqual(main_wnd.pop_up_preferences.spm_standalone_choice.
-                                                                         text(),
                          mock_path)
 
         # Sets the admin password to be 'mock_admin_password'
@@ -4794,7 +4807,7 @@ class TestMIAMainWindow(TestMIACase):
         QInputDialog.getText = lambda w, x, y, z, : (None, False)
         main_wnd.pop_up_preferences.admin_mode_switch()
 
-        # Tries to activates admin mode with the wrong password
+        # Tries to activate admin mode with the wrong password
         main_wnd.pop_up_preferences.admin_mode_checkbox.setChecked(True)
         QInputDialog.getText = lambda w, x, y, z, : ('mock_wrong_password',
                                                      True)
@@ -4807,7 +4820,7 @@ class TestMIAMainWindow(TestMIACase):
         main_wnd.pop_up_preferences.admin_mode_switch()
         self.assertTrue(main_wnd.pop_up_preferences.change_psswd.isVisible())
 
-        # Mocks the old passowd text field to be 'mock_admin_password'
+        # Mocks the old passwd text field to be 'mock_admin_password'
         # (and the other textfields too!)
         #QLineEdit.text = lambda x: admin_password
 
@@ -4825,13 +4838,13 @@ class TestMIAMainWindow(TestMIACase):
                          QMessageBox.Critical)
         main_wnd.pop_up_preferences.msg.close()
 
-        # Sets the mainwindow size
+        # Sets the main window size
         main_wnd.pop_up_preferences.use_current_mainwindow_size(main_wnd)
 
         # Mocks the click of the OK button on 'QMessageBox.exec' 
         QMessageBox.exec = lambda x: QMessageBox.Yes
 
-        # Programs the controler version to change to V1
+        # Programs the controller version to change to V1
         main_wnd.pop_up_preferences.control_checkbox_toggled(main_wnd)
         main_wnd.pop_up_preferences.control_checkbox_changed = True
         self.assertTrue(main_wnd.get_controller_version())
@@ -4857,6 +4870,7 @@ class TestMIAMainWindow(TestMIACase):
         #main_wnd.pop_up_preferences.edit_capsul_config()
         # FIXME: failing in MacOS build
 
+        # Close the software preferences window
         main_wnd.pop_up_preferences.close()
 
     def test_software_preferences_pop_up_config_file(self):
