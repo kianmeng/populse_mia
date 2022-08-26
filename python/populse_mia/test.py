@@ -5565,35 +5565,35 @@ class TestMIAMainWindow(TestMIACase):
         self.assertFalse(res)
 
     def test_tab_changed(self):
-        '''
-        Switches between data browser, data viewer and pipeline manager.
-        Tests MainWindow.tab_changed.
+        """Switches between tabs.
 
-        Notes
-        -----
-        Mocks QMessageBox.exec.
-        '''
+        Data browser, data viewer and pipeline manager.
+
+        Tests: MainWindow.tab_changed.
+
+        Mocks: QMessageBox.exec.
+        """
 
         # Creates a test project
         test_proj_path = self.get_new_test_project(light=True)
         self.main_window.switch_project(test_proj_path, 'test_project')
 
-        # Sets shortcuts for objects that are often used
+        # Set shortcuts for objects that are often used
         data_browser = self.main_window.data_browser
 
         # Switches to data viewer
-        self.main_window.tabs.setCurrentIndex(1) # Calls tab_changed()
+        self.main_window.tabs.setCurrentIndex(1)  # Calls tab_changed()
         self.assertEqual(self.main_window.tabs.currentIndex(), 1)
 
         # Deletes a scan from data browser
         data_browser.table_data.selectRow(0)
         data_browser.table_data.remove_scan()
 
-        # Mocks the execution of a dialog box by accpeting it
+        # Mocks the execution of a dialog box by accepting it
         QMessageBox.exec = lambda self_, *arg: self_.accept()
 
         # Switch to pipeline manager with unsaved modifications
-        self.main_window.tabs.setCurrentIndex(2) # Calls tab_changed()
+        self.main_window.tabs.setCurrentIndex(2)  # Calls tab_changed()
         self.assertEqual(self.main_window.tabs.currentIndex(), 2)
 
         # Mocks nots list
