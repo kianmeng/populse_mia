@@ -5605,9 +5605,9 @@ class TestMIAMainWindow(TestMIACase):
 
 
 class TestMIANodeController(TestMIACase):
-    '''
-    Tests for the node controller, part of the pipeline manager tab.
-    Tests NodeController.
+    """Tests for the node controller, part of the pipeline manager tab.
+
+    - Tests: NodeController.
 
     :Contains:
         :Method:  
@@ -5624,18 +5624,14 @@ class TestMIANodeController(TestMIACase):
             - test_plug_filter: displays a plug filter and modifies it
             - test_update_node_name: displays node parameters and 
               updates its name.
-    '''
+    """
     
     def test_attributes_filter(self):
-        '''
-        Displays the parameters of a node, displays an attributes filter
+        """Displays the parameters of a node, displays an attributes filter
         and modifies it.
 
-        Notes:
-        -----
-        Tests AttributesFilter within the Node Controller V2
-        (CapsulNodeController()).
-        '''
+        - Tests: AttributesFilter in V2 controller GUI (CapsulNodeController).
+        """
 
         # Opens project 8 and switches to it
         project_8_path = self.get_new_test_project()
@@ -5649,7 +5645,7 @@ class TestMIANodeController(TestMIACase):
         ppl_edt_tabs.get_current_editor().add_named_process(Smooth)
         pipeline = ppl_edt_tabs.get_current_pipeline()
 
-        # Exports the input plugs
+        # Exports the unconnected mandatory plugs
         ppl_edt_tabs.get_current_editor().current_node_name = 'smooth_1'
         (ppl_edt_tabs.
                  get_current_editor)().export_node_unconnected_mandatory_plugs()
@@ -5672,13 +5668,11 @@ class TestMIANodeController(TestMIACase):
         attributes_filter.ok_clicked()
 
     def test_capsul_node_controller(self):
-        """
-        Adds, changes and deletes processes using the capsul node
-        controller, displays the attributes filter.
+        """Adds, changes and deletes processes using the capsul node controller.
 
-        Notes:
-        ------
-        Tests the class CapsulNodeController().
+        Displays the attributes filter.
+
+        Tests: CapsulNodeController
         """
 
         # Opens project 8 and switches to it
@@ -5728,7 +5722,7 @@ class TestMIANodeController(TestMIACase):
         self.main_window.pipeline_manager.displayNodeParameters('rename_1',
                                                                 rename_process)
 
-        # Exports the input plugs for "rename_1"
+        # Exports plugs for "rename_1"
         ppl_edt_tabs.get_current_editor().current_node_name = 'rename_1'
         ppl_edt_tabs.get_current_editor().export_unconnected_mandatory_inputs()
         ppl_edt_tabs.get_current_editor().export_all_unconnected_outputs()
@@ -5738,11 +5732,11 @@ class TestMIANodeController(TestMIACase):
                                                   'new_name.nii')
 
         # Runs pipeline and expects an error
-        # self.main_window.pipeline_manager.runPipeline()
-        # FIXME: running the pipeline gives the error "wrapped C/C++ object of
-        #        type PipelineEditorTabs has been deleted".
+        #self.main_window.pipeline_manager.runPipeline()
+        # FIXME: running the pipeline gives the error:
+        #        ModuleNotFoundError: No module named 'capsul'
 
-        # Displays attributes filter
+        # Displays the attributes filter
         node_ctrler.filter_attributes()
         attributes_filter = node_ctrler.pop_up
         attributes_filter.table_data.selectRow(0)
@@ -5753,9 +5747,7 @@ class TestMIANodeController(TestMIACase):
         node_ctrler.update_parameters()
 
     def test_display_filter(self):
-        """
-        Displays parameters of a node and displays a plug filter
-        """
+        """Displays parameters of a node and displays a plug filter."""
 
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
                                                              pipelineEditorTabs)
@@ -5796,35 +5788,36 @@ class TestMIANodeController(TestMIACase):
                                                                  "synchronize"))
 
     def test_filter_widget(self):
-        """
-        Places a node of the "Input_Filter" process, feeds in documents
+        """Places a node of the "Input_Filter" process, feeds in documents
         and opens up the "FilterWidget()" to modify its parameters.
 
-        Notes:
-        -----
         Tests the class FilterWidget() within the Node Controller V1
         (class NodeController()). The class FilterWidget() is
         independent on the Node
         Controller version (V1 or V2) and can be used in both of them.
         """
 
-        # Switches to node controller V1
         config = Config(config_path=self.config_path)
-        config.setControlV1(True)
+        controlV1_ver = config.isControlV1()
 
-        self.restart_MIA()
+        # Switch to V1 node controller GUI, if necessary
+        if not controlV1_ver:
+            config.setControlV1(True)
+            self.restart_MIA()
 
         # Opens project 8 and switches to it
         project_8_path = self.get_new_test_project()
         self.main_window.switch_project(project_8_path, "project_8")
 
+        DOCUMENT_1 = (self.main_window.project.session.
+                                              get_documents_names)("current")[0]
         DOCUMENT_2 = (self.main_window.project.session.
                                               get_documents_names)("current")[1]
 
         ppl_edt_tabs = self.main_window.pipeline_manager.pipelineEditorTabs
         node_ctrler = self.main_window.pipeline_manager.nodeController
 
-        # Adds the process Smooth, creates the node "input_filter_1"
+        # Adds the process "input_filter_1"
         process_class = Input_Filter
         ppl_edt_tabs.get_current_editor().click_pos = QPoint(450, 500)
         ppl_edt_tabs.get_current_editor().add_named_process(process_class)
@@ -5854,42 +5847,52 @@ class TestMIANodeController(TestMIACase):
         ppl_edt_tabs.open_filter('input_filter_1')
         input_filter = ppl_edt_tabs.filter_widget
 
-        #index_DOCUMENT_1 = input_filter.table_data.get_scan_row(DOCUMENT_1)
-        #index_DOCUMENT_2 = input_filter.table_data.get_scan_row(DOCUMENT_2)
+        index_DOCUMENT_1 = input_filter.table_data.get_scan_row(DOCUMENT_1)
+        index_DOCUMENT_2 = input_filter.table_data.get_scan_row(DOCUMENT_2)
 
         # Tries to search for an empty string and asserts that none of the
-        # documents are not hidden
+        # documents are hidden
         input_filter.search_str('')
-        # self.assertFalse(input_filter.table_data.isRowHidden(index_DOCUMENT_1)) # if "DOCUMENT_1" is not hidden
-        # self.assertFalse(input_filter.table_data.isRowHidden(index_DOCUMENT_2)) # if "DOCUMENT_1" is not hidden
+
+        # Test "DOCUMENT_1" is not hidden
+        self.assertFalse(input_filter.table_data.isRowHidden(index_DOCUMENT_1))
+        # Test "DOCUMENT_2" is not hidden
+        self.assertFalse(input_filter.table_data.isRowHidden(index_DOCUMENT_2))
 
         # Searches for "DOCUMENT_2" and verifies that "DOCUMENT_1" is hidden
         input_filter.search_str(DOCUMENT_2)
-        # self.assertTrue(input_filter.table_data.isRowHidden(index_DOCUMENT_1))
+        self.assertTrue(input_filter.table_data.isRowHidden(index_DOCUMENT_1))
 
-        # Resets the search bar and assert that none of the documents are not hidden
+        # Resets the search bar and assert that none of the documents are hidden
         input_filter.reset_search_bar()
-        # self.assertFalse(input_filter.table_data.isRowHidden(index_DOCUMENT_1)) # if "DOCUMENT_1" is not hidden
-        # self.assertFalse(input_filter.table_data.isRowHidden(index_DOCUMENT_2)) # if "DOCUMENT_1" is not hidden
-        # FIXME: input_filter.table_data.isRowHidden() does not work as expected
+
+        # Test "DOCUMENT_1" is not hidden
+        self.assertFalse(input_filter.table_data.isRowHidden(index_DOCUMENT_1))
+        # Test "DOCUMENT_1" is not hidden
+        self.assertFalse(input_filter.table_data.isRowHidden(index_DOCUMENT_2))
 
         # Opens the "Visualized tags" pop up and adds the "AcquisitionDate" tag
         input_filter.update_tags()
         self.add_visualized_tag('AcquisitionDate')
+        # FIXME: The following statement is always True (not the correct test)
         self.assertTrue(type(input_filter.table_data.
                                       get_tag_column('AcquisitionDate')) == int)
 
         # Updates the tag to filter with
         input_filter.update_tag_to_filter()
+
         input_filter.push_button_tag_filter.setText('FileName')
         # TODO: select tag to filter with
 
         # Closes the filter
         input_filter.ok_clicked()
 
-        # Switches back to node controller V2
+        # Switches back to node controller V2, if necessary (return to initial
+        # state)
         config = Config(config_path=self.config_path)
-        config.setControlV1(False)
+
+        if not controlV1_ver:
+            config.setControlV1(False)
   
     def test_node_controller(self):
         """
@@ -6199,6 +6202,7 @@ class TestMIANodeController(TestMIACase):
         self.assertEqual(1,
                          len(pipeline.nodes["smooth_test_2"].plugs[
                                                    "_smoothed_files"].links_to))
+
 
 class TestMIAOthers(TestMIACase):
     '''
