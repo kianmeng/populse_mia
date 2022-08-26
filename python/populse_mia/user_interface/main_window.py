@@ -142,7 +142,7 @@ class MainWindow(QMainWindow):
         - saveChoice: checks if the project needs to be saved as or just saved
         - see_all_projects: open a pop-up to show the recent projects
         - set_controller_version: Reverses controller_version_changed attribute
-        - software_preferences_pop_up: open the MIA2 preferences pop-up
+        - software_preferences_pop_up: open the Mia preferences pop-up
         - switch_project: switches project if it's possible
         - tab_changed: method called when the tab is changed
         - undo: undoes the last action made by the user
@@ -1204,7 +1204,7 @@ class MainWindow(QMainWindow):
         self.controller_version_changed = not self.controller_version_changed
 
     def software_preferences_pop_up(self):
-        """Open the MIA preferences pop-up."""
+        """Open the Mia preferences pop-up."""
 
         self.pop_up_preferences = PopUpPreferences(self)
         self.pop_up_preferences.setGeometry(300, 200, 800, 600)

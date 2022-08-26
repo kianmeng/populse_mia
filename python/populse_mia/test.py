@@ -227,6 +227,9 @@ class TestMIACase(unittest.TestCase):
               correspond to the argument data
             - get_new_test_project: create a temporary project that can 
               be safely modified
+            - proclibview_nipype_state: give the state of nipype in the process
+            - proclibview_nipype_reset_state: reset nipype to its initial state
+              (before the start of the current test) in the process library view
             - restart_MIA: restarts MIA within a unit test
             - setUp: called automatically before each test method
             - setUpClass: called before tests in the individual class
@@ -436,6 +439,93 @@ class TestMIACase(unittest.TestCase):
         
         shutil.copytree(test_proj, new_test_proj)
         return new_test_proj
+
+    def proclibview_nipype_state(self, proc_lib_view):
+        """Give the state of nipype proc_lib_view.
+
+        :param proc_lib_view: the process library view object
+
+        :returns: the state of nipype proc_lib_view:
+                  - None: proc_lib_view is empty or nipype is not loaded.
+                  - 'nipype': 'nipype' is loaded but 'interfaces' not.
+                  - 'nipype.interface': 'nipype.interface' is loaded but
+                                        'DataGrabber' not.
+                  - 'process_enabled': 'nipype.interface.DataGrabber' is loaded.
+        """
+
+        if proc_lib_view.to_dict():
+
+            if proc_lib_view.to_dict().get('nipype'):
+
+                if proc_lib_view.to_dict().get('nipype').get('interfaces'):
+
+                    if proc_lib_view.to_dict().get(
+                                                 'nipype').get(
+                                                       'interfaces').get(
+                                                                 'DataGrabber'):
+                        state = proc_lib_view.to_dict().get(
+                                                     'nipype').get(
+                                                         'interfaces').get(
+                                                                  'DataGrabber')
+
+                    else:
+                        state = 'nipype.interfaces'
+
+                else:
+                    state = 'nipype'
+
+            else:
+                state = None
+
+        else:
+            state = None
+
+        return state
+
+    def proclibview_nipype_reset_state(self, main_window, ppl_manager,
+                                       init_state):
+        """Reset the process library view to its initial state.
+
+         :param main_window: the main window object
+         :param ppl_manager: the pipeline manager object
+         :param init_state: the initial state of nipype proc_lib_view:
+                            - None: proc_lib_view is empty or nipype is not
+                                    loaded.
+                            - 'nipype': 'nipype' is loaded but 'interfaces' not.
+                            - 'nipype.interface': 'nipype.interface' is loaded
+                                                  but 'DataGrabber' not.
+                            - 'process_enabled': 'nipype.interface.DataGrabber'
+                                                 is loaded.
+         """
+        main_window.package_library_pop_up()
+        pkg_lib_window = main_window.pop_up_package_library
+        ppl_manager.processLibrary.process_library.pkg_library.is_path = False
+
+        if init_state is None:
+            pkg_lib_window.line_edit.setText('nipype')
+            # Clicks on remove package
+            pkg_lib_window.layout().children()[0].layout().children(
+            )[3].itemAt(1).widget().clicked.emit()
+
+        elif init_state == 'nipype':
+            pkg_lib_window.line_edit.setText('nipype.interfaces')
+            # Clicks on remove package
+            pkg_lib_window.layout().children()[0].layout().children(
+            )[3].itemAt(1).widget().clicked.emit()
+
+        elif init_state == 'nipype.interfaces':
+            pkg_lib_window.line_edit.setText('nipype.interfaces.DataGrabber')
+            # Clicks on remove package
+            pkg_lib_window.layout().children()[0].layout().children(
+            )[3].itemAt(1).widget().clicked.emit()
+
+        else:
+            pkg_lib_window.line_edit.setText('nipype.interfaces.DataGrabber')
+            # Clicks on add package
+            pkg_lib_window.layout().children()[0].layout().children(
+            )[3].itemAt(0).widget().clicked.emit()
+
+        pkg_lib_window.ok_clicked()
 
     def restart_MIA(self):
         """Restarts MIA within a unit test.
@@ -3899,7 +3989,10 @@ class TestMIAMainWindow(TestMIACase):
         - Mocks:
             - QMessageBox.exec
             - QMessageBox.exec_
+            - QFileDialog.exec_
         """
+
+        PKG = 'nipype.interfaces.DataGrabber'
 
         # Creates a new project folder and switches to it
         new_proj_path = self.get_new_test_project(light=True)
@@ -3915,8 +4008,6 @@ class TestMIAMainWindow(TestMIACase):
         # Opens the package library pop-up
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
-
-        PKG = 'nipype.interfaces.DataGrabber'
 
         # Clicks on the add package button without selecting anything
         QMessageBox.exec = lambda x: None
@@ -4084,7 +4175,7 @@ class TestMIAMainWindow(TestMIACase):
 
         - Mocks:
             - QMessageBox.exec
-            - QMessageBox.exec_
+            - QMessageBox.question
         """
 
         PKG = 'nipype.interfaces.DataGrabber'
@@ -4100,20 +4191,23 @@ class TestMIAMainWindow(TestMIACase):
         ppl = ppl_edt_tabs.get_current_pipeline()
         proc_lib_view = ppl_manager.processLibrary.process_library
 
+        # Takes the initial state of nipype proc_lib_view and makes sure that
+        # PKG is already installed
+
+        init_state = self.proclibview_nipype_state(proc_lib_view)
+
+        if init_state != 'process_enabled':
+            self.main_window.package_library_pop_up()
+            pkg_lib_window = self.main_window.pop_up_package_library
+            pkg_lib_window.line_edit.setText(PKG)
+            (ppl_manager.processLibrary.process_library.
+                                                    pkg_library.is_path) = False
+            # Clicks on add package
+            pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+                                                      0).widget().clicked.emit()
+            pkg_lib_window.ok_clicked()
+
         # Opens the package library pop-up
-        self.main_window.package_library_pop_up()
-        pkg_lib_window = self.main_window.pop_up_package_library
-
-        # Make sure that PKG is already installed
-        pkg_lib_window.line_edit.setText(PKG)
-        ppl_manager.processLibrary.process_library.pkg_library.is_path = False
-        pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
-                             0).widget().clicked.emit()  # Clicks on add package
-
-        # Apply changes, close the package library pop-up
-        pkg_lib_window.ok_clicked()
-
-        # Opens again the package library pop-up
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
 
@@ -4254,23 +4348,29 @@ class TestMIAMainWindow(TestMIACase):
         QMessageBox.question = Mock(return_value=QMessageBox.Yes)
         proc_lib_view.keyPressEvent(event)
 
+        # Resets the process library to its original state for nipype
+        cur_state = self.proclibview_nipype_state(proc_lib_view)
+
+        if cur_state != init_state:
+            self.proclibview_nipype_reset_state(self.main_window, ppl_manager,
+                                                init_state)
+
         # Cleaning the process library in pipeline manager tab (deleting the
         # package added in this test, or old one still existing)
         self.clean_uts_packages(proc_lib_view)
 
     def test_package_library_dialog_rmv_pkg(self):
-        '''
-        Creates a new project folder, opens the processes library and
+        """Creates a new project folder, opens the processes library and
         removes a package. Also saves the current configuration.
-        Tests
-         - PackageLibraryDialog
 
-        Notes
-        -----
-        Mocks
-         - QMessageBox.exec
-         - QMessageBox.exec_
-        '''
+        - Tests: PackageLibraryDialog
+
+        - Mocks:
+            - QMessageBox.exec
+            - QMessageBox.exec_
+        """
+
+        PKG = 'nipype.interfaces.DataGrabber'
 
         # Creates a new project folder and switches to it
         new_proj_path = self.get_new_test_project(light=True)
@@ -4278,39 +4378,47 @@ class TestMIAMainWindow(TestMIACase):
 
         # Sets shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
+        proc_lib_view = ppl_manager.processLibrary.process_library
+
+        # Takes the initial state of nipype proc_lib_view and makes sure that
+        # PKG is already installed
+        init_state = self.proclibview_nipype_state(proc_lib_view)
+
+        if init_state != 'process_enabled':
+            self.main_window.package_library_pop_up()
+            pkg_lib_window = self.main_window.pop_up_package_library
+            pkg_lib_window.line_edit.setText(PKG)
+            (ppl_manager.processLibrary.process_library.
+                                                    pkg_library.is_path) = False
+            # Clicks on add package
+            pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
+                                                      0).widget().clicked.emit()
+            pkg_lib_window.ok_clicked()
 
         # Opens the package library pop-up
         self.main_window.package_library_pop_up()
         pkg_lib_window = self.main_window.pop_up_package_library
 
-        # Does not open the packages library ito avoid thread deadlock
-        # ppl_manager.processLibrary.open_pkg_lib()
-
-        rmv_pkg_button = (pkg_lib_window.layout().children()[0].layout().
-                          children()[3].itemAt(1).widget())
-
-        PKG = 'nipype.interfaces.DataGrabber'
-
         # Mocks the execution of a dialog box
         QMessageBox.exec = lambda x: None
         QMessageBox.exec_ = lambda x: None
-
-        '''REMOVE PACKAGE'''
 
         # Mocks deleting a package that is not specified
         res = pkg_lib_window.remove_package('')
         self.assertFalse(res)
 
-        # Tries removing an inexistant package
-        res = pkg_lib_window.remove_package('inexistant_package')
+        # Tries removing a non-existent package
+        res = pkg_lib_window.remove_package('non_existent_package')
         self.assertIsNone(res)
 
         # Clicks on the remove package button without selecting package
+        rmv_pkg_button = (pkg_lib_window.layout().children()[0].layout().
+                                               children()[3].itemAt(1).widget())
         rmv_pkg_button.clicked.emit()
 
-        # Writes the name of an existing package on the line edit
+        # Writes the name of an existing package on the line edit and clicks on
+        # the remove package button
         pkg_lib_window.line_edit.setText(PKG)
-
         rmv_pkg_button.clicked.emit()
 
         # Resets the previous action
@@ -4318,9 +4426,11 @@ class TestMIAMainWindow(TestMIACase):
         (pkg_lib_window.layout().children()[0].layout().itemAt(10).widget().
          layout().itemAt(1).widget().clicked.emit())
 
+        # Click again on the remove package button
         rmv_pkg_button.clicked.emit()
 
-        pkg_lib_window.ok_clicked()  # Apply changes
+        # Apply changes
+        pkg_lib_window.ok_clicked()
 
         # Mocks removing a package with text and from the tree
         pkg_lib_window.remove_dic[PKG] = 1
@@ -4329,32 +4439,29 @@ class TestMIAMainWindow(TestMIACase):
         pkg_lib_window.remove_package_with_text(_2rem=PKG,
                                                 tree_remove=False)
 
-        # Resets the process library to its original state
-        pkg_lib_window.remove_list.selectAll()
-        (pkg_lib_window.layout().children()[0].layout().itemAt(10).widget().
-         layout().itemAt(1).widget().clicked.emit())
+        # Resets the process library to its original state for nipype
+        cur_state = self.proclibview_nipype_state(proc_lib_view)
+
+        if cur_state != init_state:
+            self.proclibview_nipype_reset_state(self.main_window, ppl_manager,
+                                                init_state)
 
         # Saves the config to 'process_config.yml'
         ppl_manager.processLibrary.save_config()
 
     def test_package_library_others(self):
-        '''
-        Creates a new project folder, opens the processes library and
+        """Creates a new project folder, opens the processes library and
         adds a package.
-        Tests
-         - PackageLibraryDialog
 
-        Notes
-        -----
         The package library object opens up as a pop-up when
         File > Package library manager is clicked.
 
-        Mocks
-         - QMessageBox.exec
-         - QMessageBox.exec_
+        - Tests: PackageLibraryDialog
 
-         +> docstring to check !!!!!!!
-        '''
+        - Mocks:
+            - QMessageBox.exec
+            - QMessageBox.exec_
+        """
 
         # Creates a new project folder and switches to it
         new_proj_path = self.get_new_test_project(light=True)
@@ -4380,14 +4487,15 @@ class TestMIAMainWindow(TestMIACase):
         pkg_lib_window.close()
 
     def test_popUpDeletedProject(self):
-        '''
-        Adds a deleted projects to the projects list and launches mia.
-        Tests PopUpDeletedProject.
-        '''
+        """Adds a deleted projects to the projects list and launches mia.
+
+        - Tests: PopUpDeletedProject.
+        """
 
         # Sets a projects save directory
-        config = Config()
-        projects_save_path = os.path.join(config.get_mia_path(), 'projects')
+        #config = Config()
+        config = Config(config_path=self.config_path)
+        projects_save_path = os.path.join(self.config_path, 'projects')
         config.set_projects_save_path(projects_save_path)
 
         # Mocks a project filepath that does not exist in the filesystem
@@ -4397,7 +4505,10 @@ class TestMIAMainWindow(TestMIACase):
         savedProjects.addSavedProject(del_prjct)
 
         # Asserts that 'saved_projects.yml' contains the filepath
-        # self.assertIn(del_prjct, savedProjects.loadSavedProjects()['paths'])
+        # FIXME: The following line does not seem to be supported by the
+        #        appveyor version, while it works fine on my station...
+        #        For now I comment ...
+        #self.assertIn(del_prjct, savedProjects.loadSavedProjects()['paths'])
 
         # Mocks the execution of a dialog box
         PopUpDeletedProject.exec = Mock()
@@ -4415,28 +4526,26 @@ class TestMIAMainWindow(TestMIACase):
             self.msg = PopUpDeletedProject(deleted_projects)
 
         # Asserts that 'saved_projects.yml' no longer contains it
-        # self.assertNotIn(del_prjct, savedProjects.loadSavedProjects()['paths'])
-
-        print()
+        # FIXME: Since the previous FIXME, and comment, the following line is
+        #        also commented
+        #self.assertNotIn(del_prjct, savedProjects.loadSavedProjects()['paths'])
 
     def test_popUpDeleteProject(self):
-        '''
-        Creates a new project and deletes it.
-        Tests
-         - MainWindow.delete_project
-         - PopUpDeleteProject.
+        """Creates a new project and deletes it.
 
-        Notes
-        -----
-        Not to be confused with PopUpDeletedProject.
-        '''
+        Not to be confused with test_PopUpDeletedProject!
+
+        - Tests:
+            - MainWindow.delete_project
+            - PopUpDeleteProject.
+        """
 
         # Gets a new project
         test_proj_path = self.get_new_test_project()
         self.main_window.switch_project(test_proj_path, 'test_project')
 
         # Instead of executing the pop-up, only shows it
-        # This avoid thread deadlocking
+        # This avoids thread deadlocking
         QMessageBox.exec = lambda self_: self_.show()
 
         # Resets the projects folder
@@ -4448,14 +4557,13 @@ class TestMIAMainWindow(TestMIACase):
 
         # Sets a projects save directory
         config = Config(config_path=self.config_path)
-        proj_save_path = os.path.join(config.get_mia_path(),
-                                      os.path.split(test_proj_path)[0])
+        proj_save_path = os.path.split(test_proj_path)[0]
         config.set_projects_save_path(proj_save_path)
 
         # Append 'test_proj_path' to 'saved_projects.pathsList' and
         # 'opened_projects', to increase coverage
-        (self.main_window.saved_projects.pathsList.
-         append(os.path.relpath(test_proj_path)))
+        self.main_window.saved_projects.pathsList.append(os.path.relpath(
+                                                                test_proj_path))
         config.set_opened_projects([os.path.relpath(test_proj_path)])
 
         # PopUpDeleteProject.exec = lambda self_: self_.show()
@@ -4473,33 +4581,28 @@ class TestMIAMainWindow(TestMIACase):
         QMessageBox.question = Mock(return_value=QMessageBox.YesToAll)
         exPopup.ok_clicked()
 
-        print(5)
-
     def test_see_all_projects(self):
-        '''
-        Creates 2 projects and tries to open them through the all
-        projects pop-up.
-        Tests
-        - MainWindow.see_all_projects
-        - PopUpSeeAllProjects
+        """Creates 2 projects and tries to open them through the all projects pop-up.
 
-        Notes
-        -----
-        Mocks
-        - PopUpSeeAllProjects.exec
-        - QMessageBox.exec
-        '''
+        - Tests:
+            - MainWindow.see_all_projects
+            - PopUpSeeAllProjects
+
+        - Mocks:
+            - PopUpSeeAllProjects.exec
+            - QMessageBox.exec
+        """
 
         # Sets shortcuts for objects that are often used
         main_wnd = self.main_window
 
         # Creates 2 new project folders
-        project_8_path = self.get_new_test_project(name = 'project_8')
-        project_9_path = self.get_new_test_project(name = 'project_9')
+        project_8_path = self.get_new_test_project(name='project_8')
+        project_9_path = self.get_new_test_project(name='project_9')
 
         # Sets the projects save path
         config = Config(config_path=self.config_path)
-        config.set_projects_save_path(os.path.split(project_8_path)[0])
+        config.set_projects_save_path(self.config_path)
 
         # Adds the projects to the 'pathsList'
         main_wnd.saved_projects.pathsList.append(project_8_path)
@@ -4515,10 +4618,15 @@ class TestMIAMainWindow(TestMIACase):
         # Show the projects pop-up
         main_wnd.see_all_projects()
 
-        item_0 = self.main_window.exPopup.treeWidget.itemAt(0,0)
+        item_0 = self.main_window.exPopup.treeWidget.itemAt(0, 0)
         self.assertEqual(item_0.text(0), 'project_8')
         self.assertEqual(main_wnd.exPopup.treeWidget.itemBelow(item_0).text(0),
                          'project_9')
+
+        # Asserts that project 8 is not opened:
+        config = Config(config_path=self.config_path)
+        self.assertNotEqual(os.path.abspath(config.get_opened_projects()[0]),
+                            project_8_path)
 
         # Tries to open a project with no projects selected
         main_wnd.exPopup.open_project()
@@ -4531,34 +4639,34 @@ class TestMIAMainWindow(TestMIACase):
 
         # Asserts that project 8 is now opened
         config = Config(config_path=self.config_path)
+        self.assertEqual(os.path.abspath(config.get_opened_projects()[0]),
+                         project_8_path)
 
     def test_software_preferences_pop_up(self):
-        """
-        Opens the preferences pop up and changes parameters.
-        Tests
-          - MainWindow.software_preferences_pop_up
-          - PopUpPreferences
+        """Opens the preferences pop up and changes parameters.
 
-        Notes
-        -----
-        Mocks
-          - QFileDialog.getOpenFileName
-          - QFileDialog.getExistingDirectory
-          - QLineEdit.text
-          - QDialog.exec
-          - QMessageBox.exec
-          - QPlainTextEdit.toPlainText
+        - Tests:
+            - MainWindow.software_preferences_pop_up
+            - PopUpPreferences
+
+        - Mocks
+            - QFileDialog.getOpenFileName
+            - QFileDialog.getExistingDirectory
+            - QLineEdit.text
+            - QDialog.exec
+            - QMessageBox.exec
+            - QPlainTextEdit.toPlainText
         """
 
         # Sets shortcuts for objects that are often used
         main_wnd = self.main_window
         ppl_manager = main_wnd.pipeline_manager
 
-        # Creates a new project folder and adds one document to the 
-        # project, sets the plug value that is added to the database
+        # Creates a new project folder and adds one document to the project
         project_8_path = self.get_new_test_project()
         ppl_manager.project.folder = project_8_path
 
+        # Modification of some configuration parameters
         config = Config(config_path=self.config_path)
         config.setControlV1(True)
         config.setAutoSave(True)
@@ -4568,49 +4676,63 @@ class TestMIAMainWindow(TestMIACase):
         config.set_use_ants(True)
         config.set_mainwindow_size([100, 100, 100])
 
+        # Open and close the software preferences window
         main_wnd.software_preferences_pop_up()
-        
         main_wnd.pop_up_preferences.close()
 
+        # Activate the V1 controller GUI and the user mode
         config.setControlV1(False)
-
-        # Enables the user mode
         config.set_user_mode(True)
         
-        # Enables Matbalb Standalone
+        # Enables Matlab MCR
         config.set_use_matlab_standalone(True)
+
+        # Check that matlab MCR is selected
         main_wnd.software_preferences_pop_up()
         self.assertTrue(main_wnd.pop_up_preferences
-                        .use_matlab_standalone_checkbox.isChecked())
+                                    .use_matlab_standalone_checkbox.isChecked())
         main_wnd.pop_up_preferences.close()
 
-        # Enables Matbalb
+        # Enables Matlab
         config.set_use_matlab(True)
+
+        # Check that matlab is selected and matlab MCR not
         main_wnd.software_preferences_pop_up()
         self.assertTrue(main_wnd.pop_up_preferences
-                        .use_matlab_checkbox.isChecked())
+                                               .use_matlab_checkbox.isChecked())
+        self.assertFalse(main_wnd.pop_up_preferences
+                                    .use_matlab_standalone_checkbox.isChecked())
         main_wnd.pop_up_preferences.close()
 
         # Enables SPM
         config.set_use_spm(True)
+
+        # Check that SPM and matlab are selected
         main_wnd.software_preferences_pop_up()
         self.assertTrue(main_wnd.pop_up_preferences
-                        .use_matlab_checkbox.isChecked())
+                                               .use_matlab_checkbox.isChecked())
         self.assertTrue(main_wnd.pop_up_preferences
-                        .use_spm_checkbox.isChecked())
+                                               .use_spm_checkbox.isChecked())
         main_wnd.pop_up_preferences.close()
 
         # Enables SPM standalone
         config.set_use_spm_standalone(True)
-        #if 'Windows' not in architecture()[1]: 
-        #    self.assertTrue(main_wnd.pop_up_preferences
-        #                    .use_matlab_standalone_checkbox.isChecked())
-        #self.assertTrue(main_wnd.pop_up_preferences
-        #                .use_spm_standalone_checkbox.isChecked())
+
+        # Check that SPM standalone and matlab MCR are selected,
+        # SPM and matlab not
         main_wnd.software_preferences_pop_up()
+        if 'Windows' not in platform.architecture()[1]:
+            self.assertTrue(main_wnd.pop_up_preferences
+                                    .use_matlab_standalone_checkbox.isChecked())
+            self.assertTrue(main_wnd.pop_up_preferences
+                                       .use_spm_standalone_checkbox.isChecked())
+            self.assertFalse(main_wnd.pop_up_preferences
+                                               .use_matlab_checkbox.isChecked())
+            self.assertFalse(main_wnd.pop_up_preferences
+                                                  .use_spm_checkbox.isChecked())
         main_wnd.pop_up_preferences.close()
 
-        # Mocks 'QFileDialog.getOpenFileName' (returns an exising file)
+        # Mocks 'QFileDialog.getOpenFileName' (returns an existing file)
         # This method returns a tuple (filename, file_types), where file_types
         # is the allowed file type (eg. 'All Files (*)')
         mock_path = os.path.split(project_8_path)[0]
@@ -4619,6 +4741,7 @@ class TestMIAMainWindow(TestMIACase):
         # Mocks 'QFileDialog.getExistingDirectory'
         QFileDialog.getExistingDirectory = lambda x, y, z: mock_path
 
+        # Open the software preferences window
         main_wnd.software_preferences_pop_up()
 
         # Browses the FSL path
@@ -4641,9 +4764,20 @@ class TestMIAMainWindow(TestMIACase):
         self.assertEqual(main_wnd.pop_up_preferences.matlab_choice.text(),
                          mock_path)
 
-        # Browses the MATLAB Standalone path
+        # Browses the MATLAB MCR path
         main_wnd.pop_up_preferences.browse_matlab_standalone()
         self.assertEqual(main_wnd.pop_up_preferences.matlab_standalone_choice.
+                                                                         text(),
+                         mock_path)
+
+        # Browses the SPM path
+        main_wnd.pop_up_preferences.browse_spm()
+        self.assertEqual(main_wnd.pop_up_preferences.spm_choice.text(),
+                         mock_path)
+
+        # Browses the SPM Standalone path
+        main_wnd.pop_up_preferences.browse_spm_standalone()
+        self.assertEqual(main_wnd.pop_up_preferences.spm_standalone_choice.
                                                                          text(),
                          mock_path)
 
@@ -4657,17 +4791,6 @@ class TestMIAMainWindow(TestMIACase):
         main_wnd.pop_up_preferences.browse_projects_save_path()
         self.assertEqual(main_wnd.pop_up_preferences.
                                             projects_save_path_line_edit.text(),
-                         mock_path)
-
-        # Browses the SPM path
-        main_wnd.pop_up_preferences.browse_spm()
-        self.assertEqual(main_wnd.pop_up_preferences.spm_choice.text(), 
-                         mock_path)
-
-        # Browses the SPM Standalone path
-        main_wnd.pop_up_preferences.browse_spm_standalone()
-        self.assertEqual(main_wnd.pop_up_preferences.spm_standalone_choice.
-                                                                         text(),
                          mock_path)
 
         # Sets the admin password to be 'mock_admin_password'
@@ -4684,7 +4807,7 @@ class TestMIAMainWindow(TestMIACase):
         QInputDialog.getText = lambda w, x, y, z, : (None, False)
         main_wnd.pop_up_preferences.admin_mode_switch()
 
-        # Tries to activates admin mode with the wrong password
+        # Tries to activate admin mode with the wrong password
         main_wnd.pop_up_preferences.admin_mode_checkbox.setChecked(True)
         QInputDialog.getText = lambda w, x, y, z, : ('mock_wrong_password',
                                                      True)
@@ -4697,7 +4820,7 @@ class TestMIAMainWindow(TestMIACase):
         main_wnd.pop_up_preferences.admin_mode_switch()
         self.assertTrue(main_wnd.pop_up_preferences.change_psswd.isVisible())
 
-        # Mocks the old passowd text field to be 'mock_admin_password'
+        # Mocks the old passwd text field to be 'mock_admin_password'
         # (and the other textfields too!)
         #QLineEdit.text = lambda x: admin_password
 
@@ -4715,13 +4838,13 @@ class TestMIAMainWindow(TestMIACase):
                          QMessageBox.Critical)
         main_wnd.pop_up_preferences.msg.close()
 
-        # Sets the mainwindow size
+        # Sets the main window size
         main_wnd.pop_up_preferences.use_current_mainwindow_size(main_wnd)
 
         # Mocks the click of the OK button on 'QMessageBox.exec' 
         QMessageBox.exec = lambda x: QMessageBox.Yes
 
-        # Programs the controler version to change to V1
+        # Programs the controller version to change to V1
         main_wnd.pop_up_preferences.control_checkbox_toggled(main_wnd)
         main_wnd.pop_up_preferences.control_checkbox_changed = True
         self.assertTrue(main_wnd.get_controller_version())
@@ -4747,23 +4870,22 @@ class TestMIAMainWindow(TestMIACase):
         #main_wnd.pop_up_preferences.edit_capsul_config()
         # FIXME: failing in MacOS build
 
+        # Close the software preferences window
         main_wnd.pop_up_preferences.close()
 
     def test_software_preferences_pop_up_config_file(self):
-        """
-        Opens the preferences pop up and changes parameters to edit the
+        """Opens the preferences pop up and changes parameters to edit the
         config file and capsul config file.
-        Tests
-          - PopUpPreferences.edit_config_file
-          - PopUpPreferences.findChar
-          - PopUpPreferences.edit_capsul_config
 
-        Notes
-        -----
-        Mocks
-          - Config.set_capsul_config
-          - QDialog.exec
-          - SettingsEditor.update_gui
+        -Tests:
+            - PopUpPreferences.edit_config_file
+            - PopUpPreferences.findChar
+            - PopUpPreferences.edit_capsul_config
+
+        - Mocks
+            - Config.set_capsul_config
+            - QDialog.exec
+            - SettingsEditor.update_gui
         """
 
         # Sets shortcuts for objects that are often used
@@ -4772,20 +4894,14 @@ class TestMIAMainWindow(TestMIACase):
         # Mocks the execution of 'PopUpPreferences' to speed up the test
         #PopUpPreferences.show = lambda x: None
 
-        # Creates a new project folder and adds one document to the 
-        # project, sets the plug value that is added to the database
-        project_8_path = self.get_new_test_project()
-        #ppl_manager.project.folder = project_8_path      
-
         main_wnd.software_preferences_pop_up()
         
-        # Tries do edit the config file, mocks failure in 'QDialog.exec'
+        # Tries to edit the config file, mocks failure in 'QDialog.exec'
         QDialog.exec = lambda x: False
         main_wnd.pop_up_preferences.edit_config_file()
         self.assertTrue(hasattr(main_wnd.pop_up_preferences, 'editConf'))
         
-        # Mocks the execution to change 'user_mode' from 'false' to
-        # 'true'
+        # Mocks the execution to change 'user_mode' from 'false' to 'true'
         def mock_exec(x):
             config_file = main_wnd.pop_up_preferences.editConf.txt.toPlainText()
             config_file = config_file.replace('user_mode: false',
@@ -4818,7 +4934,7 @@ class TestMIAMainWindow(TestMIACase):
         Config.set_capsul_config = mock_exc
         main_wnd.pop_up_preferences.edit_capsul_config()
 
-        QDialog.exec = mock_exc
+        QDialog.exec = lambda x: (_ for _ in ()).throw(Exception('mock_except'))
         main_wnd.pop_up_preferences.edit_capsul_config()
 
         QDialog.exec = lambda x: False
@@ -4827,22 +4943,19 @@ class TestMIAMainWindow(TestMIACase):
         main_wnd.pop_up_preferences.close()
 
     def test_software_preferences_pop_up_modules_config(self):
-        """
-        Opens the preferences pop up and sets configuration of the 
-        modules AFNI, ANTS, FSL, SPM and MATLAB in the preferences 
-        window.
-        Tests
-          - PopUpPreferences.validate_and_save
+        """Opens the preferences pop up and sets the configuration of modules.
 
-        Notes
-        -----
-        Mocks
-          - PopUpPreferences.show
-          - QMessageBox.show
-          - QLineEdit.text
-          - QDialog.exec
-          - QMessageBox.exec
-          - QPlainTextEdit.toPlainText
+        For AFNI, ANTS, FSL, SPM and MATLAB.
+
+        -Tests: PopUpPreferences.validate_and_save
+
+        - Mocks:
+            - PopUpPreferences.show
+            - QMessageBox.show
+            - QLineEdit.text
+            - QDialog.exec
+            - QMessageBox.exec
+            - QPlainTextEdit.toPlainText
         """
 
         # Sets shortcuts for objects that are often used
@@ -4851,25 +4964,21 @@ class TestMIAMainWindow(TestMIACase):
         # Mocks the execution of 'PopUpPreferences' to speed up the test
         #PopUpPreferences.show = lambda x: None
 
-        # Mocks the execution of 'wrong_path' and 'QMessageBox.show'
-        #QMessageBox.show = lambda x: None
+        # Mocks 'QMessageBox.show'
+        QMessageBox.show = lambda x: None
 
-        # Creates a new project folder and adds one document to the 
-        # project, sets the plug value that is added to the database
-        project_8_path = self.get_new_test_project()
-        tmp_path = os.path.split(project_8_path)[0]
+        tmp_path = self.config_path
 
-        # Temporary solution that allows test on Linux and MacOS
+        # Temporary solution that allows test only on Linux and MacOS
         if platform.system() == 'Windows':
             return
 
         # Mocks executables to be used as the afni, ants, fslm, matlab 
         # and spm cmds
-        def mock_executable(exc_dir, exc_name, failing = False, 
+        def mock_executable(exc_dir, exc_name, failing=False,
                             output='mock executable',
                             err_msg='mock_error'):
-            """
-            Creates a working or failing mocked executable, optionally 
+            """Creates a working or failing mocked executable, optionally
             setting the output and error messages,
             """
 
@@ -4903,16 +5012,14 @@ class TestMIAMainWindow(TestMIACase):
         # of the code
 
         def test_afni_config():
-            """
-            Tests the AFNI configuration.
-            """
+            """Tests the AFNI configuration."""
 
             main_wnd.software_preferences_pop_up()  # Reopens the window
 
             # Enables AFNI
             main_wnd.pop_up_preferences.use_afni_checkbox.setChecked(True)
 
-            # Sets a directory that does not exists
+            # Sets a directory that does not exist
             (main_wnd.pop_up_preferences
                           .afni_choice.setText(os.path.join(tmp_path + 'mock')))
             main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
@@ -4929,10 +5036,10 @@ class TestMIAMainWindow(TestMIACase):
             main_wnd.pop_up_preferences.afni_choice.setText(tmp_path)
 
             mock_executable(tmp_path, 'afni', failing=True)
-            main_wnd.pop_up_preferences.ok_clicked() # Opens error dialog
+            main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             mock_executable(tmp_path, 'afni')
-            main_wnd.pop_up_preferences.ok_clicked() # Closes the window
+            main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
 
             # Disables AFNI
             config = Config(config_path=self.config_path)
@@ -4940,16 +5047,14 @@ class TestMIAMainWindow(TestMIACase):
             config.set_afni_path('')
 
         def test_ants_config():
-            """
-            Tests the ANTS configuration.
-            """
+            """Tests the ANTS configuration."""
 
             main_wnd.software_preferences_pop_up()  # Reopens the window
 
             # Enables ANTS
             main_wnd.pop_up_preferences.use_ants_checkbox.setChecked(True)
 
-            # Sets a directory that does not exists
+            # Sets a directory that does not exist
             (main_wnd.pop_up_preferences
                           .ants_choice.setText(os.path.join(tmp_path + 'mock')))
             main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
@@ -4977,9 +5082,7 @@ class TestMIAMainWindow(TestMIACase):
             config.set_ants_path('')
 
         def test_fsl_config():
-            """
-            Tests the FSL configuration.
-            """
+            """Tests the FSL configuration."""
 
             main_wnd.software_preferences_pop_up()  # Reopens the window
 
@@ -5028,9 +5131,7 @@ class TestMIAMainWindow(TestMIACase):
             config.set_fsl_config('')
 
         def test_spm_matlab_config():
-            """
-            Tests the SPM and MATLAB (licence) configuration.
-            """
+            """Tests the SPM and MATLAB (licence) configuration."""
 
             main_wnd.software_preferences_pop_up()  # Reopens the window
 
@@ -5052,7 +5153,7 @@ class TestMIAMainWindow(TestMIACase):
             config.set_matlab_path(os.path.join(tmp_path, 'matlab'))
             #main_wnd.pop_up_preferences.ok_clicked() # Opens error dialog
 
-            # Also sets the same SPM directory in the preferenes window and 
+            # Also sets the same SPM directory in the preferences window and
             # in the config object, and a 'tmp_path' as the MATLAB directory
             config = Config(config_path=self.config_path)
             config.set_spm_path(tmp_path)
@@ -5085,12 +5186,12 @@ class TestMIAMainWindow(TestMIACase):
             # call on 'ok_clicked')
             Config(config_path=self.config_path).set_matlab_path('')
 
-            main_wnd.pop_up_preferences.ok_clicked() # Opens error dialog
+            main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             # Case where SPM directory is not valid
             (main_wnd.pop_up_preferences.spm_choice
-             .setText(os.path.join(tmp_path, 'not_existing')))
-            main_wnd.pop_up_preferences.ok_clicked() # Opens error dialog
+                               .setText(os.path.join(tmp_path, 'not_existing')))
+            main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             main_wnd.pop_up_preferences.close()
 
@@ -5102,16 +5203,14 @@ class TestMIAMainWindow(TestMIACase):
             config.set_matlab_path('')
 
         def test_matlab_config():
-            '''
-            Tests the MATLAB (license) configuration.
-            '''
+            """Tests the MATLAB (license) configuration."""
 
-            main_wnd.software_preferences_pop_up() # Reopens the window
+            main_wnd.software_preferences_pop_up()  # Reopens the window
 
             # Sets the projects folder for the preferences window to close 
             # when pressing on 'OK'
             (main_wnd.pop_up_preferences.projects_save_path_line_edit
-             .setText(tmp_path))
+                                                             .setText(tmp_path))
 
             # Enables MATLAB
             main_wnd.pop_up_preferences.use_matlab_checkbox.setChecked(True)
@@ -5121,7 +5220,7 @@ class TestMIAMainWindow(TestMIACase):
             main_wnd.pop_up_preferences.matlab_choice.setText(tmp_path)
             Config(config_path=self.config_path).set_matlab_path(tmp_path)
 
-            main_wnd.pop_up_preferences.ok_clicked() # Closes the window
+            main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
 
             # Asserts that MATLAB was enabled and MATLAB standalone 
             # remains disabled
@@ -5129,27 +5228,27 @@ class TestMIAMainWindow(TestMIACase):
             self.assertTrue(config.get_use_matlab())
             self.assertFalse(config.get_use_matlab_standalone())
 
-            main_wnd.software_preferences_pop_up() # Reopens the window
+            main_wnd.software_preferences_pop_up()  # Reopens the window
 
             # Resets the 'config' object
             config.set_use_matlab(False)
 
             # Resets the MATLAB directory
             main_wnd.pop_up_preferences.matlab_choice.setText('')
-            main_wnd.pop_up_preferences.ok_clicked() # Opens error dialog
+            main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             # Creates a failing MATLAB executable
             mock_executable(tmp_path, 'matlab', failing=True)
 
             # Sets the MATLAB directory to this executable
             (main_wnd.pop_up_preferences
-             .matlab_choice.setText(os.path.join(tmp_path, 'matlab')))
-            main_wnd.pop_up_preferences.ok_clicked() # Opens error dialog
+                       .matlab_choice.setText(os.path.join(tmp_path, 'matlab')))
+            main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             # Restricts the permission required to run the MATLAB 
             # executable to induce an exception on 'subprocess.Popen'
             subprocess.run(['chmod', '-x', os.path.join(tmp_path, 'matlab')])
-            main_wnd.pop_up_preferences.ok_clicked() # Opens error dialog
+            main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             # Asserts that MATLAB was still not enabled
             config = Config(config_path=self.config_path)
@@ -5157,7 +5256,7 @@ class TestMIAMainWindow(TestMIACase):
 
             # Creates a working MATLAB executable
             mock_executable(tmp_path, 'matlab')
-            main_wnd.pop_up_preferences.ok_clicked() # Closes window
+            main_wnd.pop_up_preferences.ok_clicked()  # Closes window
 
             # Asserts that MATLAB was enabled and MATLAB standalone 
             # remains disabled
@@ -5171,113 +5270,112 @@ class TestMIAMainWindow(TestMIACase):
             config.set_matlab_path('')
 
         def test_matlab_mcr_spm_standalone():
-            '''
-            Tests the Matlab MCR and SPM standalone configuration'''
+            """Tests the Matlab MCR and SPM standalone configuration"""
 
-            main_wnd.software_preferences_pop_up() # Opens the window
+            main_wnd.software_preferences_pop_up()  # Opens the window
 
             # Sets the projects folder for the preferences window to close 
             # when pressing on 'OK'
             (main_wnd.pop_up_preferences.projects_save_path_line_edit.
-             setText(tmp_path))
+                                                              setText(tmp_path))
 
             # Enables SPM standalone
             (main_wnd.pop_up_preferences.use_spm_standalone_checkbox.
-             setChecked(True))
+                                                               setChecked(True))
 
-            '''Failing configurations for SPM standalone + MATLAB MCR'''
+            #Failing configurations for SPM standalone + MATLAB MCR
 
-            # Sets a non exixting directory for MATLAB MCR
+            # Sets a non-existing directory for MATLAB MCR
             (main_wnd.pop_up_preferences.matlab_standalone_choice.
-             setText(os.path.join(tmp_path, 'non_existing')))
+                                setText(os.path.join(tmp_path, 'non_existing')))
 
-            main_wnd.pop_up_preferences.ok_clicked() # Opens error message
+            main_wnd.pop_up_preferences.ok_clicked()  # Opens error message
 
-            # Sets an existing directory for MATLAB MCR, non existing 
+            # Sets an existing directory for MATLAB MCR, non-existing
             # directory for SPM standalone
             (main_wnd.pop_up_preferences.matlab_standalone_choice.
-             setText(tmp_path))
+                                                              setText(tmp_path))
             (main_wnd.pop_up_preferences.spm_standalone_choice.
-             setText(os.path.join(tmp_path, 'non_existing')))
-            main_wnd.pop_up_preferences.ok_clicked() # Opens error dialog
+                                setText(os.path.join(tmp_path, 'non_existing')))
+            main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             # Sets existing directories for both MATLAB MCR and SPM 
             # standalone
             (main_wnd.pop_up_preferences.spm_standalone_choice.
-             setText(tmp_path))
-            main_wnd.pop_up_preferences.ok_clicked() # Opens error dialog
+                                                              setText(tmp_path))
+            main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             # Does not find a SPM standalone executable
-            main_wnd.pop_up_preferences.ok_clicked() # Opens error dialog
+            main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             # Creates a failing SPM standalone executable
             mock_executable(tmp_path, 'run_spm.sh', failing=True)
 
-            main_wnd.pop_up_preferences.ok_clicked() # Opens error dialog
+            main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             mock_executable(tmp_path, 'run_spm.sh', failing=True, 
-                            err_msg = 'shared libraries')
+                            err_msg='shared libraries')
 
-            main_wnd.pop_up_preferences.ok_clicked() # Opens error dialog
+            main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             # Restricts the permission required to run the MATLAB 
             # executable to induce an exception on 'subprocess.Popen'
-            subprocess.run(['chmod', '-x', os.path.join(tmp_path, 'run_spm.sh')])
-            main_wnd.pop_up_preferences.ok_clicked() # Opens error dialog
+            subprocess.run(['chmod', '-x', os.path.join(tmp_path,
+                                                        'run_spm.sh')])
+            main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             config = Config(config_path=self.config_path)
             self.assertFalse(config.get_use_spm_standalone())
             self.assertFalse(config.get_use_matlab_standalone())
           
-            '''Passing configurations for SPM standalone + MATLAB MCR'''
+            #Passing configurations for SPM standalone + MATLAB MCR
 
-            # Creates an SPM standalone executable that throws a non
-            # critical error
+            # Creates an SPM standalone executable that throws a non-critical
+            # error
             mock_executable(tmp_path, 'run_spm.sh', failing=True, 
-                            output = '_ _ version (standalone)')
+                            output='_ _ version (standalone)')
 
-            main_wnd.pop_up_preferences.ok_clicked() # Closes window
+            main_wnd.pop_up_preferences.ok_clicked()  # Closes window
 
-            
             config = Config(config_path=self.config_path)
-            #self.assertTrue(config.get_use_spm_standalone())
-            #self.assertTrue(config.get_use_matlab_standalone())
+            self.assertTrue(config.get_use_spm_standalone())
+            self.assertTrue(config.get_use_matlab_standalone())
 
             # Resets the 'config' object
             config.set_spm_standalone_path('')
             config.set_use_spm_standalone(False)
             config.set_use_matlab_standalone(False)
 
-            main_wnd.software_preferences_pop_up() # Opens the window 
+            main_wnd.software_preferences_pop_up()  # Opens the window
 
             (main_wnd.pop_up_preferences.use_spm_standalone_checkbox.
-             setChecked(True))
+                                                               setChecked(True))
             main_wnd.pop_up_preferences.spm_standalone_choice.setText(tmp_path)
 
             mock_executable(tmp_path, 'run_spm.sh')
 
-            main_wnd.pop_up_preferences.ok_clicked() # Closes the window
+            main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
 
             config = Config(config_path=self.config_path)
-            #self.assertTrue(config.get_use_spm_standalone())
-            #self.assertTrue(config.get_use_matlab_standalone())
+            self.assertTrue(config.get_use_spm_standalone())
+            self.assertTrue(config.get_use_matlab_standalone())
 
             # Resets the 'config' object
             config.set_use_spm_standalone(False)
             config.set_use_matlab_standalone(False)
 
-            main_wnd.software_preferences_pop_up() # Opens the window 
+            main_wnd.software_preferences_pop_up()  # Opens the window
             (main_wnd.pop_up_preferences.use_spm_standalone_checkbox.
-             setChecked(True))
+                                                               setChecked(True))
 
             # The same MATLAB directory is already the same on both the 
             # preferences window and 'config' object, same for SPM 
             # standalone
-            main_wnd.pop_up_preferences.ok_clicked() # Closes the window
+            main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
 
             config = Config(config_path=self.config_path)
-            #self.assertTrue(config.get_use_spm_standalone())
-            #self.assertTrue(config.get_use_matlab_standalone())
+            self.assertTrue(config.get_use_spm_standalone())
+            self.assertTrue(config.get_use_matlab_standalone())
 
         Config(config_path=self.config_path).set_projects_save_path(tmp_path)
 
