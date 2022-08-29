@@ -6593,8 +6593,16 @@ class TestMIAPipelineEditor(TestMIACase):
             - QFileDialog.getSaveFileName
         """
 
-        # FIXME: this method removes the User_processes and so we lose all
-        #        the user's packages!
+        # Save the state of the current process library
+        config = Config(config_path=self.config_path)
+        usr_proc_folder = os.path.join(config.get_mia_path(),
+                                       'processes', 'User_processes')
+        shutil.copytree(usr_proc_folder,
+                        os.path.join(self.config_path, '4test_save_pipeline',
+                                     'User_processes'))
+        shutil.copy(os.path.join(config.get_mia_path(), 'properties',
+                                 'process_config.yml'),
+                    os.path.join(self.config_path, '4test_save_pipeline'))
 
         # Sets often used shortcuts
         ppl_edt_tabs = self.main_window.pipeline_manager.pipelineEditorTabs
@@ -6634,7 +6642,7 @@ class TestMIAPipelineEditor(TestMIACase):
         QFileDialog.getSaveFileName = lambda *args: [filename]
 
         # Removes the user processes tree to increase coverage
-        #shutil.rmtree(usr_proc_folder)
+        shutil.rmtree(usr_proc_folder)
 
         # Tries to save the pipeline with a filename starting by a digit
         res = ppl_edt_tabs.save_pipeline()
@@ -6671,6 +6679,19 @@ class TestMIAPipelineEditor(TestMIACase):
         filename = os.path.join(usr_proc_folder, 'test_pipeline_3.py')
         res = ppl_edt_tabs.save_pipeline(new_file_name=filename)
         self.assertTrue(res)  # The resulting filename is not empty
+
+        # Restore the initial process library (before this test)
+        config = Config(config_path=self.config_path)
+        shutil.rmtree(usr_proc_folder)
+        os.remove(os.path.join(config.get_mia_path(), 'properties',
+                                 'process_config.yml'))
+        shutil.copytree(os.path.join(self.config_path, '4test_save_pipeline',
+                                     'User_processes'),
+                        os.path.join(usr_proc_folder))
+        shutil.copy(os.path.join(self.config_path, '4test_save_pipeline',
+                                 'process_config.yml'),
+                                 os.path.join(config.get_mia_path(),
+                                              'properties'))
 
     def test_update_plug_value(self):
         """
