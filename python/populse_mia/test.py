@@ -6390,36 +6390,35 @@ class TestMIAOthers(TestMIACase):
         proc_lib.mousePressEvent(mouse_event)
 
 class TestMIAPipelineEditor(TestMIACase):
-    '''
-    Tests for the pipeline editor, part of the pipeline manager tab.
+    """Tests for the pipeline editor, part of the pipeline manager tab.
+
     Tests PipelineEditor.
 
     :Contains:
         :Method:
-            - test_add_tab: adds tabs to the PipelineEditorTabs.
-            - test_close_tab: closes a tab in the PipelineEditorTabs.
+            - test_add_tab: adds tabs to the PipelineEditorTabs
+            - test_close_tab: closes a tab in the PipelineEditorTabs
             - test_drop_process: adds a Nipype SPM Smooth process to the
-              pipeline editor.
-            - test_export_plug: exports plugs and mocks dialog boxes.
+              pipeline editor
+            - test_export_plug: exports plugs and mocks dialog boxes
+            - test_save_pipeline: creates a pipeline and tries to save it
             - test_update_plug_value: displays node parameters and 
-              updates a plug value.
+              updates a plug value
             - test_z_check_modif: opens a pipeline, modifies it and 
-              check the modifications.
-            - test_z_get_editor: gets the instance of an editor.
+              check the modifications
+            - test_z_get_editor: gets the instance of an editor
             - test_z_get_filename: gets the relative path to a 
-              previously saved pipeline file.
-            - test_z_get_index: gets the index of an editor.
-            - test_z_get_tab_name: gets the tab name of the editor.
-            - test_z_load_pipeline: loads a pipeline.
-            - test_z_open_sub_pipeline: opens a sub_pipeline.
-            - test_z_set_current_editor: sets the current editor.
-            - test_zz_del_pack: deletes a brick created during UTs.
-    '''
+              previously saved pipeline file
+            - test_z_get_index: gets the index of an editor
+            - test_z_get_tab_name: gets the tab name of the editor
+            - test_z_load_pipeline: loads a pipeline
+            - test_z_open_sub_pipeline: opens a sub_pipeline
+            - test_z_set_current_editor: sets the current editor
+            - test_zz_del_pack: deletes a brick created during UTs
+    """
 
     def test_add_tab(self):
-        """
-        Adds tabs to the PipelineEditorTabs
-        """
+        """Adds tabs to the PipelineEditorTabs."""
 
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
                                                              pipelineEditorTabs)
@@ -6433,21 +6432,17 @@ class TestMIAPipelineEditor(TestMIACase):
         self.assertEqual(pipeline_editor_tabs.tabText(2), "New Pipeline 2")
 
     def test_close_tab(self):
-        """
-        Closes a tab in the pipeline editor tabs while mocking the
-        execution of the dialog boxes.
-        Tests PipelineEditor.close_tab.
+        """Closes a tab in the pipeline editor tabs.
 
-        Notes
-        -----
-        Indirectly tests PopUpClosePipeline.
+         Indirectly tests PopUpClosePipeline.
+
+         - Tests: PipelineEditor.close_tab
+
+         - Mocks: PopUpClosePipeline.exec
         """
 
         # Sets shortcuts for objects that are often used
         ppl_edt_tabs = self.main_window.pipeline_manager.pipelineEditorTabs
-
-        # Adding a new tab and closing the first one
-        #ppl_edt_tabs.new_tab()
 
         # Closes an unmodified tab 
         ppl_edt_tabs.close_tab(0)
@@ -6459,8 +6454,8 @@ class TestMIAPipelineEditor(TestMIACase):
 
         # Mocks the execution of the 'QDialog'
         # Instead of showing it, directly chooses 'save_as_clicked'
-        PopUpClosePipeline.exec = Mock(side_effect=lambda:ppl_edt_tabs
-                                       .pop_up_close.save_as_clicked())
+        PopUpClosePipeline.exec = Mock(side_effect=lambda: ppl_edt_tabs.
+                                                 pop_up_close.save_as_clicked())
         ppl_edt_tabs.save_pipeline = Mock()
 
         # Tries to close the modified tab and saves the pipeline as
@@ -6473,8 +6468,8 @@ class TestMIAPipelineEditor(TestMIACase):
             ppl_edt_tabs.redos[editor]
 
         # Directly chooses 'do_not_save_clicked'
-        PopUpClosePipeline.exec = Mock(side_effect=lambda:ppl_edt_tabs
-                                       .pop_up_close.do_not_save_clicked())
+        PopUpClosePipeline.exec = Mock(side_effect=lambda: ppl_edt_tabs.
+                                             pop_up_close.do_not_save_clicked())
 
         # Adds a new tab and a process
         ppl_edt_tabs.new_tab()
@@ -6485,8 +6480,8 @@ class TestMIAPipelineEditor(TestMIACase):
         ppl_edt_tabs.close_tab(0)
 
         # Directly chooses 'cancel_clicked'
-        PopUpClosePipeline.exec = Mock(side_effect=lambda:ppl_edt_tabs
-                                       .pop_up_close.cancel_clicked())
+        PopUpClosePipeline.exec = Mock(side_effect=lambda: ppl_edt_tabs.
+                                                  pop_up_close.cancel_clicked())
 
         # Adds a process
         ppl_edt_tabs.get_current_editor().click_pos = QPoint(450, 500)
@@ -6496,8 +6491,8 @@ class TestMIAPipelineEditor(TestMIACase):
         ppl_edt_tabs.close_tab(0)
 
         # Directly chooses 'cancel_clicked'
-        PopUpClosePipeline.exec = Mock(side_effect=lambda:ppl_edt_tabs
-                                       .pop_up_close.cancel_clicked())
+        PopUpClosePipeline.exec = Mock(side_effect=lambda: ppl_edt_tabs.
+                                                  pop_up_close.cancel_clicked())
 
         # Adds a new process
         ppl_edt_tabs.get_current_editor().click_pos = QPoint(450, 500)
@@ -6507,32 +6502,34 @@ class TestMIAPipelineEditor(TestMIACase):
         ppl_edt_tabs.close_tab(0)
     
     def test_drop_process(self):
-        """
-        Adds a Nipype SPM's Smooth process to the pipeline editor
-        """
+        """Adds a Nipype SPM's Smooth process to the pipeline editor."""
 
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
                                                              pipelineEditorTabs)
+        self.assertFalse('smooth_1' in (pipeline_editor_tabs.
+                                           get_current_pipeline)().nodes.keys())
         pipeline_editor_tabs.get_current_editor().click_pos = QPoint(450, 500)
         pipeline_editor_tabs.get_current_editor().drop_process(
                                                  'nipype.interfaces.spm.Smooth')
-        self.assertTrue('smooth_1' in
-                        (pipeline_editor_tabs.
+        self.assertTrue('smooth_1' in (pipeline_editor_tabs.
                                            get_current_pipeline)().nodes.keys())
 
     def test_export_plug(self):
-        '''
-        Adds a process and exports plugs in the pipeline editor while 
-        mocking the execution of dialog boxes.
-        Tests PipelineEditor.test_export_plug.
-        '''
+        """Adds a process and exports plugs in the pipeline editor.
+
+        -Tests: PipelineEditor.test_export_plug
+
+        - Mocks:
+            - QMessageBox.question
+            - QInputDialog.getText
+        """
 
         # Sets shortcuts for objects that are often used
         ppl_edt_tabs = self.main_window.pipeline_manager.pipelineEditorTabs
         ppl_edt = ppl_edt_tabs.get_current_editor()
 
         # Mocks 'PipelineEditor' attributes
-        ppl_edt._temp_plug_name = ('','')
+        ppl_edt._temp_plug_name = ('', '')
         ppl_edt._temp_plug = Mock()
         ppl_edt._temp_plug.optional = False
 
@@ -6577,27 +6574,24 @@ class TestMIAPipelineEditor(TestMIACase):
         # Tries to export the same plug value, denies overwriting it
         res = ppl_edt._export_plug(temp_plug_name=('rename_1', '_out_file'),
                                    pipeline_parameter='_out_file',
-                                   multi_export = True)
+                                   multi_export=True)
 
         QMessageBox.question.assert_called_once()
         QInputDialog.getText.assert_called_once()
-        #self.assertIsNone(res)
         self.assertEqual(res, '_out_file') 
 
     def test_save_pipeline(self):
-        '''
-        Creates a pipeline and tries to save it.
-        Tests
-        - PipelineEditor.save_pipeline
-        - PipelineEditorTabs.save_pipeline
-        - save_pipeline inside pipeline_editor.py
+        """Creates a pipeline and tries to save it.
 
-        Notes
-        -----
-        Mocks
-        - QMessageBox.exec
-        - QFileDialog.getSaveFileName
-        '''
+        - Tests:
+            - PipelineEditor.save_pipeline
+            - PipelineEditorTabs.save_pipeline
+            - save_pipeline inside pipeline_editor.py
+
+        - Mocks:
+            - QMessageBox.exec
+            - QFileDialog.getSaveFileName
+        """
 
         # FIXME: this method removes the User_processes and so we lose all
         #        the user's packages!
@@ -6616,12 +6610,12 @@ class TestMIAPipelineEditor(TestMIACase):
         ppl_edt_tabs.get_current_editor().click_pos = QPoint(450, 500)
         ppl_edt_tabs.get_current_editor().add_named_process(Smooth)
 
-        # Exports the input plugs
+        # Exports the input and output plugs
         ppl_edt_tabs.get_current_editor().current_node_name = 'smooth_1'
         (ppl_edt_tabs.get_current_editor().
-         export_node_unconnected_mandatory_plugs())
+                                      export_node_unconnected_mandatory_plugs())
         (ppl_edt_tabs.
-         get_current_editor().export_node_all_unconnected_outputs())
+                     get_current_editor().export_node_all_unconnected_outputs())
         
         # Mocks the execution of a dialog box
         QMessageBox.exec = lambda *args: None
@@ -6640,27 +6634,27 @@ class TestMIAPipelineEditor(TestMIACase):
         QFileDialog.getSaveFileName = lambda *args: [filename]
 
         # Removes the user processes tree to increase coverage
-        shutil.rmtree(usr_proc_folder)
+        #shutil.rmtree(usr_proc_folder)
 
         # Tries to save the pipeline with a filename starting by a digit
         res = ppl_edt_tabs.save_pipeline()
         self.assertIsNone(res)
 
-        filename = os.path.join(usr_proc_folder, 'test_pipeline')
+        filename = os.path.join(usr_proc_folder, 'test_pipeline_1')
         QFileDialog.getSaveFileName = lambda *args: [filename]
 
         # Tries to save the pipeline with a filename without extension, 
         # which is automatically completed to .py
         res = ppl_edt_tabs.save_pipeline()
-        self.assertTrue(res) # The resulting filename is not empty
+        self.assertTrue(res)  # The resulting filename is not empty
 
-        filename = os.path.join(usr_proc_folder, 'test_pipeline.c')
+        filename = os.path.join(usr_proc_folder, 'test_pipeline_2.c')
         QFileDialog.getSaveFileName = lambda *args: [filename]
 
         # Save the pipeline with a filename with the wrong .c extension, 
         # which is automatically corrected to .py 
         res = ppl_edt_tabs.save_pipeline()
-        self.assertTrue(res) # The resulting filename is not empty
+        self.assertTrue(res)  # The resulting filename is not empty
 
         # Sets user mode to true
         Config(config_path=self.config_path).set_user_mode(True)
@@ -6673,10 +6667,10 @@ class TestMIAPipelineEditor(TestMIACase):
         # Sets user mode back to false
         Config(config_path=self.config_path).set_user_mode(True)
 
-        # Saves a pipeliene by specifying a filename
-        filename = os.path.join(usr_proc_folder, 'test_pipeline.py')
-        res = ppl_edt_tabs.save_pipeline(new_file_name = filename)
-        self.assertTrue(res) # The resulting filename is not empty
+        # Saves a pipeline by specifying a filename
+        filename = os.path.join(usr_proc_folder, 'test_pipeline_3.py')
+        res = ppl_edt_tabs.save_pipeline(new_file_name=filename)
+        self.assertTrue(res)  # The resulting filename is not empty
 
     def test_update_plug_value(self):
         """
