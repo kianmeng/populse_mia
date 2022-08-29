@@ -6006,18 +6006,20 @@ class TestMIANodeController(TestMIACase):
             config.setControlV1(False)
 
     def test_plug_filter(self):
-        """Displays the parameters of a node, displays a plug filter
-        and modifies it.
+        """Displays the parameters of a node, displays a plug filter and
+        modifies it.
 
         Tests the class PlugFilter() within the Node Controller V1
         (class NodeController()).
         """
 
-        # Switches to node controller V1
         config = Config(config_path=self.config_path)
-        config.setControlV1(True)
+        controlV1_ver = config.isControlV1()
 
-        self.restart_MIA()
+        # Switch to V1 node controller GUI, if necessary
+        if not controlV1_ver:
+            config.setControlV1(True)
+            self.restart_MIA()
 
         # Opens project 8 and switches to it
         project_8_path = self.get_new_test_project()
@@ -6033,11 +6035,9 @@ class TestMIANodeController(TestMIACase):
                                                              pipelineEditorTabs)
         node_controller = self.main_window.pipeline_manager.nodeController
 
-        # Add the "Smooth" process
+        # Add the "Smooth" process, creates a node called "smooth_1"
         process_class = Smooth
         pipeline_editor_tabs.get_current_editor().click_pos = QPoint(450, 500)
-
-        # Creates a node called "smooth_1"
         pipeline_editor_tabs.get_current_editor().add_named_process(
                                                                   process_class)
         pipeline = pipeline_editor_tabs.get_current_pipeline()
@@ -6064,7 +6064,7 @@ class TestMIANodeController(TestMIACase):
         node = pipeline.nodes[""]
         self.assertEqual(Undefined, node.get_plug_value("in_files"))
 
-        # Searchs for "DOCUMENT_2" the input documents
+        # Look for "DOCUMENT_2" in the input documents
         plug_filter = node_controller.pop_up
         plug_filter.search_str(DOCUMENT_2)
         index_DOCUMENT_1 = plug_filter.table_data.get_scan_row(DOCUMENT_1)
@@ -6119,21 +6119,21 @@ class TestMIANodeController(TestMIACase):
         node_controller.display_filter("inputs", "in_files",
                                        parameters, input_process)
 
-        # Searchs for something that does not give any match
+        # Look for something that does not give any match
         plug_filter.search_str('!@#')
         # this will empty the "plug_filter.table_data.selectedIndexes()"
-        # and trigger a uncovered part of "set_plug_value(self)"
+        # and trigger an uncovered part of "set_plug_value(self)"
 
         plug_filter.ok_clicked()
 
-        # Switches back to node controller V2
+        # Switches back to node controller V2, if necessary (return to initial
+        # state)
         config = Config(config_path=self.config_path)
-        config.setControlV1(False)
 
+        if not controlV1_ver:
+            config.setControlV1(False)
     def test_update_node_name(self):
-        """
-        Displays parameters of a node and updates its name
-        """
+        """Displays parameters of a node and updates its name."""
 
         pipeline_manager = self.main_window.pipeline_manager
         pipeline_editor_tabs = pipeline_manager.pipelineEditorTabs
