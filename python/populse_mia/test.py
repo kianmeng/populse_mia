@@ -6228,8 +6228,8 @@ class TestMIAOthers(TestMIACase):
     """
 
     def test_iteration_table(self):
-        """Opens a new project, initializes the pipeline iteration and
-        changes its parameters.
+        """Opens a new project, initializes the pipeline iteration and changes
+        its parameters.
 
         - Tests: IterationTable
 
@@ -6245,7 +6245,7 @@ class TestMIAOthers(TestMIACase):
         ppl_manager = self.main_window.pipeline_manager
         ppl_editor = ppl_manager.pipelineEditorTabs.get_current_editor()
 
-        # Mocks the execution of a dialog box to avoid assyncronous shot
+        # Mocks the execution of a dialog box to avoid asynchronous shot
         QDialog.exec_ = Mock(return_value=QDialog.Accepted)
 
         # Allows for the iteration of the pipeline
@@ -6268,11 +6268,11 @@ class TestMIAOthers(TestMIACase):
         self.assertEqual(len(iter_table.push_buttons), 2)
 
         # Mocks the execution of 'PopUpSelectTagCountTable' to avoid 
-        # assyncronous shot
+        # asynchronous shot
         PopUpSelectTagCountTable.exec_ = Mock(return_value=True)
 
-        # Selects a tag to iterate over, tests 'select_iteration_tag'
-        # while mocking a 'PopUpSelectTagCountTable'
+        # Selects a tag to iterate over, tests 'select_iteration_tag' while
+        # mocking a 'PopUpSelectTagCountTable'.
         # Due to the above mock, 'iterated_tag' is set as None
         ppl_editor.iterated_tag = 'BandWidth'
         iter_table.select_iteration_tag()
@@ -6292,14 +6292,14 @@ class TestMIAOthers(TestMIACase):
         # Selects the visualized tag
         iter_table.select_visualized_tag(0)
 
-        # Sends the data browser scans to the pipieline manager and
-        # updates the iterated tags
+        # Sends the data browser scans to the pipeline manager and updates the
+        # iterated tags
         SCANS_LIST = iter_table.project.session.get_documents_names('current')
         ppl_manager.scan_list = SCANS_LIST
         iter_table.update_iterated_tag()
 
         # Updates the iteration table, tests 'update_table' while 
-        # mocking the execution of 'filter_documents' ftom
+        # mocking the execution of 'filter_documents'
 
         DOC_1_NAME = SCANS_LIST[0]
         DOC_1 = iter_table.project.session.get_document('current', DOC_1_NAME)
@@ -6310,25 +6310,21 @@ class TestMIAOthers(TestMIACase):
         iter_table.update_table()
 
         # Asserts that the iteration table has one item
-        self.assertIsNotNone(iter_table.iteration_table.item(0,0))
-        self.assertIsNone(iter_table.iteration_table.item(1,0))
+        self.assertIsNotNone(iter_table.iteration_table.item(0, 0))
+        self.assertIsNone(iter_table.iteration_table.item(1, 0))
 
     def test_process_library(self):
-        '''
-        Inserts a row, mimes and changes the data and deletes it.
-        Tests
-        - ProcessLibrary
+        """Inserts a row, mimes and changes the data and deletes it.
 
-        Notes
-        -----
-        The process library is located at the left corner of the 
-        pipeline manager tab, where the list of available bricks is 
-        shown.
+        - Tests: ProcessLibrary
 
-        Mocks
-        - QMessageBox.exec
-        - QMessageBox.question
-        '''
+        -Mocks:
+            - QMessageBox.exec
+            - QMessageBox.question
+
+        The process library is located at the left corner of the pipeline
+        manager tab, where the list of available bricks is shown.
+        """
 
         # Sets shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
@@ -6353,7 +6349,7 @@ class TestMIAOthers(TestMIACase):
         # Mimes the data of the row widget
         mime_data = proc_lib._model.mimeData([row_index])
         self.assertEqual(mime_data.data('component/name').data(), 
-                         bytes(row_data, encoding = 'utf-8'))
+                         bytes(row_data, encoding='utf-8'))
 
         # Changes the data of the row
         proc_lib._model.setData(row_index, 'untitled101')
@@ -6362,7 +6358,7 @@ class TestMIAOthers(TestMIACase):
         # Mocks the execution of a dialog box
         QMessageBox.exec = lambda *args: None
         QMessageBox.question = lambda *args: QMessageBox.Yes
-        
+
         # Deletes the row by pressing the del key
         event = Mock()
         event.key = lambda *args: Qt.Key_Delete
@@ -6370,7 +6366,7 @@ class TestMIAOthers(TestMIACase):
 
         # Mocks a mouse press event of the first item of the process lib
         mouse_event = QtGui.QMouseEvent
-        mouse_event.pos = lambda *args: QPoint(0,0)
+        mouse_event.pos = lambda *args: QPoint(0, 0)
         mouse_event.button = lambda *args: Qt.RightButton
 
         # Mocks the return value of 'mousePressEvent'
