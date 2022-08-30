@@ -203,6 +203,9 @@ os.chdir(os.path.dirname(os.path.realpath(__file__)))
 if 'NO_ET' not in os.environ:
     os.environ['NO_ET'] = "1"
 
+if "NIPYPE_NO_ET" not in os.environ:
+    os.environ["NIPYPE_NO_ET"] = "1"
+
 
 class TestMIACase(unittest.TestCase):
     """Parent class for the test classes of mia.
@@ -6613,11 +6616,13 @@ class TestMIAPipelineEditor(TestMIACase):
         usr_proc_folder = os.path.join(config.get_mia_path(),
                                        'processes', 'User_processes')
         shutil.copytree(usr_proc_folder,
-                        os.path.join(self.config_path, '4test_save_pipeline',
+                        os.path.join(self.config_path,
+                                     '4UTs_TestMIAPipelineEditor',
                                      'User_processes'))
         shutil.copy(os.path.join(config.get_mia_path(), 'properties',
                                  'process_config.yml'),
-                    os.path.join(self.config_path, '4test_save_pipeline'))
+                    os.path.join(self.config_path,
+                                 '4UTs_TestMIAPipelineEditor'))
 
         # Sets often used shortcuts
         ppl_edt_tabs = self.main_window.pipeline_manager.pipelineEditorTabs
@@ -6649,11 +6654,6 @@ class TestMIAPipelineEditor(TestMIACase):
         self.assertIsNone(res)
 
         # Mocks the execution of a QFileDialog
-        config = Config(config_path=self.config_path)
-        usr_proc_folder = os.path.join(config.get_mia_path(), 
-                                       'processes', 'User_processes')
-        
-        filename = os.path.join(usr_proc_folder, '1_test_pipeline')
         QFileDialog.getSaveFileName = lambda *args: [filename]
 
         # Removes the config.get_mia_path()/processes/User_processes folder, to
@@ -6661,22 +6661,24 @@ class TestMIAPipelineEditor(TestMIACase):
         shutil.rmtree(usr_proc_folder)
 
         # Tries to save the pipeline with a filename starting by a digit
+        config = Config(config_path=self.config_path)
+        usr_proc_folder = os.path.join(config.get_mia_path(),
+                                       'processes', 'User_processes')
+        filename = os.path.join(usr_proc_folder, '1_test_pipeline')
         res = ppl_edt_tabs.save_pipeline()
         self.assertIsNone(res)
 
-        filename = os.path.join(usr_proc_folder, 'test_pipeline_1')
-        QFileDialog.getSaveFileName = lambda *args: [filename]
-
         # Tries to save the pipeline with a filename without extension, 
         # which is automatically completed to .py
+        filename = os.path.join(usr_proc_folder, 'test_pipeline_1')
+        QFileDialog.getSaveFileName = lambda *args: [filename]
         res = ppl_edt_tabs.save_pipeline()
         self.assertTrue(res)  # The resulting filename is not empty
 
+        # Save the pipeline with a filename with the wrong .c extension, 
+        # which is automatically corrected to .py
         filename = os.path.join(usr_proc_folder, 'test_pipeline_2.c')
         QFileDialog.getSaveFileName = lambda *args: [filename]
-
-        # Save the pipeline with a filename with the wrong .c extension, 
-        # which is automatically corrected to .py 
         res = ppl_edt_tabs.save_pipeline()
         self.assertTrue(res)  # The resulting filename is not empty
 
@@ -6695,19 +6697,6 @@ class TestMIAPipelineEditor(TestMIACase):
         filename = os.path.join(usr_proc_folder, 'test_pipeline_3.py')
         res = ppl_edt_tabs.save_pipeline(new_file_name=filename)
         self.assertTrue(res)  # The resulting filename is not empty
-
-        # Restore the initial process library (before this test)
-        config = Config(config_path=self.config_path)
-        shutil.rmtree(usr_proc_folder)
-        os.remove(os.path.join(config.get_mia_path(), 'properties',
-                               'process_config.yml'))
-        shutil.copytree(os.path.join(self.config_path, '4test_save_pipeline',
-                                     'User_processes'),
-                        os.path.join(usr_proc_folder))
-        shutil.copy(os.path.join(self.config_path, '4test_save_pipeline',
-                                 'process_config.yml'),
-                    os.path.join(config.get_mia_path(),
-                                 'properties'))
 
     def test_update_plug_value(self):
         """Displays parameters of a node and updates a plug value."""
@@ -6796,33 +6785,35 @@ class TestMIAPipelineEditor(TestMIACase):
             config.setControlV1(False)
 
     def test_z_check_modif(self):
-        """
-        Opens a pipeline, opens it as a process in another tab, modifies it
-        and check the modifications
+        """Opens a pipeline, opens it as a process in another tab, modifies it
+        and check the modifications.
         """
 
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
                                                              pipelineEditorTabs)
+
+        # Adding a process from a .py file, creates a node called "smooth_1"
         pipeline_editor_tabs.get_current_editor().click_pos = QPoint(450, 500)
         config = Config(config_path=self.config_path)
-
         filename = os.path.join(config.get_mia_path(), 'processes',
-                                'User_processes', 'test_pipeline.py')
+                                'User_processes', 'test_pipeline_1.py')
         pipeline_editor_tabs.load_pipeline(filename)
-
         pipeline = pipeline_editor_tabs.get_current_pipeline()
         self.assertTrue("smooth_1" in pipeline.nodes.keys())
 
+        # Make a new pipeline editor tab
         pipeline_editor_tabs.new_tab()
         pipeline_editor_tabs.set_current_editor_by_tab_name("New Pipeline 1")
+
+        # Adding a process from Packages library, creates a node called
+        # "test_pipeline_1_1"
         pipeline_editor_tabs.get_current_editor().click_pos = QPoint(450, 500)
-
         pipeline_editor_tabs.get_current_editor().drop_process(
-                                                 "User_processes.Test_pipeline")
+                                               "User_processes.Test_pipeline_1")
         pipeline = pipeline_editor_tabs.get_current_pipeline()
+        self.assertTrue("test_pipeline_1_1" in pipeline.nodes.keys())
 
-        self.assertTrue("test_pipeline_1" in pipeline.nodes.keys())
-
+        # Adding two processes, creates nodes called "smooth_1" and "smooth_2"
         pipeline_editor_tabs.get_current_editor().drop_process(
                                                  "nipype.interfaces.spm.Smooth")
         pipeline_editor_tabs.get_current_editor().drop_process(
@@ -6830,79 +6821,83 @@ class TestMIAPipelineEditor(TestMIACase):
         self.assertTrue("smooth_1" in pipeline.nodes.keys())
         self.assertTrue("smooth_2" in pipeline.nodes.keys())
 
+        # Adding a link between smooth_1 and test_pipeline_1_1 nodes
         pipeline_editor_tabs.get_current_editor().add_link(
-                                                ("smooth_1", "_smoothed_files"),
-                                                ("test_pipeline_1", "in_files"),
-                                                active=True, weak=False)
-
+                                              ("smooth_1", "_smoothed_files"),
+                                              ("test_pipeline_1_1", "in_files"),
+                                              active=True, weak=False)
         self.assertEqual(1,
-                         len(pipeline.nodes["test_pipeline_1"].plugs[
+                         len(pipeline.nodes["test_pipeline_1_1"].plugs[
                                                         "in_files"].links_from))
         self.assertEqual(1,
                          len(pipeline.nodes["smooth_1"].plugs[
                                                    "_smoothed_files"].links_to))
 
+        # Adding a link between test_pipeline_1_1 and smooth_2 nodes
         pipeline_editor_tabs.get_current_editor().add_link(
-                                         ("test_pipeline_1", "_smoothed_files"),
-                                         ("smooth_2", "in_files"),
-                                         active=True, weak=False)
-
+                                       ("test_pipeline_1_1", "_smoothed_files"),
+                                       ("smooth_2", "in_files"),
+                                       active=True, weak=False)
         self.assertEqual(1,
                          len(pipeline.nodes["smooth_2"].plugs[
                                                         "in_files"].links_from))
         self.assertEqual(1,
-                         len(pipeline.nodes["test_pipeline_1"].plugs[
+                         len(pipeline.nodes["test_pipeline_1_1"].plugs[
                                                    "_smoothed_files"].links_to))
 
-        pipeline_editor_tabs.set_current_editor_by_tab_name("test_pipeline.py")
-        pipeline_editor_tabs.get_current_editor().click_pos = QPoint(450, 500)
+        # Return to the first tab
+        pipeline_editor_tabs.set_current_editor_by_tab_name(
+                                                           "test_pipeline_1.py")
 
-        (pipeline_editor_tabs.
-                          get_current_editor)().export_node_plugs("smooth_1",
+        # Export all plugs of the smooth_1 node
+        pipeline_editor_tabs.get_current_editor().click_pos = QPoint(450, 500)
+        pipeline_editor_tabs.get_current_editor().export_node_plugs(
+                                                                  "smooth_1",
                                                                   optional=True)
+
+        # Save the pipeline
         self.main_window.pipeline_manager.savePipeline(uncheck=True)
 
+        # Go back to the second tab
         pipeline_editor_tabs.set_current_editor_by_tab_name("New Pipeline 1")
         pipeline_editor_tabs.get_current_editor().scene.pos[
-                                           "test_pipeline_1"] = QPoint(450, 500)
-        pipeline_editor_tabs.get_current_editor().check_modifications()
+                                         "test_pipeline_1_1"] = QPoint(450, 500)
 
+        # Check if the nodes of the pipeline have been modified
+        pipeline_editor_tabs.get_current_editor().check_modifications()
         pipeline = pipeline_editor_tabs.get_current_pipeline()
-        self.assertTrue("fwhm" in
-                                 pipeline.nodes["test_pipeline_1"].plugs.keys())
+        self.assertTrue("fwhm" in pipeline.nodes[
+                                              "test_pipeline_1_1"].plugs.keys())
 
     def test_z_get_editor(self):
-        """
-        Gets the instance of an editor (z to run at the end)
+        """Gets the instance of an editor.
 
-        This tests:
-         - PipelineEditorTabs.get_editor_by_index
-         - PipelineEditorTabs.get_current_editor
-         - PipelineEditorTabs.get_editor_by_tab_name
-         - PipelineEditorTabs.get_editor_by_filename
+        - Tests:
+            - PipelineEditorTabs.get_editor_by_index
+            - PipelineEditorTabs.get_current_editor
+            - PipelineEditorTabs.get_editor_by_tab_name
+            - PipelineEditorTabs.get_editor_by_filename
         """
 
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
                                                              pipelineEditorTabs)
         config = Config(config_path=self.config_path)
-
         filename = os.path.join(config.get_mia_path(), 'processes',
-                                'User_processes', 'test_pipeline.py')
+                                'User_processes', 'test_pipeline_1.py')
         pipeline_editor_tabs.load_pipeline(filename)
-
         editor0 = pipeline_editor_tabs.get_current_editor()
+
         # create new tab with new editor and make it current:
         pipeline_editor_tabs.new_tab()
         editor1 = pipeline_editor_tabs.get_current_editor()
 
+        # Perform various tests on the pipeline editor tabs
         self.assertEqual(pipeline_editor_tabs.get_editor_by_index(0), editor0)
         self.assertEqual(pipeline_editor_tabs.get_editor_by_index(1), editor1)
         self.assertEqual(pipeline_editor_tabs.get_current_editor(), editor1)
-        self.assertEqual(editor0,
-                         pipeline_editor_tabs.get_editor_by_tab_name(
-                                                            "test_pipeline.py"))
-        self.assertEqual(editor1,
-                         pipeline_editor_tabs.get_editor_by_tab_name(
+        self.assertEqual(editor0, pipeline_editor_tabs.get_editor_by_tab_name(
+                                                          "test_pipeline_1.py"))
+        self.assertEqual(editor1, pipeline_editor_tabs.get_editor_by_tab_name(
                                                               "New Pipeline 1"))
         self.assertEqual(None,
                          pipeline_editor_tabs.get_editor_by_tab_name("dummy"))
@@ -6912,56 +6907,52 @@ class TestMIAPipelineEditor(TestMIACase):
                          pipeline_editor_tabs.get_editor_by_file_name("dummy"))
 
     def test_z_get_filename(self):
-        """
-        Gets the relative path to a previously saved pipeline file
-        (z to run at the end).
+        """Gets the relative path to a previously saved pipeline file.
 
-        This tests:
-         - PipelineEditorTabs.get_filename_by_index
-         - PipelineEditorTabs.get_current_filename
+        - Tests:
+            - PipelineEditorTabs.get_filename_by_index
+            - PipelineEditorTabs.get_current_filename
         """
 
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
                                                              pipelineEditorTabs)
         config = Config(config_path=self.config_path)
-
         filename = os.path.join(config.get_mia_path(), 'processes',
-                                'User_processes', 'test_pipeline.py')
+                                'User_processes', 'test_pipeline_1.py')
         pipeline_editor_tabs.load_pipeline(filename)
 
         self.assertEqual(filename,
                          os.path.abspath(
-                             pipeline_editor_tabs.get_filename_by_index(0)))
+                                 pipeline_editor_tabs.get_filename_by_index(0)))
         self.assertEqual(None, pipeline_editor_tabs.get_filename_by_index(1))
         self.assertEqual(filename,
                          os.path.abspath(
-                             pipeline_editor_tabs.get_current_filename()))
+                                   pipeline_editor_tabs.get_current_filename()))
 
     def test_z_get_index(self):
-        """
-        Gets the index of an editor. (z to run at the end)
+        """Gets the index of an editor.
 
-        This tests:
-         - PipelineEditorTabs.get_index_by_tab_name
-         - PipelineEditorTabs.get_index_by_filename
-         - PipelineEditorTabs.get_index_by_editor
+        - Tests:
+            - PipelineEditorTabs.get_index_by_tab_name
+            - PipelineEditorTabs.get_index_by_filename
+            - PipelineEditorTabs.get_index_by_editor
         """
 
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
                                                              pipelineEditorTabs)
         config = Config(config_path=self.config_path)
         filename = os.path.join(config.get_mia_path(), 'processes',
-                                'User_processes', 'test_pipeline.py')
+                                'User_processes', 'test_pipeline_1.py')
         pipeline_editor_tabs.load_pipeline(filename)
         editor0 = pipeline_editor_tabs.get_current_editor()
 
-        # create new tab with new editor and make it current
+        # Create new tab with new editor and make it current
         pipeline_editor_tabs.new_tab()
         editor1 = pipeline_editor_tabs.get_current_editor()
 
         self.assertEqual(0,
                          pipeline_editor_tabs.get_index_by_tab_name(
-                                                            "test_pipeline.py"))
+                                                          "test_pipeline_1.py"))
         self.assertEqual(1,
                          pipeline_editor_tabs.get_index_by_tab_name(
                                                               "New Pipeline 1"))
@@ -6979,12 +6970,11 @@ class TestMIAPipelineEditor(TestMIACase):
                          pipeline_editor_tabs.get_index_by_editor("dummy"))
 
     def test_z_get_tab_name(self):
-        """
-        Gets the tab name of the editor. (z to run at the end)
+        """Gets the tab name of the editor.
 
-        This tests:
-         - PipelineEditorTabs.get_tab_name_by_index
-         - PipelineEditorTabs.get_current_tab_name
+        - Tests:
+            - PipelineEditorTabs.get_tab_name_by_index
+            - PipelineEditorTabs.get_current_tab_name
         """
 
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
@@ -6998,73 +6988,66 @@ class TestMIAPipelineEditor(TestMIACase):
                          pipeline_editor_tabs.get_current_tab_name())
 
     def test_z_load_pipeline(self):
-        """
-        Loads a pipeline (z to run at the end)
-        """
+        """Loads a pipeline."""
 
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
                                                              pipelineEditorTabs)
         config = Config(config_path=self.config_path)
-
         filename = os.path.join(config.get_mia_path(), 'processes',
-                                'User_processes', 'test_pipeline.py')
+                                'User_processes', 'test_pipeline_1.py')
         pipeline_editor_tabs.load_pipeline(filename)
 
         pipeline = pipeline_editor_tabs.get_current_pipeline()
         self.assertTrue("smooth_1" in pipeline.nodes.keys())
 
     def test_z_open_sub_pipeline(self):
-        """
-        Opens a sub_pipeline (z to run at the end)
-        """
+        """Opens a sub_pipeline."""
 
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
                                                              pipelineEditorTabs)
         config = Config(config_path=self.config_path)
 
-        # Adding the processes path to the system path
+        # Adding the "config.get_mia_path()/processes" path to the system path
         sys.path.append(os.path.join(config.get_mia_path(), 'processes'))
 
-        # Importing the package
+        # Importing the 'User_processes' package
         package_name = 'User_processes'
         __import__(package_name)
         pkg = sys.modules[package_name]
 
         for name, cls in sorted(list(pkg.__dict__.items())):
 
-            if name == 'Test_pipeline':
+            if name == 'Test_pipeline_1':
                 process_class = cls
 
-        # Adding the "test_pipeline" as a process
+        # Adding the "test_pipeline_1" as a process
         pipeline_editor_tabs.get_current_editor().click_pos = QPoint(450, 500)
         pipeline_editor_tabs.get_current_editor().add_named_process(
                                                                   process_class)
 
         # Opening the sub-pipeline in a new editor
         pipeline = pipeline_editor_tabs.get_current_pipeline()
-        process_instance = pipeline.nodes["test_pipeline_1"].process
+        process_instance = pipeline.nodes["test_pipeline_1_1"].process
         pipeline_editor_tabs.open_sub_pipeline(process_instance)
-
         self.assertTrue(3, pipeline_editor_tabs.count())
-        self.assertEqual("test_pipeline.py",
+        self.assertEqual("test_pipeline_1.py",
                          os.path.basename(
-                             pipeline_editor_tabs.get_filename_by_index(1)))
+                                 pipeline_editor_tabs.get_filename_by_index(1)))
 
     def test_z_set_current_editor(self):
-        """
-        Sets the current editor (z to run at the end)
+        """Sets the current editor.
 
-        This tests:
-         - PipelineEditorTabs.set_current_editor_by_tab_name
-         - PipelineEditorTabs.set_current_editor_by_file_name
-         - PipelineEditorTabs.set_current_editor_by_editor
+        - Tests:
+            - PipelineEditorTabs.set_current_editor_by_tab_name
+            - PipelineEditorTabs.set_current_editor_by_file_name
+            - PipelineEditorTabs.set_current_editor_by_editor
         """
 
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
                                                              pipelineEditorTabs)
         config = Config(config_path=self.config_path)
         filename = os.path.join(config.get_mia_path(), 'processes',
-                                'User_processes', 'test_pipeline.py')
+                                'User_processes', 'test_pipeline_1.py')
         pipeline_editor_tabs.load_pipeline(filename)
         editor0 = pipeline_editor_tabs.get_current_editor()
 
@@ -7072,7 +7055,8 @@ class TestMIAPipelineEditor(TestMIACase):
         pipeline_editor_tabs.new_tab()
         editor1 = pipeline_editor_tabs.get_current_editor()
 
-        pipeline_editor_tabs.set_current_editor_by_tab_name("test_pipeline.py")
+        pipeline_editor_tabs.set_current_editor_by_tab_name(
+                                                           "test_pipeline_1.py")
         self.assertEqual(pipeline_editor_tabs.currentIndex(), 0)
         pipeline_editor_tabs.set_current_editor_by_tab_name("New Pipeline 1")
         self.assertEqual(pipeline_editor_tabs.currentIndex(), 1)
@@ -7086,21 +7070,42 @@ class TestMIAPipelineEditor(TestMIACase):
         self.assertEqual(pipeline_editor_tabs.currentIndex(), 0)
 
     def test_zz_del_pack(self):
-        """ We remove the brick created during the unit tests, and we take
-        advantage of this to cover the part of the code used to remove the
-        packages """
+        """Remove the bricks created during the unit tests.
+
+        Take advantage of this to cover the part of the code used to remove the
+        packages.
+        """
          
         pkg = PackageLibraryDialog(self.main_window)
 
         # The Test_pipeline brick was added in the package library
-        self.assertTrue("Test_pipeline" in
+        self.assertTrue("Test_pipeline_1" in
                              pkg.package_library.package_tree['User_processes'])
 
-        pkg.delete_package(to_delete="User_processes.Test_pipeline", loop=True)
+        pkg.delete_package(to_delete="User_processes.Test_pipeline_1",
+                           loop=True)
 
         # The Test_pipeline brick has been removed from the package library
-        self.assertFalse("Test_pipeline" in
+        self.assertFalse("Test_pipeline_1" in
                              pkg.package_library.package_tree['User_processes'])
+
+        # Restore the initial process library (before test_save_pipeline test)
+        config = Config(config_path=self.config_path)
+        usr_proc_folder = os.path.join(config.get_mia_path(),
+                                       'processes', 'User_processes')
+        shutil.rmtree(usr_proc_folder)
+        os.remove(os.path.join(config.get_mia_path(), 'properties',
+                               'process_config.yml'))
+        shutil.copytree(os.path.join(self.config_path,
+                                     '4UTs_TestMIAPipelineEditor',
+                                     'User_processes'),
+                        os.path.join(usr_proc_folder))
+        shutil.copy(os.path.join(self.config_path,
+                                 '4UTs_TestMIAPipelineEditor',
+                                 'process_config.yml'),
+                    os.path.join(config.get_mia_path(),
+                                 'properties'))
+
 
 class TestMIAPipelineManagerTab(TestMIACase):
     '''
