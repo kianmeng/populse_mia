@@ -5749,6 +5749,14 @@ class TestMIANodeController(TestMIACase):
     def test_display_filter(self):
         """Displays parameters of a node and displays a plug filter."""
 
+        config = Config(config_path=self.config_path)
+        controlV1_ver = config.isControlV1()
+
+        # Switch to V1 node controller GUI, if necessary
+        if not controlV1_ver:
+            config.setControlV1(True)
+            self.restart_MIA()
+
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
                                                              pipelineEditorTabs)
         node_controller = self.main_window.pipeline_manager.nodeController
@@ -5786,6 +5794,13 @@ class TestMIANodeController(TestMIACase):
             self.assertEqual(2,
                              pipeline.nodes["threshold_1"].get_plug_value(
                                                                  "synchronize"))
+
+        # Switches back to node controller V2, if necessary (return to initial
+        # state)
+        config = Config(config_path=self.config_path)
+
+        if not controlV1_ver:
+            config.setControlV1(False)
 
     def test_filter_widget(self):
         """Places a node of the "Input_Filter" process, feeds in documents
@@ -6524,7 +6539,7 @@ class TestMIAPipelineEditor(TestMIACase):
             - QInputDialog.getText
         """
 
-        # Sets shortcuts for objects that are often used
+        # Set shortcuts for objects that are often used
         ppl_edt_tabs = self.main_window.pipeline_manager.pipelineEditorTabs
         ppl_edt = ppl_edt_tabs.get_current_editor()
 
@@ -6641,7 +6656,8 @@ class TestMIAPipelineEditor(TestMIACase):
         filename = os.path.join(usr_proc_folder, '1_test_pipeline')
         QFileDialog.getSaveFileName = lambda *args: [filename]
 
-        # Removes the user processes tree to increase coverage
+        # Removes the config.get_mia_path()/processes/User_processes folder, to
+        # increase coverage
         shutil.rmtree(usr_proc_folder)
 
         # Tries to save the pipeline with a filename starting by a digit
@@ -6684,29 +6700,33 @@ class TestMIAPipelineEditor(TestMIACase):
         config = Config(config_path=self.config_path)
         shutil.rmtree(usr_proc_folder)
         os.remove(os.path.join(config.get_mia_path(), 'properties',
-                                 'process_config.yml'))
+                               'process_config.yml'))
         shutil.copytree(os.path.join(self.config_path, '4test_save_pipeline',
                                      'User_processes'),
                         os.path.join(usr_proc_folder))
         shutil.copy(os.path.join(self.config_path, '4test_save_pipeline',
                                  'process_config.yml'),
-                                 os.path.join(config.get_mia_path(),
-                                              'properties'))
+                    os.path.join(config.get_mia_path(),
+                                 'properties'))
 
     def test_update_plug_value(self):
-        """
-        Displays parameters of a node and updates a plug value
-        """
+        """Displays parameters of a node and updates a plug value."""
+
+        config = Config(config_path=self.config_path)
+        controlV1_ver = config.isControlV1()
+
+        # Switch to V1 node controller GUI, if necessary
+        if not controlV1_ver:
+            config.setControlV1(True)
+            self.restart_MIA()
 
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
                                                              pipelineEditorTabs)
         node_controller = self.main_window.pipeline_manager.nodeController
 
-        # Adding a process
+        # Adding a process, creates a node called "threshold_1"
         process_class = Threshold
         pipeline_editor_tabs.get_current_editor().click_pos = QPoint(450, 500)
-
-        # Creates a node called "threshold_1":
         pipeline_editor_tabs.get_current_editor().add_named_process(
                                                                   process_class)
 
@@ -6716,7 +6736,10 @@ class TestMIAPipelineEditor(TestMIACase):
                                            get_process_instance(process_class),
                                            pipeline)
 
-        # Updating the value of the "synchronize" plug
+        # Updating the value of the "synchronize" input plug and
+        # "_activation_forced" output plugs.
+        # get_index_from_plug_name() only exists on the NodeController class
+        # (v1).
         if hasattr(node_controller, 'get_index_from_plug_name'):
             index = node_controller.get_index_from_plug_name("synchronize",
                                                              "in")
@@ -6751,6 +6774,9 @@ class TestMIAPipelineEditor(TestMIACase):
                                            get_process_instance(input_process),
                                            pipeline)
 
+        # Updating the value of the "synchronize" input plug.
+        # get_index_from_plug_name() only exists on the NodeController class
+        # (v1).
         if hasattr(node_controller, 'get_index_from_plug_name'):
             index = node_controller.get_index_from_plug_name("synchronize",
                                                              "in")
@@ -6761,6 +6787,13 @@ class TestMIAPipelineEditor(TestMIACase):
             self.assertEqual(2,
                              pipeline.nodes["threshold_1"].get_plug_value(
                                                                  "synchronize"))
+
+        # Switches back to node controller V2, if necessary (return to initial
+        # state)
+        config = Config(config_path=self.config_path)
+
+        if not controlV1_ver:
+            config.setControlV1(False)
 
     def test_z_check_modif(self):
         """
@@ -8468,7 +8501,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         Tests PipelineManagerTab.test_show_status.        
         '''
 
-        # Sets shortcuts for objects that are often used
+        # Set shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
 
         # Creates a 'RunProgress' object
@@ -8483,6 +8516,15 @@ class TestMIAPipelineManagerTab(TestMIACase):
         Tests the undo/redo actions
         """
 
+        config = Config(config_path=self.config_path)
+        controlV1_ver = config.isControlV1()
+
+        # Switch to V1 node controller GUI, if necessary
+        if not controlV1_ver:
+            config.setControlV1(True)
+            self.restart_MIA()
+
+        # Set shortcuts for objects that are often used
         pipeline_manager = self.main_window.pipeline_manager
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
                                 pipelineEditorTabs)
@@ -8511,7 +8553,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         #QMessageBox.exec = lambda self_, *arg: self_.buttons()[-1].clicked.emit()
 
         # Switches to pipeline manager
-        #self.main_window.tabs.setCurrentIndex(2)
+        self.main_window.tabs.setCurrentIndex(2)
 
         # Add a process => creates a node called "smooth_1",
         # test if Smooth_1 is a node in the current pipeline / editor
@@ -8731,6 +8773,13 @@ class TestMIAPipelineManagerTab(TestMIACase):
             self.assertEqual("PREFIX",
                              pipeline.nodes["my_smooth"].get_plug_value(
                                                                   "out_prefix"))
+
+        # Switches back to node controller V2, if necessary (return to initial
+        # state)
+        config = Config(config_path=self.config_path)
+
+        if not controlV1_ver:
+            config.setControlV1(False)
 
     def test_update_auto_inheritance(self):
         '''
@@ -9050,7 +9099,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
                       'Guerbet_MDEFT-MDEFTpvm-000940_800.nii')
         DOCUMENT_1 = os.path.abspath(os.path.join(folder, NII_FILE_1))
 
-        # Switches to pipiline manager tab
+        # Switches to pipeline manager tab
         self.main_window.tabs.setCurrentIndex(2)
         
         # Adds a Rename processes, creates the 'rename_1' node
