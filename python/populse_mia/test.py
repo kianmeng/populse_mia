@@ -7108,81 +7108,65 @@ class TestMIAPipelineEditor(TestMIACase):
 
 
 class TestMIAPipelineManagerTab(TestMIACase):
-    '''
-    Tests the pipeline manager tab class, part of the homonym tab.
+    """Tests the pipeline manager tab class, part of the homonym tab.
 
     :Contains:
         :Method:
-            - test_add_plug_value_to_database_list_type: adds a list 
+            - test_add_plug_value_to_database_list_type: adds a list type plug
+              value to the database
+            - test_add_plug_value_to_database_non_list_type: adds a non list
               type plug value to the database
-            - test_add_plug_value_to_database_non_list_type: adds a non 
-              list type plug value to the database
-            - test_add_plug_value_to_database_several_inputs: exports a 
-        	  non list type input plug and with several possible inputs
+            - test_add_plug_value_to_database_several_inputs: exports a non list
+              type input plug and with several possible inputs
             - test_ask_iterated_pipeline_plugs: test the iteration 
               dialog for each plug of a Rename process
             - test_build_iterated_pipeline: mocks methods and builds an 
               iterated pipeline
-            - test_check_requirements: checks the requirements for a
-              given node
-            - test_cleanup_older_init: tests the cleaning of old 
-              initialisations
+            - test_check_requirements: checks the requirements for a given node
+            - test_cleanup_older_init: tests the cleaning of old initialisations
             - test_complete_pipeline_parameters: test the pipeline 
               parameters completion
-            - test_delete_processes: deletes a process and makes the 
-              undo/redo
-            - test_end_progress: creates a progress object and tries to 
-              end it
+            - test_delete_processes: deletes a process and makes the undo/redo
+            - test_end_progress: creates a progress object and tries to end it
             - test_garbage_collect: collects the garbage of a pipeline
-            - test_get_capsul_engine: gets the capsul engine of the
-              pipeline
+            - test_get_capsul_engine: gets the capsul engine of the pipeline
             - test_get_missing_mandatory_parameters: tries to initialize
               the pipeline with missing mandatory parameters
-            - test_get_pipeline_or_process: gets a pipeline and a
-              process from the pipeline_manager
-            - test_initialize: mocks objects and initializes the 
-              workflow
-            - test_register_completion_attributes: registers completion 
-              attributes
+            - test_get_pipeline_or_process: gets a pipeline and a process from
+              the pipeline_manager
+            - test_initialize: mocks objects and initializes the workflow
+            - test_register_completion_attributes: mocks methods of the
+              pipeline manager and registers completion attributes
             - test_register_node_io_in_database: sets input and output 
               parameters and registers them in database
-            - test_register_completion_attributes: mocks methods of the 
-              pipeline manager and registers completion attributes
             - test_remove_progress: removes the progress of the pipeline
             - test_run: creates a pipeline manager progress object and 
               tries to run it
             - test_save_pipeline: saves a simple pipeline
             - test_savePipelineAs: saves a pipeline under another name
-            - test_set_anim_frame: runs the 'rotatingBrainVISA.gif' 
-              animation
+            - test_set_anim_frame: runs the 'rotatingBrainVISA.gif' animation
             - test_show_status: shows the status of pipeline execution
-            - test_stop_execution: shows the status window of the 
-              pipeline manager
+            - test_stop_execution: shows the status window of the pipeline
+              manager
             - test_undo_redo: tests the undo/redo feature
-            - test_update_auto_inheritance: updates the job's auto 
-              inheritance dict
-            - test_update_inheritance: updates the job's inheritance 
+            - test_update_auto_inheritance: updates the job's auto inheritance
               dict
+            - test_update_inheritance: updates the job's inheritance dict
             - test_update_node_list: initializes a workflow and adds a 
               process to the "pipline_manager.node_list"
             - test_z_init_pipeline: initializes the pipeline
             - test_z_runPipeline: adds a processruns a pipeline
-            - test_zz_del_pack: deletion of the brick created 
-              during UTs
-    '''
+            - test_zz_del_pack: deletion of the brick created during UTs
+    """
 
     def test_add_plug_value_to_database_list_type(self):
-        """
-        Opens a project, adds a 'Select' process, exports a list type
+        """Opens a project, adds a 'Select' process, exports a list type
         input plug and adds it to the database.
 
-        Notes
-        -----
-        Tests the PipelineManagerTab(QWidget).add_plug_value_to_database().
+        - Tests: PipelineManagerTab(QWidget).add_plug_value_to_database().
         """
 
         # Opens project 8 and switches to it
-
         project_8_path = self.get_new_test_project()
         self.main_window.switch_project(project_8_path, 'project_9')
 
@@ -7193,7 +7177,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         ppl_edt_tabs = self.main_window.pipeline_manager.pipelineEditorTabs
 
-        # Adds the processe Select, creates the "select_1" node
+        # Adds the process Select, creates the "select_1" node
         ppl_edt_tabs.get_current_editor().click_pos = QPoint(450, 500)
         ppl_edt_tabs.get_current_editor().add_named_process(Select)
         pipeline = ppl_edt_tabs.get_current_pipeline()
@@ -7205,10 +7189,14 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         pipeline_manager = self.main_window.pipeline_manager
 
+        #input('1')
+
         # Initializes the workflow manually
         pipeline_manager.workflow = workflow_from_pipeline(
                                                        pipeline,
                                                        complete_parameters=True)
+
+        #input('2')
 
         # Gets the 'job' and mocks adding a brick to the collection
         job = pipeline_manager.workflow.jobs[0]
@@ -7254,13 +7242,10 @@ class TestMIAPipelineManagerTab(TestMIACase):
         self.assertTrue(has_document(COLLECTION_CURRENT, DOCUMENT_2))
 
     def test_add_plug_value_to_database_non_list_type(self):
-        """
-        Opens a project, adds a 'Rename' process, exports a non list type
+        """Opens a project, adds a 'Rename' process, exports a non list type
         input plug and adds it to the database.
 
-        Notes
-        -----
-        Tests the PipelineManagerTab(QWidget).add_plug_value_to_database().
+        - Tests: PipelineManagerTab(QWidget).add_plug_value_to_database()
         """
 
         # Opens project 8 and switches to it
@@ -7273,7 +7258,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
                                                              pipelineEditorTabs)
 
-        # Adds the processes Smooth, creates the "rename_1" node
+        # Adds the process Rename, creates the "rename_1" node
         pipeline_editor_tabs.get_current_editor().click_pos = QPoint(450, 500)
         pipeline_editor_tabs.get_current_editor().add_named_process(Rename)
         pipeline = pipeline_editor_tabs.get_current_pipeline()
@@ -7375,7 +7360,6 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # 'parent_files' are extracted from the 'inheritance_dict' and
         # 'auto_inheritance_dict' attributes of 'job'. They test cases are
         # listed below:
-
         # 'parent_files' inside 'auto_inheritance_dict'
         job.auto_inheritance_dict = {inside_project: 'parent_files_value'}
         pipeline_manager.add_plug_value_to_database(inside_project, brick_id,
@@ -7440,20 +7424,53 @@ class TestMIAPipelineManagerTab(TestMIACase):
                                                     inputs, attributes)
 
     def test_add_plug_value_to_database_several_inputs(self):
-        '''
-        Creates a new project folder, adds a 'Rename' process, exports a 
+        """Creates a new project folder, adds a 'Rename' process, exports a
         non list type input plug and with several possible inputs.
-        Independently opens a inheritance dict pop-up.
-        
-        Tests the objects
-          - PipelineManagerTab.add_plug_value_to_database
-          - PopUpInheritanceDict.
 
-        Notes
-        -----
-        Mocks the object
-          - PopUpInheritanceDict.exec
-        '''
+        Independently opens an inheritance dict pop-up.
+
+        The test cases are divided into:
+        - 1) 'parent_files' is a dict with 2 keys and identical values
+        - 2) 'parent_files' is a dict with 2 keys and distinct values
+        - 3) 'mock_key_2' is in 'ppl_manager.key' indexed by the node name
+        - 4) 'mock_key_2' is in 'ppl_manager.key' indexed by the node name +
+             plug value
+        
+        - Tests:
+            - PipelineManagerTab.add_plug_value_to_database
+            - PopUpInheritanceDict.
+
+        - Mocks:
+            - PopUpInheritanceDict.exec
+        """
+
+        def mock_get_document(collection, relfile):
+
+            SCAN_1_ = SCAN_1
+
+            if relfile == 'mock_val_1':
+                SCAN_1_._values[3] = 'Exp Type 1'
+                return SCAN_1_
+            elif relfile == 'mock_val_2':
+                SCAN_1_._values[3] = 'Exp Type 2'
+                return SCAN_1_
+
+            return None
+
+        # Those methods are called prior to adding a plug to the database
+        def reset_inheritance_dicts():
+            job.inheritance_dict = {DOCUMENT_1: None}
+            job.auto_inheritance_dict = {DOCUMENT_1: parent_files}
+
+        def reset_collections():
+            if session.has_document(COLLECTION_CURRENT, P_VALUE):
+                session.remove_document(COLLECTION_CURRENT, P_VALUE)
+            if  session.has_document(COLLECTION_CURRENT, DOCUMENT_1):
+                session.remove_document(COLLECTION_CURRENT, DOCUMENT_1)
+            if session.has_document(COLLECTION_INITIAL, P_VALUE):
+                session.remove_document(COLLECTION_INITIAL, P_VALUE)
+            if session.has_document(COLLECTION_INITIAL, DOCUMENT_1):
+                session.remove_document(COLLECTION_INITIAL, DOCUMENT_1)
 
         # Sets shortcuts for often used objects
         ppl_manager = self.main_window.pipeline_manager
@@ -7465,7 +7482,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # project, sets the plug value that is added to the database
         project_8_path = self.get_new_test_project()
         ppl_manager.project.folder = project_8_path
-        folder = os.path.join(project_8_path,'data','raw_data')
+        folder = os.path.join(project_8_path, 'data', 'raw_data')
         NII_FILE_1 = ('Guerbet-C6-2014-Rat-K52-Tube27-2014-02-14102317-04-G3_'
                       'Guerbet_MDEFT-MDEFTpvm-000940_800.nii')
         DOCUMENT_1 = os.path.abspath(os.path.join(folder, NII_FILE_1))
@@ -7473,7 +7490,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         
         session.add_document(COLLECTION_CURRENT, DOCUMENT_1)
 
-        # Adds the processes Smooth, creates the "rename_1" node
+        # Adds the processes Rename, creates the "rename_1" node
         ppl_edt_tab.click_pos = QPoint(450, 500)
         ppl_edt_tab.add_named_process(Rename)
         pipeline = ppl_edt_tabs.get_current_pipeline()
@@ -7520,77 +7537,39 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         # Mocks the document getter to always return a scan 
         SCAN_1 = session.get_document(COLLECTION_CURRENT, DOCUMENT_1)
-
-        def mock_get_document(collection, relfile):
-
-            SCAN_1_ = SCAN_1
-
-            if relfile == 'mock_val_1':
-                SCAN_1_._values[3] = 'Exp Type 1'
-                return SCAN_1_
-            elif relfile == 'mock_val_2':
-                SCAN_1_._values[3] = 'Exp Type 2'
-                return SCAN_1_
-
-            return None            
-        
         session.get_document = mock_get_document
 
         # Mocks the value setter on the session
         session.set_values = Mock()
 
-        # Those methods are called prior to adding a plug to the database
-        def reset_inheritance_dicts():
-            job.inheritance_dict = {DOCUMENT_1: None}
-            job.auto_inheritance_dict = {DOCUMENT_1: parent_files}
-
-        def reset_collections():
-            if session.has_document(COLLECTION_CURRENT, P_VALUE):
-                session.remove_document(COLLECTION_CURRENT, P_VALUE)
-            if  session.has_document(COLLECTION_CURRENT, DOCUMENT_1):
-                session.remove_document(COLLECTION_CURRENT, DOCUMENT_1)
-            if session.has_document(COLLECTION_INITIAL, P_VALUE):
-                session.remove_document(COLLECTION_INITIAL, P_VALUE)
-            if session.has_document(COLLECTION_INITIAL, DOCUMENT_1):
-                session.remove_document(COLLECTION_INITIAL, DOCUMENT_1)
-
-        '''
-        The test cases are divided into
-           - 'parent_files' is a dict with 2 keys and identical values
-           -                   ''                     distinct values
-           - 'mock_key_2' is in 'ppl_manager.key' indexed by the node 
-              name
-           - 'mock_key_2' is in 'ppl_manager.key' indexed by the node 
-              name + plug value
-        '''
-
-        # 'parent_files' is a dict with 2 keys and identical values
+        # 1) 'parent_files' is a dict with 2 keys and identical values
         parent_files = {
-            'mock_key_1': os.path.join(ppl_manager.project.folder,'mock_val_1'),
-            'mock_key_2': os.path.join(ppl_manager.project.folder,'mock_val_1')
+           'mock_key_1': os.path.join(ppl_manager.project.folder, 'mock_val_1'),
+           'mock_key_2': os.path.join(ppl_manager.project.folder, 'mock_val_1')
         }
 
         reset_inheritance_dicts()
         reset_collections()
 
-        args = [DOCUMENT_1, brick_id,'', 'rename_1', plug_name,'rename_1', job, 
-                trait,inputs, attributes]
+        args = [DOCUMENT_1, brick_id, '', 'rename_1', plug_name,
+                'rename_1', job, trait, inputs, attributes]
         ppl_manager.add_plug_value_to_database(*args)
 
         # Mocks the execution of 'PopUpInheritanceDict' to avoid 
-        # assyncronous shot
+        # asynchronous shot
         PopUpInheritanceDict.exec = Mock()
 
-        # 'parent_files' is a dict with 2 keys and distinct values
+        # 2) 'parent_files' is a dict with 2 keys and distinct values
         # Triggers the execution of 'PopUpInheritanceDict'
-        parent_files['mock_key_2'] = os.path.join(ppl_manager.project.folder,'mock_val_2')
+        parent_files['mock_key_2'] = os.path.join(ppl_manager.project.folder,
+                                                  'mock_val_2')
 
         reset_inheritance_dicts()
         reset_collections()
         
         ppl_manager.add_plug_value_to_database(*args)
 
-        # 'mock_key_2' is in 'ppl_manager.key' indexed by the node name
+        # 3) 'mock_key_2' is in 'ppl_manager.key' indexed by the node name
         ppl_manager.key = {'rename_1': 'mock_key_2'}
 
         reset_inheritance_dicts()
@@ -7598,7 +7577,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         ppl_manager.add_plug_value_to_database(*args)
 
-        # 'mock_key_2' is in 'ppl_manager.key' indexed by the node name 
+        # 4) 'mock_key_2' is in 'ppl_manager.key' indexed by the node name
         # + plug value
         ppl_manager.key = {'rename_1in_file': 'mock_key_2'}
 
@@ -7609,7 +7588,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         # Independently tests 'PopUpInheritanceDict'
         pop_up = PopUpInheritanceDict({'mock_key': 'mock_value'},
-                                      'mock_full_name','mock_plug_name', True)
+                                      'mock_full_name', 'mock_plug_name', True)
 
         pop_up.ok_clicked()
         pop_up.okall_clicked()
@@ -7618,18 +7597,15 @@ class TestMIAPipelineManagerTab(TestMIACase):
         pop_up.ignore_node_clicked()
 
     def test_ask_iterated_pipeline_plugs(self):
-        '''
-        Adds the process 'Rename', export mandatory input and output plug 
+        """Adds the process 'Rename', export mandatory input and output plug
         and opens an iteration dialog for each plug.
 
-        Notes
-        -----
-        Tests the PipelineManagerTab.ask_iterated_pipeline_plugs.
-        '''
+        - Tests: PipelineManagerTab.ask_iterated_pipeline_plugs
+        """
 
         ppl_edt_tabs = self.main_window.pipeline_manager.pipelineEditorTabs
 
-        # Adds the processes Smooth, creates the "rename_1" node
+        # Adds the processes Rename, creates the "rename_1" node
         ppl_edt_tabs.get_current_editor().click_pos = QPoint(450, 500)
         ppl_edt_tabs.get_current_editor().add_named_process(Rename)
 
@@ -7644,19 +7620,14 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # Mocks executing a dialog box and clicking close
         QDialog.exec_ = lambda self_, *args: self_.accept()
 
-        #QTimer.singleShot(1000, self.execute_QDialogAccept)
         pipeline_manager.ask_iterated_pipeline_plugs(pipeline)
 
     def test_build_iterated_pipeline(self):
-        '''
-        Adds a 'Select' process, exports its mandatory inputs, mocks 
-        some methods of the pipeline manager and builds an iterated 
-        pipeline.
+        """Adds a 'Select' process, exports its mandatory inputs, mocks
+        some methods of the pipeline manager and builds an iterated pipeline.
 
-        Notes
-        -----
-        Tests the method 'PipelineManagerTab.build_iterated_pipeline'.
-        '''
+        - Tests:'PipelineManagerTab.build_iterated_pipeline'
+        """
 
         ppl_edt_tabs = self.main_window.pipeline_manager.pipelineEditorTabs
         ppl_manager = self.main_window.pipeline_manager
@@ -7688,24 +7659,21 @@ class TestMIAPipelineManagerTab(TestMIACase):
         pipeline.update_nodes_and_plugs_activation = MagicMock()
 
         # Builds iterated pipeline
-        print('\n\n** an exception message is expected below\n')
+        print('\n\n** An exception message is expected below\n')
         ppl_manager.build_iterated_pipeline()
 
         # Asserts the mock methods were called as expected
         ppl_manager.get_pipeline_or_process.assert_called_once_with()
-        (ppl_manager.ask_iterated_pipeline_plugs.
-                                              assert_called_once_with)(pipeline)
+        ppl_manager.ask_iterated_pipeline_plugs.assert_called_once_with(
+                                                                       pipeline)
         pipeline.update_nodes_and_plugs_activation.assert_called_once_with()
     
     def test_check_requirements(self):
-        '''
-        Adds a 'Select' process, appends it to the nodes list and checks
+        """Adds a 'Select' process, appends it to the nodes list and checks
         the requirements for the given node.
 
-        Notes
-        -----
-        Tests PipelineManagerTab.check_requirements.
-        '''
+        - Tests: PipelineManagerTab.check_requirements
+        """
 
         ppl_edt_tabs = self.main_window.pipeline_manager.pipelineEditorTabs
         pipeline_manager = self.main_window.pipeline_manager
@@ -7727,13 +7695,10 @@ class TestMIAPipelineManagerTab(TestMIACase):
                                                 'capsul.engine.module.nipype'])
 
     def test_cleanup_older_init(self):
-        """
-        Mocks a brick list, mocks some methods from the pipeline manager
-        and cleans older inits.
+        """Mocks a brick list, mocks some methods from the pipeline manager
+        and cleans up old initialization results.
 
-        Notes
-        -----
-        Tests PipelineManagerTab.cleanup_older_init.
+        - Tests: PipelineManagerTab.cleanup_older_init
         """
 
         ppl_manager = self.main_window.pipeline_manager
@@ -7761,13 +7726,10 @@ class TestMIAPipelineManagerTab(TestMIACase):
         self.assertTrue(len(ppl_manager.node_list) == 0)
 
     def test_complete_pipeline_parameters(self):
-        """
-        Mocks a method of pipeline manager and completes the pipeline
+        """Mocks a method of pipeline manager and completes the pipeline
         parameters.
 
-        Notes
-        -----
-        Tests PipelineManagerTab.complete_pipeline_parameters.
+        - Tests: PipelineManagerTab.complete_pipeline_parameters
         """
 
         ppl_manager = self.main_window.pipeline_manager
@@ -7783,9 +7745,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         ppl_manager.get_capsul_engine.assert_called_once_with()
 
     def test_delete_processes(self):
-        """
-        Deletes a process and makes the undo/redo action
-        """
+        """Deletes a process and makes the undo/redo action."""
 
         pipeline_manager = self.main_window.pipeline_manager
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
@@ -7877,10 +7837,10 @@ class TestMIAPipelineManagerTab(TestMIACase):
                                                         "in_files"].links_from))
 
     def test_end_progress(self):
-        '''
-        Creates a pipeline manager progress object and tries to end it.
-        Tests RunProgress.end_progress.
-        '''
+        """Creates a pipeline manager progress object and tries to end it.
+
+        - Tests RunProgress.end_progress
+        """
 
         # Sets shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
@@ -7901,32 +7861,30 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # Ends the progress with success
         ppl_manager.progress.end_progress()
 
-        (engine.raise_for_status.assert_called_once_with(ppl_manager.progress.worker.status, 
-         ppl_manager.progress.worker.exec_id))
+        engine.raise_for_status.assert_called_once_with(
+                                            ppl_manager.progress.worker.status,
+                                            ppl_manager.progress.worker.exec_id)
         
         # Mocks a 'WorkflowExecutionError' exception
-        engine.raise_for_status = Mock(side_effect=WorkflowExecutionError({},{},verbose=False))
+        engine.raise_for_status = Mock(side_effect=WorkflowExecutionError(
+                                                                 {}, {},
+                                                                 verbose=False))
 
         # Raises a 'WorkflowExecutionError' while ending progress 
         #ppl_manager.progress.end_progress()
         # FIXME: the above call to the function leads to a Segmentation
-        # fault when the test routine is lauched in AppVeyor.
-
-        print
+        #        fault when the test routine is launched in AppVeyor.
 
     def test_garbage_collect(self):
-        '''
-        Mocks several objects of the pipeline manager and collects the 
+        """Mocks several objects of the pipeline manager and collects the
         garbage of the pipeline.
 
-        Notes
-        -----
-        Tests PipelineManagerTab.test_garbage_collect.
-        '''
+        - Tests: PipelineManagerTab.test_garbage_collect
+        """
 
         ppl_manager = self.main_window.pipeline_manager
 
-        # INTEGRATED TEST
+        ### INTEGRATED TEST
 
         # Mocks the 'initialized' object
         ppl_manager.pipelineEditorTabs.get_current_editor().initialized = True
@@ -7938,7 +7896,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         self.assertFalse(ppl_manager.pipelineEditorTabs.get_current_editor().
                                                                     initialized)
 
-        # ISOLATED TEST
+        ### ISOLATED TEST
 
         # Mocks again the 'initialized' object
         ppl_manager.pipelineEditorTabs.get_current_editor().initialized = True
@@ -7958,7 +7916,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         self.assertFalse(ppl_manager.pipelineEditorTabs.get_current_editor().
                                                                     initialized)
 
-        # Assertes that the mocked methods were called as expected
+        # Asserts that the mocked methods were called as expected
         ppl_manager.postprocess_pipeline_execution.assert_called_once_with()
         (ppl_manager.project.
                      cleanup_orphan_nonexisting_files.assert_called_once_with())
@@ -7968,44 +7926,38 @@ class TestMIAPipelineManagerTab(TestMIACase):
         ppl_manager.update_user_buttons_states.assert_called_once_with()
 
     def test_get_capsul_engine(self):
-        """
-        Mocks an object in the pipeline manager and gets the capsul engine
+        """Mocks an object in the pipeline manager and gets the capsul engine
         of the pipeline.
 
-        Notes
-        -----
-        Tests PipelineManagerTab.get_capsul_engine.
+        - Tests: PipelineManagerTab.get_capsul_engine
         """
 
         ppl_manager = self.main_window.pipeline_manager
 
-        # INTEGRATED
+        ### INTEGRATED
 
         # Gets the capsul engine
-        capsul_engine = ppl_manager.get_capsul_engine()  # integrated
+        capsul_engine = ppl_manager.get_capsul_engine()
 
         # Asserts that the 'capsul_engine' is of class 'CapsulEngine'
         self.assertIsInstance(capsul_engine, CapsulEngine)
 
-        # ISOLATED
+        ### ISOLATED
         ppl_manager.pipelineEditorTabs.get_capsul_engine = MagicMock()
 
         # Gets the capsul engine
-        _ = ppl_manager.get_capsul_engine()  # isolated
+        _ = ppl_manager.get_capsul_engine()
 
         # Asserts that the mocked method was called as expected
         (ppl_manager.pipelineEditorTabs.
-         get_capsul_engine.assert_called_once_with())
+                                    get_capsul_engine.assert_called_once_with())
 
     def test_get_missing_mandatory_parameters(self):
-        '''
-        Adds a process, exports input and output plugs and tries to initialize
+        """Adds a process, exports input and output plugs and tries to initialize
         the pipeline with missing mandatory parameters.
 
-        Notes
-        -----
-        Tests PipelineManagerTab.get_missing_mandatory_parameters.
-        '''
+        -Tests: PipelineManagerTab.get_missing_mandatory_parameters
+        """
 
         ppl_manager = self.main_window.pipeline_manager
         ppl_edt_tabs = ppl_manager.pipelineEditorTabs
@@ -8018,7 +7970,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         ppl_edt_tabs.get_current_editor().current_node_name = 'rename_1'
         (ppl_edt_tabs.
                      get_current_editor)().export_unconnected_mandatory_inputs()
-        (ppl_edt_tabs.get_current_editor)()._export_plug(
+        ppl_edt_tabs.get_current_editor()._export_plug(
                                        temp_plug_name=('rename_1', '_out_file'),
                                        pipeline_parameter='_out_file',
                                        optional=False,
@@ -8046,13 +7998,10 @@ class TestMIAPipelineManagerTab(TestMIACase):
         self.assertEqual(missing_inputs[1], 'Pipeline.rename_1.in_file')
 
     def test_get_pipeline_or_process(self):
-        """
-        Adds a process and gets a pipeline and a process from the pipeline
+        """Adds a process and gets a pipeline and a process from the pipeline
         manager.
 
-        Notes
-        -----
-        Tests PipelineManagerTab.get_pipeline_or_process.
+        - Tests: PipelineManagerTab.get_pipeline_or_process
         """
 
         # Sets shortcuts for often used objects
@@ -8076,14 +8025,11 @@ class TestMIAPipelineManagerTab(TestMIACase):
         self.assertIsInstance(process, NipypeProcess)
 
     def test_initialize(self):
-        '''
-        Adds Select process, exports its plugs, mocks objects from the 
+        """Adds Select process, exports its plugs, mocks objects from the
         pipeline manager and initializes the workflow.
 
-        Notes
-        -----
-        Tests the PipelineManagerTab.initialize.
-        '''
+        - Tests: the PipelineManagerTab.initialize
+        """
 
         # Gets the paths of 2 documents
         config = Config(config_path=self.config_path)
@@ -8100,7 +8046,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         ppl_manager = self.main_window.pipeline_manager
         ppl_edt_tabs = ppl_manager.pipelineEditorTabs
         
-        # Adds the process 'Select' as the node 'select_1'
+        # Adds the process 'Rename' as the node 'rename_1'
         ppl_edt_tabs.get_current_editor().click_pos = QPoint(450, 500)
         ppl_edt_tabs.get_current_editor().add_named_process(Rename)
         pipeline = ppl_edt_tabs.get_current_pipeline()
@@ -8114,7 +8060,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         pipeline.nodes[''].set_plug_value('in_file', DOCUMENT_1)
         pipeline.nodes[''].set_plug_value('format_string', 'new_name.nii')
 
-        # Checks that there is no workflowindex
+        # Checks that there is no workflow index
         self.assertIsNone(ppl_manager.workflow)
 
         # Mocks objects
@@ -8152,16 +8098,14 @@ class TestMIAPipelineManagerTab(TestMIACase):
         self.assertFalse(ppl_manager.ignore_node)
 
     def test_register_completion_attributes(self):
-        '''
-        Mocks methods of the pipeline manager and registers completion 
+        """Mocks methods of the pipeline manager and registers completion
         attributes.
 
-        Notes
-        ------
-        Tests PipelineManagerTab.register_completion_attributes.
-        Since a method of the ProcessCompletionEngine class is mocked, 
-        this test may render the upcoming testing routine instable.
-        '''
+        Since a method of the ProcessCompletionEngine class is mocked,
+        this test may render the upcoming test routine unstable.
+
+        - Tests: PipelineManagerTab.register_completion_attributes
+        """
 
         # Sets shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
@@ -8181,7 +8125,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         DOCUMENT_1 = os.path.abspath(os.path.join(folder, NII_FILE_1))
         DOCUMENT_2 = os.path.abspath(os.path.join(folder, NII_FILE_2))
 
-        # Adds a Rename processes, creates the 'rename_1' node
+        # Adds a Select processes, creates the 'select_1' node
         ppl_edt_tabs.get_current_editor().click_pos = QPoint(450, 500)
         ppl_edt_tabs.get_current_editor().add_named_process(Select)
 
@@ -8190,9 +8134,9 @@ class TestMIAPipelineManagerTab(TestMIACase):
         ppl_edt_tabs.get_current_editor().export_unconnected_mandatory_inputs()
         ppl_edt_tabs.get_current_editor().export_all_unconnected_outputs()
         ppl.nodes[''].set_plug_value('inlist', [DOCUMENT_1, DOCUMENT_2])
-        proj_dir = (os.path.join(os.path.abspath(os.path.normpath(
-                                                   ppl_manager.project.folder)),
-                                 ''))
+        proj_dir = os.path.join(
+                       os.path.abspath(
+                           os.path.normpath(ppl_manager.project.folder)), '')
         output_dir = os.path.join(proj_dir, 'output_file.nii')
         ppl.nodes[''].set_plug_value('_out', output_dir)
 
@@ -8205,35 +8149,32 @@ class TestMIAPipelineManagerTab(TestMIACase):
         ppl_manager.get_capsul_engine = Mock(return_value=capsul_engine)
 
         # Mocks attributes values that are in the tags list
-        attributes = {'Checksum':'Checksum_value'}
+        attributes = {'Checksum': 'Checksum_value'}
         (ProcessCompletionEngine.get_completion_engine(ppl).
                                   get_attribute_values)().export_to_dict = Mock(
-                                                      return_value=attributes)
+                                                        return_value=attributes)
 
         # Register completion with mocked 'attributes'
         ppl_manager.register_completion_attributes(ppl)
 
     def test_register_node_io_in_database(self):
-        '''
-        Adds a process, sets input and output parameters and registers them
+        """Adds a process, sets input and output parameters and registers them
         in database.
 
-        Notes
-        -----
-        Tests PipelineManagerTab._register_node_io_in_database.
-        '''
+        - Tests: PipelineManagerTab._register_node_io_in_database
+        """
 
         # Opens project 8 and switches to it
         project_8_path = self.get_new_test_project()
         self.main_window.switch_project(project_8_path, 'project_9')
 
-        DOCUMENT_1 = (self.main_window.project.session.
-                      get_documents_names)("current")[0]
+        DOCUMENT_1 = self.main_window.project.session.get_documents_names(
+                                                                   "current")[0]
 
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
-                                pipelineEditorTabs)
+                                                             pipelineEditorTabs)
 
-        # Adds the processes Smooth, creates the "rename_1" node
+        # Adds the processes Rename, creates the "rename_1" node
         process_class = Rename
         pipeline_editor_tabs.get_current_editor().click_pos = QPoint(450, 500)
         pipeline_editor_tabs.get_current_editor().add_named_process(
@@ -8294,12 +8235,9 @@ class TestMIAPipelineManagerTab(TestMIACase):
         pipeline_manager._register_node_io_in_database(job, job.process())
     
     def test_remove_progress(self):
-        """
-        Mocks an object of the pipeline manager and removes its progress.
+        """Mocks an object of the pipeline manager and removes its progress.
 
-        Notes
-        -----
-        Tests the method PipelineManagerTab.remove_progress.
+        - Tests: PipelineManagerTab.remove_progress
         """
 
         ppl_manager = self.main_window.pipeline_manager
@@ -8314,11 +8252,11 @@ class TestMIAPipelineManagerTab(TestMIACase):
         self.assertFalse(hasattr(ppl_manager, 'progress'))
 
     def test_run(self):
-        '''
-        Adds a process, creates a pipeline manager progress object and 
+        """Adds a process, creates a pipeline manager progress object and
         tries to run it while mocking methods of the pipeline manager.
-        Tests RunWorker.run.
-        '''
+
+        - Tests: RunWorker.run
+        """
 
         # Sets shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
@@ -8352,16 +8290,20 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # Mocks a node that does not have a process and a node that has 
         # a pipeline as a process
         ppl.nodes['switch'] = Switch(ppl, '', [''], [''])
-        ppl.nodes['pipeline'] = ProcessNode(ppl,'pipeline',Pipeline())
+        ppl.nodes['pipeline'] = ProcessNode(ppl, 'pipeline', Pipeline())
 
         ppl_manager.progress.worker.run()
 
-        # Mocks 'get_pipeline_or_process' to return a 'NipypeProcess' 
-        # instead of a 'Pipeline' and 'postprocess_pipeline_execution'
-        # to throw an exception
+        # Mocks 'get_pipeline_or_process' to return a 'NipypeProcess' instead
+        # of a 'Pipeline' and 'postprocess_pipeline_execution' to throw an
+        # exception
         ppl_manager.progress = RunProgress(ppl_manager)
-        ppl_manager.progress.worker.pipeline_manager.get_pipeline_or_process = Mock(return_value=ppl.nodes['rename_1'].process)
-        ppl_manager.progress.worker.pipeline_manager.postprocess_pipeline_execution = Mock(side_effect=ValueError())
+        (ppl_manager.progress.worker.pipeline_manager.
+                                get_pipeline_or_process) = Mock(
+                                     return_value=ppl.nodes['rename_1'].process)
+        (ppl_manager.progress.worker.pipeline_manager.
+                                postprocess_pipeline_execution) = Mock(
+                                                       side_effect=ValueError())
 
         print('\n\n** an exception message is expected below\n')
         ppl_manager.progress.worker.run()
@@ -8372,14 +8314,15 @@ class TestMIAPipelineManagerTab(TestMIACase):
         ppl_manager.progress.worker.run()
 
     def test_savePipeline(self):
-        '''
-        Mocks methods of the pipeline manager and tries to save the 
-        pipeline over several conditions.
+        """Mocks methods of the pipeline manager and tries to save the pipeline
+        over several conditions.
 
-        Notes
-        -----
-        Tests PipelineManagerTab.savePipeline.
-        '''
+        -Tests: PipelineManagerTab.savePipeline
+        """
+
+        def click_yes(self_):
+            close_button = self_.button(QMessageBox.Yes)
+            QTest.mouseClick(close_button, Qt.LeftButton)
 
         # Sets shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
@@ -8415,11 +8358,8 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # Aborts pipeline saving with filled filename
         #QTimer.singleShot(1000, self.execute_QDialogClose)
         ppl_manager.savePipeline()
-        
+
         # Mocks executing a dialog box and clicking yes
-        def click_yes(self_):
-            close_button = self_.button(QMessageBox.Yes)
-            QTest.mouseClick(close_button, Qt.LeftButton)
         QMessageBox.exec = click_yes
         
         # Accept pipeline saving with filled filename
