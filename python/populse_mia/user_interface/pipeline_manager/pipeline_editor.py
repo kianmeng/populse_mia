@@ -742,10 +742,14 @@ class PipelineEditor(PipelineDeveloperView):
 
         for node_name, node in pipeline.nodes.items():
             process = node
+
             if isinstance(process, ProcessNode):
                 process = node.process
-            self.main_window.pipeline_manager.displayNodeParameters(node_name,
-                                                                    process)
+
+            if node_name != '':
+                self.main_window.pipeline_manager.displayNodeParameters(
+                                                                      node_name,
+                                                                      process)
 
         self.main_window.pipeline_manager.update_user_buttons_states()
 
