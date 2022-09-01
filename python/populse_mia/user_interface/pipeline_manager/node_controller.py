@@ -551,9 +551,10 @@ class CapsulNodeController(QWidget):
     def parameters_changed(self, _, plug_name, old_value, new_value):
         """Emit the value_changed signal."""
 
-        plug_name_type = type(plug_name)
+        #plug_name_type = type(plug_name)
+        plug_type = type(new_value)
         self.value_changed.emit(["plug_value", self.node_name, old_value,
-                                 plug_name, plug_name_type, new_value])
+                                 plug_name, plug_type, new_value])
 
     def update_node_name(self, new_node_name=None,
                          old_node_name=None, from_undo=False,

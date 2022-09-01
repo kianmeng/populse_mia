@@ -1117,8 +1117,12 @@ class PipelineEditor(PipelineDeveloperView):
         """
         old_value = self.scene.pipeline.nodes[node_name].get_plug_value(
             plug_name)
-        self.scene.pipeline.nodes[node_name].set_plug_value(
-            plug_name, value_type(new_value))
+        if from_undo or from_redo:
+            self.scene.pipeline.nodes[node_name].set_plug_value(
+                plug_name, new_value)
+        else:
+            self.scene.pipeline.nodes[node_name].set_plug_value(
+                plug_name, value_type(new_value))
 
         if from_undo or from_redo:
             self.undos.pop()
