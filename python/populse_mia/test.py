@@ -8324,7 +8324,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
             close_button = self_.button(QMessageBox.Yes)
             QTest.mouseClick(close_button, Qt.LeftButton)
 
-        # Sets shortcuts for objects that are often used
+        # Set shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
         ppl_edt_tabs = ppl_manager.pipelineEditorTabs
 
@@ -8334,10 +8334,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         ppl_edt_tabs.get_current_editor()._pipeline_filename = ppl_path
 
-        # Mocks methods
-        #ppl_manager.main_window.statusBar().showMessage = Mock()
-
-        # Save pipeline as with empty filename, checked
+        # Save pipeline as with empty filename, unchecked
         ppl_manager.savePipeline(uncheck=True)
 
         # Mocks 'savePipeline' from 'ppl_edt_tabs'
@@ -8356,27 +8353,22 @@ class TestMIAPipelineManagerTab(TestMIACase):
         QMessageBox.exec = lambda self_, *args: self_.close()
 
         # Aborts pipeline saving with filled filename
-        #QTimer.singleShot(1000, self.execute_QDialogClose)
         ppl_manager.savePipeline()
 
         # Mocks executing a dialog box and clicking yes
         QMessageBox.exec = click_yes
         
         # Accept pipeline saving with filled filename
-        #QTimer.singleShot(1000, self.execute_QMessageBox_clickYes)
         ppl_manager.savePipeline()
     
     def test_savePipelineAs(self):
-        '''
-        Mocks a method from pipeline manager and saves a pipeline under
+        """Mocks a method from pipeline manager and saves a pipeline under
         another name.
 
-        Notes
-        -----
-        Tests PipelineManagerTab.savePipelineAs.
-        '''
+        - Tests: PipelineManagerTab.savePipelineAs
+        """
 
-        # Sets shortcuts for objects that are often used
+        # Set shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
         ppl_edt_tabs = ppl_manager.pipelineEditorTabs
 
@@ -8390,33 +8382,29 @@ class TestMIAPipelineManagerTab(TestMIACase):
         ppl_manager.savePipelineAs()
 
     def test_set_anim_frame(self):
-      """
-      Runs the 'rotatingBrainVISA.gif' animation.
-      """
+        """Runs the 'rotatingBrainVISA.gif' animation."""
 
-      pipeline_manager = self.main_window.pipeline_manager
+        pipeline_manager = self.main_window.pipeline_manager
       
-      config = Config()
-      sources_images_dir = config.getSourceImageDir()
-      self.assertTrue(sources_images_dir)  # if the string is not empty
+        config = Config()
+        sources_images_dir = config.getSourceImageDir()
+        self.assertTrue(sources_images_dir)  # if the string is not empty
 
-      pipeline_manager._mmovie = QtGui.QMovie(os.path.join(
+        pipeline_manager._mmovie = QtGui.QMovie(os.path.join(
                                                        sources_images_dir,
                                                        'rotatingBrainVISA.gif'))
-      pipeline_manager._set_anim_frame()
+        pipeline_manager._set_anim_frame()
 
     def test_show_status(self):
-        '''
-        Shows the status of the pipeline execution.
-        Tests PipelineManagerTab.test_show_status.
+        """Shows the status of the pipeline execution.
 
-        Notes
-        -----
-        Indirectly tests StatusWidget.__init__ and 
+        Indirectly tests StatusWidget.__init__ and
         StatusWidget.toggle_soma_workflow.
-        '''
 
-        # Sets shortcuts for objects that are often used
+        -Tests: PipelineManagerTab.test_show_status
+        """
+
+        # Set shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
 
         # Shows the status of the pipeline's execution
@@ -8441,10 +8429,10 @@ class TestMIAPipelineManagerTab(TestMIACase):
         self.assertTrue(ppl_manager.status_widget.swf_widget.isVisible())
 
     def test_stop_execution(self):
-        '''
-        Shows the status window of the pipeline manager.
-        Tests PipelineManagerTab.test_show_status.        
-        '''
+        """Shows the status window of the pipeline manager.
+
+        - Tests: PipelineManagerTab.test_show_status
+        """
 
         # Set shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
@@ -8457,9 +8445,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         self.assertTrue(ppl_manager.progress.worker.interrupt_request)
 
     def test_undo_redo(self):
-        """
-        Tests the undo/redo actions
-        """
+        """Tests the undo/redo action."""
 
         config = Config(config_path=self.config_path)
         controlV1_ver = config.isControlV1()
@@ -8472,7 +8458,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # Set shortcuts for objects that are often used
         pipeline_manager = self.main_window.pipeline_manager
         pipeline_editor_tabs = (self.main_window.pipeline_manager.
-                                pipelineEditorTabs)
+                                                             pipelineEditorTabs)
 
         # Creates a new project folder and adds one document to the 
         # project
@@ -8500,7 +8486,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # Switches to pipeline manager
         self.main_window.tabs.setCurrentIndex(2)
 
-        # Add a process => creates a node called "smooth_1",
+        # Add a Smooth process => creates a node called "smooth_1",
         # test if Smooth_1 is a node in the current pipeline / editor
         process_class = Smooth
         pipeline_editor_tabs.get_current_editor().click_pos = QPoint(450, 500)
@@ -8509,7 +8495,6 @@ class TestMIAPipelineManagerTab(TestMIACase):
         
         pipeline = pipeline_editor_tabs.get_current_pipeline()
         self.assertTrue("smooth_1" in pipeline.nodes.keys())
-        print(pipeline.nodes.keys())
 
         # Undo (remove the node), test if the node was removed
         pipeline_manager.undo()
@@ -8532,15 +8517,13 @@ class TestMIAPipelineManagerTab(TestMIACase):
         pipeline_manager.redo()
         self.assertFalse("smooth1" in pipeline.nodes.keys())
 
-        # Adding a new process => creates a node called "smooth_1"
+        # Adding a new Smooth process => creates a node called "smooth_1"
         pipeline_editor_tabs.get_current_editor().click_pos = QPoint(450, 500)
-
-        # Creates a node called "smooth_1"
         pipeline_editor_tabs.get_current_editor().add_named_process(
                                                                   process_class)
 
-        # Export the "out_prefix" plug,
-        # test if the Input node have a prefix_smooth plug
+        # Export the "out_prefix" plug as "prefix_smooth" in Input node, test
+        # if the Input node have a prefix_smooth plug
         pipeline_editor_tabs.get_current_editor()._export_plug(
                                       temp_plug_name=("smooth_1", "out_prefix"),
                                       pipeline_parameter="prefix_smooth",
@@ -8577,7 +8560,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # FIXME: export_plugs (currently there is a bug if a plug is
         #        of type list)
 
-        # Adding a new process => creates a node called "smooth_2"
+        # Adding a new Smooth process => creates a node called "smooth_2"
         pipeline_editor_tabs.get_current_editor().click_pos = QPoint(450, 550)
         pipeline_editor_tabs.get_current_editor().add_named_process(
                                                                   process_class)
@@ -8727,15 +8710,10 @@ class TestMIAPipelineManagerTab(TestMIACase):
             config.setControlV1(False)
 
     def test_update_auto_inheritance(self):
-        '''
-        Adds a process and updates the job's auto inheritance dict.
-        Tests PipelineManagerTab.update_auto_inheritance.
-        '''
+        """Adds a process and updates the job's auto inheritance dict.
 
-        # Sets shortcuts for objects that are often used
-        ppl_manager = self.main_window.pipeline_manager
-        ppl_edt_tabs = ppl_manager.pipelineEditorTabs
-        ppl = ppl_edt_tabs.get_current_pipeline()
+        - Tests: PipelineManagerTab.update_auto_inheritance
+        """
 
         config = Config(config_path=self.config_path)
         folder = os.path.abspath(os.path.join(config.get_mia_path(),
@@ -8750,7 +8728,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         DOCUMENT_1 = os.path.abspath(os.path.join(folder, NII_FILE_1))
         DOCUMENT_2 = os.path.abspath(os.path.join(folder, NII_FILE_2))
 
-        # Sets shortcuts for objects that are often used
+        # Set shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
         ppl_edt_tabs = ppl_manager.pipelineEditorTabs
         ppl = ppl_edt_tabs.get_current_pipeline()
@@ -8797,19 +8775,15 @@ class TestMIAPipelineManagerTab(TestMIACase):
         del node.process.study_config.project
         ppl_manager.update_auto_inheritance(job, node)
 
-        # 'node.process' is not a process
-        #node.process = {}
-        #ppl_manager.update_auto_inheritance(job, node)
-
         # 'node' is not a 'Process'
         node = {}
         ppl_manager.update_auto_inheritance(job, node)
 
     def test_update_inheritance(self):
-        '''
-        Adds a process and updates the job's inheritance dict.
-        Tests PipelineManagerTab.update_inheritance.
-        '''
+        """Adds a process and updates the job's inheritance dict.
+
+        - Tests: PipelineManagerTab.update_inheritance
+        """
 
         # Sets shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
@@ -8848,22 +8822,19 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         # Node's name in 'node_inheritance_history'
         (ppl_manager.project
-         .node_inheritance_history['rename_1']) = [{0: 'new_value'}]
+                     .node_inheritance_history['rename_1']) = [{0: 'new_value'}]
         ppl_manager.update_inheritance(job, node)
 
         self.assertEqual(job.inheritance_dict, {0: 'new_value'})
 
     def test_update_node_list(self):
-        """
-        Adds a process, exports input and output plugs, initializes a workflow
-        and adds the process to the "pipline_manager.node_list".
+        """Adds a process, exports input and output plugs, initializes a
+        workflow and adds the process to the "pipline_manager.node_list".
 
-        Notes
-        -----
-        Tests the PipelineManagerTab.update_node_list.
+        - Tests: PipelineManagerTab.update_node_list
         """
 
-        # Sets shortcuts for often used objects
+        # Set shortcuts for often used objects
         ppl_manager = self.main_window.pipeline_manager
         ppl_edt_tabs = ppl_manager.pipelineEditorTabs
         
@@ -8892,17 +8863,11 @@ class TestMIAPipelineManagerTab(TestMIACase):
         self.assertEqual(node_list[0]._nipype_class, 'Rename')
 
     def test_z_init_pipeline(self):
-        '''
-        Adds a process, mocks several parameters from the pipeline
+        """Adds a process, mocks several parameters from the pipeline
         manager and initializes the pipeline.
 
-        Notes
-        -----
-        Tests PipelineManagerTab.init_pipeline.
-        The 'z' prefix places this test at the end of the alphabetically
-        organized routine. This prevents the 'Segmentation Fault' error 
-        to be thrown during the test.
-        '''
+        - Tests: PipelineManagerTab.init_pipeline
+        """
 
         # Sets shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
@@ -8938,7 +8903,6 @@ class TestMIAPipelineManagerTab(TestMIACase):
         QMessageBox.exec = lambda self_, *args: self_.show()
 
         ppl_manager.update_node_list()
-        #QTimer.singleShot(1000, self.execute_QDialogAccept)
         init_result = ppl_manager.init_pipeline()
         ppl_manager.msg.accept()
         self.assertFalse(init_result)
@@ -8959,15 +8923,13 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         # Mocks null requirements and initializes the pipeline
         ppl_manager.check_requirements = Mock(return_value=None)
-        #QTimer.singleShot(1000, self.execute_QDialogAccept)
         init_result = ppl_manager.init_pipeline()
         ppl_manager.msg.accept()
         self.assertFalse(init_result)
         ppl_manager.check_requirements.assert_called_once_with('global', 
                                                                message_list=[])
 
-        # Mocks external packages as requirements and initializes the 
-        # pipeline
+        # Mocks external packages as requirements and initializes the pipeline
         pkgs = ['fsl', 'afni', 'ants', 'matlab', 'spm']
         req = {'capsul_engine':{'uses': Mock()}}
 
@@ -9017,20 +8979,16 @@ class TestMIAPipelineManagerTab(TestMIACase):
         self.assertFalse(init_result)
     
     def test_z_runPipeline(self):
-        '''
-        Adds a process, export plugs and runs a pipeline.
-        Tests
-        - PipelineManagerTab.runPipeline
-        - PipelineManagerTab.finish_execution
-        - RunProgress
-        - RunWorker
+        """Adds a process, export plugs and runs a pipeline.
 
-        Notes
-        -----
-        Mocks
-        '''
+        - Tests:
+            - PipelineManagerTab.runPipeline
+            - PipelineManagerTab.finish_execution
+            - RunProgress
+            - RunWorker
+        """
 
-        # Sets shortcuts for objects that are often used
+        # Set shortcuts for objects that are often used
         ppl_manager = self.main_window.pipeline_manager
         ppl_edt_tabs = ppl_manager.pipelineEditorTabs
         ppl = ppl_edt_tabs.get_current_pipeline()
@@ -9039,7 +8997,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # project, sets the plug value that is added to the database
         project_8_path = self.get_new_test_project()
         ppl_manager.project.folder = project_8_path
-        folder = os.path.join(project_8_path,'data','raw_data')
+        folder = os.path.join(project_8_path, 'data', 'raw_data')
         NII_FILE_1 = ('Guerbet-C6-2014-Rat-K52-Tube27-2014-02-14102317-04-G3_'
                       'Guerbet_MDEFT-MDEFTpvm-000940_800.nii')
         DOCUMENT_1 = os.path.abspath(os.path.join(folder, NII_FILE_1))
@@ -9059,8 +9017,8 @@ class TestMIAPipelineManagerTab(TestMIACase):
         ppl.nodes[''].set_plug_value('format_string', 'new_name.nii')
 
         # Mocks the allocation of the pipeline into another thread
-        # This funciton seem to require a different number of arguments
-        # depending of the platform, therefore a 'Mock' is used
+        # This function seem to require a different number of arguments
+        # depending on the platform, therefore a 'Mock' is used
         QThread.start = Mock()
 
         # Pipeline fails while running, due to capsul import error
@@ -9075,10 +9033,8 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         self.assertEqual(ppl_manager.last_run_pipeline, ppl)
         QThread.start.assert_called_once()
-        
-        
-        # Pipeline is stopped by the user, the pipeline fails before
-        # running
+
+        # Pipeline is stopped by the user, the pipeline fails before running
         ppl_manager.runPipeline()
         ppl_manager.stop_execution()
         ppl_manager.progress.worker.run()
@@ -9090,11 +9046,13 @@ class TestMIAPipelineManagerTab(TestMIACase):
         packages """
 
         pkg = PackageLibraryDialog(self.main_window)
+
         # The Test_pipeline brick was added in the package library
         self.assertTrue("Test_pipeline_1" in
                         pkg.package_library.package_tree['User_processes'])
 
-        pkg.delete_package(to_delete="User_processes.Test_pipeline_1", loop=True)
+        pkg.delete_package(to_delete="User_processes.Test_pipeline_1",
+                           loop=True)
 
         # The Test_pipeline brick has been removed from the package library
         self.assertFalse("Test_pipeline_1" in
