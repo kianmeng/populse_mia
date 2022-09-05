@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- #
+# -*- coding: utf-8 -*-
 
 """ User interface module, encompass the main window and its tabs
 definition, as well as pop ups.

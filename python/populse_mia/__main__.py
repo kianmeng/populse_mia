@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """ Make populse_mia accessible as a module.
 
 For example by using python3 -m populse_mia.
@@ -15,5 +16,5 @@ For example by using python3 -m populse_mia.
 # Populse_MIA imports
 from populse_mia.main import main
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

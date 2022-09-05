@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 MIA is shorthand for “Multiparametric Image Analysis”. It is intended to be
 a complete image processing environment mainly targeted at the analysis and

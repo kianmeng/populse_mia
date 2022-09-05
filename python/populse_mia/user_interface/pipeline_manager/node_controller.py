@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- #
+# -*- coding: utf-8 -*-
 """ Module to handle the node of a pipeline and its plugs.
 
 :Contains:
@@ -20,13 +20,18 @@
 ##########################################################################
 
 import os
-import sip
-import six
 import sys
 from functools import partial
-from matplotlib.backends.qt_compat import QtWidgets
-from traits.api import Undefined, TraitError
 
+import sip
+import six
+from capsul.attributes.completion_engine import ProcessCompletionEngine
+# capsul imports
+from capsul.pipeline.pipeline_nodes import PipelineNode
+from capsul.pipeline.process_iteration import ProcessIteration
+from capsul.qt_gui.widgets.attributed_process_widget import \
+    AttributedProcessWidget
+from matplotlib.backends.qt_compat import QtWidgets
 # PyQt5 imports
 from PyQt5 import Qt
 from PyQt5.QtCore import pyqtSignal
@@ -35,42 +40,34 @@ from PyQt5.QtWidgets import (QApplication, QDialog, QDialogButtonBox,
                              QGroupBox, QHBoxLayout, QLabel, QLineEdit,
                              QMessageBox, QPushButton, QToolButton,
                              QVBoxLayout, QWidget)
-
 # soma-base imports
 from soma.controller import trait_ids
-
-# capsul imports
-from capsul.pipeline.pipeline_nodes import PipelineNode
-from capsul.pipeline.process_iteration import ProcessIteration
-from capsul.qt_gui.widgets.attributed_process_widget import (
-                                                        AttributedProcessWidget)
-from capsul.attributes.completion_engine import ProcessCompletionEngine
+from traits.api import TraitError, Undefined
 
 # Populse_MIA imports
 from populse_mia.data_manager.filter import Filter
 from populse_mia.data_manager.project import (COLLECTION_BRICK,
-                                              COLLECTION_CURRENT,
-                                              TAG_FILENAME)
+                                              COLLECTION_CURRENT, TAG_FILENAME)
 from populse_mia.software_properties import Config
-from populse_mia.user_interface.data_browser.advanced_search import (
-                                                                 AdvancedSearch)
+from populse_mia.user_interface.data_browser.advanced_search import \
+    AdvancedSearch
 from populse_mia.user_interface.data_browser.data_browser import (
-                                                              not_defined_value,
-                                                              TableDataBrowser)
+    TableDataBrowser, not_defined_value)
 from populse_mia.user_interface.data_browser.rapid_search import RapidSearch
 from populse_mia.user_interface.pipeline_manager.process_mia import ProcessMIA
 from populse_mia.user_interface.pop_ups import (PopUpSelectTagCountTable,
                                                 PopUpVisualizedTags)
-from . import type_editors
 
+from . import type_editors
 
 if sys.version_info[0] >= 3:
     unicode = str
 
-
     def values(d):
         return list(d.values())
+
 else:
+
     def values(d):
         return d.values()
 
@@ -93,8 +90,16 @@ class PlugFilter(QWidget):
 
     plug_value_changed = pyqtSignal(list)
 
-    def __init__(self, project, scans_list, process, node_name, plug_name,
-                 node_controller, main_window):
+    def __init__(
+        self,
+        project,
+        scans_list,
+        process,
+        node_name,
+        plug_name,
+        node_controller,
+        main_window,
+    ):
         """
         Initialization of the PlugFilter widget
 
@@ -108,9 +113,9 @@ class PlugFilter(QWidget):
         """
         super(PlugFilter, self).__init__(None)
 
-        from populse_mia.user_interface.data_browser.rapid_search import (
-                                                                    RapidSearch)
         from populse_mia.data_manager.project import COLLECTION_CURRENT
+        from populse_mia.user_interface.data_browser.rapid_search import \
+            RapidSearch
 
         self.project = project
         self.node_controller = node_controller
@@ -129,14 +134,14 @@ class PlugFilter(QWidget):
         # Verifying that the scan names begin not with a "/" or a "\"
         doc_list = []
         for brick in self.main_window.pipeline_manager.brick_list:
-            doc = self.project.session.get_document(COLLECTION_BRICK,
-                                                    brick)
+            doc = self.project.session.get_document(COLLECTION_BRICK, brick)
             if doc is not None:
                 for key in doc["Output(s)"]:
                     if isinstance(doc["Output(s)"][key], str):
-                        if doc["Output(s)"][key] != '':
-                            doc_delete = os.path.relpath(doc["Output(s)"][key],
-                                                     self.project.folder)
+                        if doc["Output(s)"][key] != "":
+                            doc_delete = os.path.relpath(
+                                doc["Output(s)"][key], self.project.folder
+                            )
                             doc_list.append(doc_delete)
 
         if scans_list:
@@ -154,14 +159,20 @@ class PlugFilter(QWidget):
         # of the database needs to be taken into account
         else:
             self.scans_list = self.project.session.get_documents_names(
-                COLLECTION_CURRENT)
+                COLLECTION_CURRENT
+            )
 
         self.setWindowTitle("Filter - " + node_name + " - " + plug_name)
 
         # Graphical components
-        self.table_data = TableDataBrowser(self.project, self,
-                                           self.node_controller.visibles_tags,
-                                           False, True, link_viewer=False)
+        self.table_data = TableDataBrowser(
+            self.project,
+            self,
+            self.node_controller.visibles_tags,
+            False,
+            True,
+            link_viewer=False,
+        )
 
         # Reducing the list of scans to selection
         all_scans = self.table_data.scans_to_visualize
@@ -176,17 +187,22 @@ class PlugFilter(QWidget):
 
         sources_images_dir = Config().getSourceImageDir()
         self.button_cross = QToolButton()
-        self.button_cross.setStyleSheet('background-color:rgb(255, 255, 255);')
-        self.button_cross.setIcon(QIcon(os.path.join(sources_images_dir,
-                                                     'gray_cross.png')))
+        self.button_cross.setStyleSheet("background-color:rgb(255, 255, 255);")
+        self.button_cross.setIcon(
+            QIcon(os.path.join(sources_images_dir, "gray_cross.png"))
+        )
         self.button_cross.clicked.connect(self.reset_search_bar)
 
         search_bar_layout.addWidget(self.rapid_search)
         search_bar_layout.addWidget(self.button_cross)
 
         self.advanced_search = AdvancedSearch(
-            self.project, self, self.scans_list,
-            self.node_controller.visibles_tags, from_pipeline=True)
+            self.project,
+            self,
+            self.scans_list,
+            self.node_controller.visibles_tags,
+            from_pipeline=True,
+        )
         self.advanced_search.show_search()
 
         push_button_tags = QPushButton("Visualized tags")
@@ -263,16 +279,20 @@ class PlugFilter(QWidget):
             # Scans with at least a not defined value
             if str_search == not_defined_value:
                 filter = self.prepare_not_defined_filter(
-                    self.project.session.get_shown_tags())
+                    self.project.session.get_shown_tags()
+                )
 
             # Scans matching the search
             else:
                 filter = self.rapid_search.prepare_filter(
-                    str_search, self.project.session.get_shown_tags(),
-                    self.table_data.scans_to_search)
+                    str_search,
+                    self.project.session.get_shown_tags(),
+                    self.table_data.scans_to_search,
+                )
 
             generator = self.project.session.filter_documents(
-                COLLECTION_CURRENT, filter)
+                COLLECTION_CURRENT, filter
+            )
 
             # Creating the list of scans
             return_list = [getattr(scan, TAG_FILENAME) for scan in generator]
@@ -294,26 +314,30 @@ class PlugFilter(QWidget):
             for point in points:
                 row = point.row()
                 tag_name = self.push_button_tag_filter.text()
-                if tag_name.startswith('&'):
+                if tag_name.startswith("&"):
                     tag_name = tag_name[1:]
                 # We get the FileName of the scan from the first row
                 scan_name = self.table_data.item(row, 0).text()
-                value = self.project.session.get_value(COLLECTION_CURRENT,
-                                                       scan_name, tag_name)
+                value = self.project.session.get_value(
+                    COLLECTION_CURRENT, scan_name, tag_name
+                )
                 if tag_name == TAG_FILENAME:
-                    value = os.path.abspath(os.path.join(self.project.folder,
-                                                         value))
+                    value = os.path.abspath(
+                        os.path.join(self.project.folder, value)
+                    )
                 result_names.append(value)
         else:
             filter = self.table_data.get_current_filter()
             for i in range(len(filter)):
                 scan_name = filter[i]
                 tag_name = self.push_button_tag_filter.text()
-                value = self.project.session.get_value(COLLECTION_CURRENT,
-                                                       scan_name, tag_name)
+                value = self.project.session.get_value(
+                    COLLECTION_CURRENT, scan_name, tag_name
+                )
                 if tag_name == TAG_FILENAME:
-                    value = os.path.abspath(os.path.join(self.project.folder,
-                                                         value))
+                    value = os.path.abspath(
+                        os.path.join(self.project.folder, value)
+                    )
                 result_names.append(value)
 
         self.plug_value_changed.emit(result_names)
@@ -321,9 +345,11 @@ class PlugFilter(QWidget):
     def update_tag_to_filter(self):
         """Update the tag to Filter."""
 
-        popUp = PopUpSelectTagCountTable(self.project,
-                                         self.node_controller.visibles_tags,
-                                         self.push_button_tag_filter.text())
+        popUp = PopUpSelectTagCountTable(
+            self.project,
+            self.node_controller.visibles_tags,
+            self.push_button_tag_filter.text(),
+        )
         if popUp.exec_():
             self.push_button_tag_filter.setText(popUp.selected_tag)
 
@@ -332,13 +358,14 @@ class PlugFilter(QWidget):
 
         dialog = QDialog()
         visualized_tags = PopUpVisualizedTags(
-            self.project,
-            self.node_controller.visibles_tags)
+            self.project, self.node_controller.visibles_tags
+        )
         layout = QVBoxLayout()
         layout.addWidget(visualized_tags)
         buttons_layout = QHBoxLayout()
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok |
-                                   QDialogButtonBox.Cancel)
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        )
         buttons.accepted.connect(dialog.accept)
         buttons.rejected.connect(dialog.reject)
         buttons_layout.addWidget(buttons)
@@ -351,11 +378,13 @@ class PlugFilter(QWidget):
             new_visibilities = []
             for x in range(visualized_tags.list_widget_selected_tags.count()):
                 visible_tag = visualized_tags.list_widget_selected_tags.item(
-                    x).text()
+                    x
+                ).text()
                 new_visibilities.append(visible_tag)
             new_visibilities.append(TAG_FILENAME)
             self.table_data.update_visualized_columns(
-                self.node_controller.visibles_tags, new_visibilities)
+                self.node_controller.visibles_tags, new_visibilities
+            )
             self.node_controller.visibles_tags = new_visibilities
             for row in self.advanced_search.rows:
                 fields = row[2]
@@ -373,6 +402,7 @@ class AttributesFilter(PlugFilter):
     a rapid search and an advanced search to filter these files. Once the
     filtering is done, the result (as a list of files) is set to the plug.
     """
+
     attributes_selected = pyqtSignal(dict)
 
     def ok_clicked(self):
@@ -387,20 +417,24 @@ class AttributesFilter(PlugFilter):
             for point in points:
                 row = point.row()
                 for tag_name in self.project.session.get_fields_names(
-                        COLLECTION_CURRENT):
+                    COLLECTION_CURRENT
+                ):
                     # We get the FileName of the scan from the first row
                     scan_name = self.table_data.item(row, 0).text()
-                    value = self.project.session.get_value(COLLECTION_CURRENT,
-                                                          scan_name, tag_name)
+                    value = self.project.session.get_value(
+                        COLLECTION_CURRENT, scan_name, tag_name
+                    )
                     attributes.setdefault(tag_name, []).append(value)
         else:
             filter = self.table_data.get_current_filter()
             for i in range(len(filter)):
                 scan_name = filter[i]
                 for tag_name in self.project.session.get_fields_names(
-                        COLLECTION_CURRENT):
-                    value = self.project.session.get_value(COLLECTION_CURRENT,
-                                                          scan_name, tag_name)
+                    COLLECTION_CURRENT
+                ):
+                    value = self.project.session.get_value(
+                        COLLECTION_CURRENT, scan_name, tag_name
+                    )
                     attributes.setdefault(tag_name, []).append(value)
 
         self.attributes_selected.emit(attributes)
@@ -408,21 +442,23 @@ class AttributesFilter(PlugFilter):
 
 # Node controller V2 style
 class CapsulNodeController(QWidget):
-    '''
+    """
     Implementation of NodeController using Capsul AttributedProcessWidget
     widget
-    '''
+    """
+
     value_changed = pyqtSignal(list)
 
-    def __init__(self, project, scan_list, pipeline_manager_tab,
-                 main_window):
+    def __init__(self, project, scan_list, pipeline_manager_tab, main_window):
         super().__init__()
         self.project = project
         self.scan_list = scan_list
         self.main_window = main_window
         self.node_name = ""
         self.visibles_tags = []
-        self.pipeline = pipeline_manager_tab.pipelineEditorTabs.get_current_pipeline()
+        self.pipeline = (
+            pipeline_manager_tab.pipelineEditorTabs.get_current_pipeline()
+        )
 
         # Layouts
         v_box_final = QVBoxLayout()
@@ -432,7 +468,7 @@ class CapsulNodeController(QWidget):
         # Node name
         hlayout = QHBoxLayout()
         label_node_name = QLabel()
-        label_node_name.setText('Node name:')
+        label_node_name.setText("Node name:")
 
         self.line_edit_node_name = QLineEdit()
         hlayout.addWidget(label_node_name)
@@ -453,19 +489,21 @@ class CapsulNodeController(QWidget):
         self.node_name = node_name
         self.pipeline = pipeline
         # The pipeline global inputs and outputs node name cannot be modified
-        if self.node_name not in ('inputs', 'outputs'):
+        if self.node_name not in ("inputs", "outputs"):
             self.line_edit_node_name.setText(self.node_name)
             self.line_edit_node_name.setReadOnly(False)
             self.line_edit_node_name.returnPressed.connect(
-                self.update_node_name)
+                self.update_node_name
+            )
         else:
-            self.line_edit_node_name.setText('Pipeline inputs/outputs')
+            self.line_edit_node_name.setText("Pipeline inputs/outputs")
             self.line_edit_node_name.setReadOnly(True)
 
         if self.process_widget:
             item = self.layout().takeAt(1)
-            self.static_release(self.process_widget.attributed_process,
-                                self.parameters_changed)
+            self.static_release(
+                self.process_widget.attributed_process, self.parameters_changed
+            )
             self.process_widget.deleteLater()
             del item
             self.process_widget = None
@@ -486,41 +524,43 @@ class CapsulNodeController(QWidget):
         ProcessCompletionEngine.get_completion_engine(process)
 
         self.process_widget = AttributedProcessWidget(
-            process, override_control_types={
-                'File': type_editors.PopulseFileControlWidget,
-                'Directory': type_editors.PopulseDirectoryControlWidget,
-                'List_File':
-                    type_editors.PopulseOffscreenListFileControlWidget,
-                'Undefined':
-                    type_editors.PopulseUndefinedControlWidget},
+            process,
+            override_control_types={
+                "File": type_editors.PopulseFileControlWidget,
+                "Directory": type_editors.PopulseDirectoryControlWidget,
+                "List_File": type_editors.PopulseOffscreenListFileControlWidget,
+                "Undefined": type_editors.PopulseUndefinedControlWidget,
+            },
             separate_outputs=True,
-            user_data={'project': self.project,
-                       'scan_list': self.scan_list,
-                       'main_window': self.main_window,
-                       'node_controller': self,
-                       'connected_inputs': connected_inputs},
+            user_data={
+                "project": self.project,
+                "scan_list": self.scan_list,
+                "main_window": self.main_window,
+                "node_controller": self,
+                "connected_inputs": connected_inputs,
+            },
             scroll=False,
-            userlevel=userlevel)
-        
-        if hasattr(process, 'completion_engine'):
+            userlevel=userlevel,
+        )
+
+        if hasattr(process, "completion_engine"):
             compl = process.completion_engine
             atts = compl.get_attribute_values()
 
             if len(atts.user_traits()) != 0:
-                btn = QPushButton('Filter')
-                btn.setSizePolicy(Qt.QSizePolicy.Fixed,
-                                  Qt.QSizePolicy.Fixed)
+                btn = QPushButton("Filter")
+                btn.setSizePolicy(Qt.QSizePolicy.Fixed, Qt.QSizePolicy.Fixed)
                 btn.clicked.connect(self.filter_attributes)
                 self.process_widget.attrib_widget.layout().insertWidget(0, btn)
 
         self.layout().addWidget(self.process_widget)
-        self.process.on_trait_change(self.parameters_changed, dispatch='ui')
+        self.process.on_trait_change(self.parameters_changed, dispatch="ui")
         # this cannot be done in __del__ since the C++ part will be already
         # destroyed by then.
         # However this signal seems never to be emitted, and I don't understand
         # why. So release_process() has to be called manually from the
         # pipeline manager. Sigh.
-        #self.process_widget.destroyed.connect(partial(self.static_release, process,
+        # self.process_widget.destroyed.connect(partial(self.static_release, process,
         #                               self.parameters_changed))
 
     @staticmethod
@@ -530,7 +570,7 @@ class CapsulNodeController(QWidget):
 
     def release_process(self):
         """Remove notification from process"""
-        if hasattr(self, 'process'):
+        if hasattr(self, "process"):
             self.process.on_trait_change(self.parameters_changed, remove=True)
         try:
             if not sip.isdeleted(self):
@@ -551,14 +591,26 @@ class CapsulNodeController(QWidget):
     def parameters_changed(self, _, plug_name, old_value, new_value):
         """Emit the value_changed signal."""
 
-        #plug_name_type = type(plug_name)
+        # plug_name_type = type(plug_name)
         plug_type = type(new_value)
-        self.value_changed.emit(["plug_value", self.node_name, old_value,
-                                 plug_name, plug_type, new_value])
+        self.value_changed.emit(
+            [
+                "plug_value",
+                self.node_name,
+                old_value,
+                plug_name,
+                plug_type,
+                new_value,
+            ]
+        )
 
-    def update_node_name(self, new_node_name=None,
-                         old_node_name=None, from_undo=False,
-                         from_redo=False):
+    def update_node_name(
+        self,
+        new_node_name=None,
+        old_node_name=None,
+        from_undo=False,
+        from_redo=False,
+    ):
         """Change the name of the selected node and updates the pipeline.
 
         Because the nodes are stored in a dictionary, we have to create
@@ -584,63 +636,78 @@ class CapsulNodeController(QWidget):
         old_node = self.pipeline.nodes[old_node_name]
 
         if isinstance(self.process, ProcessIteration):
-            if not new_node_name.startswith('iterated_'):
-                new_node_name = 'iterated_' + new_node_name
+            if not new_node_name.startswith("iterated_"):
+                new_node_name = "iterated_" + new_node_name
                 self.line_edit_node_name.setText(new_node_name)
 
         if new_node_name in list(self.pipeline.nodes.keys()):
-            print("\nUpdate of the node name from '{0}' to '{1}': impossible, "
-                  "the node '{1}' already exists !".format(old_node_name,
-                                                           new_node_name))
+            print(
+                "\nUpdate of the node name from '{0}' to '{1}': impossible, "
+                "the node '{1}' already exists !".format(
+                    old_node_name, new_node_name
+                )
+            )
 
         else:
             self.pipeline.rename_node(old_node_name, new_node_name)
-            self.rename_subprocesses(self.pipeline.nodes[new_node_name], new_node_name)
+            self.rename_subprocesses(
+                self.pipeline.nodes[new_node_name], new_node_name
+            )
 
             # Updating the node_name attribute
             self.node_name = new_node_name
             self.pipeline.update_nodes_and_plugs_activation()
 
             # To undo/redo
-            self.value_changed.emit(["node_name",
-                                     self.pipeline.nodes[new_node_name],
-                                     new_node_name, old_node_name])
+            self.value_changed.emit(
+                [
+                    "node_name",
+                    self.pipeline.nodes[new_node_name],
+                    new_node_name,
+                    old_node_name,
+                ]
+            )
 
             # For history
             history_maker = ["update_node_name"]
 
             if from_undo:
 
-                #TODO: next line is strange!
+                # TODO: next line is strange!
                 history_maker.append
-                  
+
             else:
                 history_maker.append(self.pipeline.nodes[new_node_name])
                 history_maker.append(new_node_name)
                 history_maker.append(old_node_name)
-                
-            (self.main_window.pipeline_manager.pipelineEditorTabs.
-                    get_current_editor().update_history)(history_maker,
-                                                         from_undo,
-                                                         from_redo)
+
+            (
+                self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().update_history
+            )(history_maker, from_undo, from_redo)
 
             self.main_window.statusBar().showMessage(
                 'Node name "{0}" has been changed to "{1}".'.format(
-                    old_node_name, new_node_name))
+                    old_node_name, new_node_name
+                )
+            )
 
     def rename_subprocesses(self, node, parent_node_name):
-        if node.process.context_name.split('.')[0] == 'Pipeline':
-            if len(node.process.context_name.split('.')) >= 3:
-                node.process.context_name = 'Pipeline.' + parent_node_name + '.' + '.'.join(
-                    node.process.context_name.split('.')[2:])
+        if node.process.context_name.split(".")[0] == "Pipeline":
+            if len(node.process.context_name.split(".")) >= 3:
+                node.process.context_name = (
+                    "Pipeline."
+                    + parent_node_name
+                    + "."
+                    + ".".join(node.process.context_name.split(".")[2:])
+                )
             else:
-                node.process.context_name = 'Pipeline.' + parent_node_name
+                node.process.context_name = "Pipeline." + parent_node_name
         else:
             node.process.context_name = parent_node_name
 
         if isinstance(node, PipelineNode):
             for name, subnode in node.process.nodes.items():
-                if name == '':
+                if name == "":
                     continue
                 else:
                     self.rename_subprocesses(subnode, parent_node_name)
@@ -648,11 +715,18 @@ class CapsulNodeController(QWidget):
     def filter_attributes(self):
         """Display a filter widget."""
         self.pop_up = AttributesFilter(
-            self.project, self.scan_list, self.process,
-            self.node_name, 'attributes', self, self.main_window)
+            self.project,
+            self.scan_list,
+            self.process,
+            self.node_name,
+            "attributes",
+            self,
+            self.main_window,
+        )
         self.pop_up.show()
         self.pop_up.attributes_selected.connect(
-            self.update_attributes_from_filter)
+            self.update_attributes_from_filter
+        )
 
     def update_attributes_from_filter(self, attributes):
         """Update attributes from filter widger"""
@@ -672,9 +746,11 @@ class CapsulNodeController(QWidget):
 
         if num_set == 0 and len(attributes) != 0:
             mbox_icon = QMessageBox.Information
-            mbox_title = 'Unmatching tags / attributes'
-            mbox_text = ('The selected data tags do not match the expected '
-                         'attributes set for process parameters completion')
+            mbox_title = "Unmatching tags / attributes"
+            mbox_text = (
+                "The selected data tags do not match the expected "
+                "attributes set for process parameters completion"
+            )
             mbox = QMessageBox(mbox_icon, mbox_title, mbox_text)
             timer = Qt.QTimer.singleShot(2000, mbox.accept)
             mbox.exec()
@@ -706,7 +782,7 @@ class FilterWidget(QWidget):
         :param node: instance of the corresponding Input_Filter node
         :param main_window: parent main window
         """
-        
+
         super(FilterWidget, self).__init__(None)
 
         self.setWindowTitle("Filter - " + node_name)
@@ -723,15 +799,17 @@ class FilterWidget(QWidget):
                 path, file_name = os.path.split(scan)
                 path, second_folder = os.path.split(path)
                 first_folder = os.path.basename(path)
-                database_file = os.path.join(first_folder, second_folder,
-                                             file_name)
+                database_file = os.path.join(
+                    first_folder, second_folder, file_name
+                )
                 scan_list.append(database_file)
 
         self.scan_list = scan_list
 
         # Graphical components
-        self.table_data = TableDataBrowser(self.project, self,
-                                           self.visible_tags, False, False)
+        self.table_data = TableDataBrowser(
+            self.project, self, self.visible_tags, False, False
+        )
 
         # Reducing the list of scans to selection
         all_scans = self.table_data.scans_to_visualize
@@ -749,10 +827,13 @@ class FilterWidget(QWidget):
             self.rapid_search.setText(filter_to_apply.search_bar)
         self.rapid_search.textChanged.connect(partial(self.search_str))
 
-        self.advanced_search = AdvancedSearch(self.project, self,
-                                              self.scan_list,
-                                              self.visible_tags,
-                                              from_pipeline=True)
+        self.advanced_search = AdvancedSearch(
+            self.project,
+            self,
+            self.scan_list,
+            self.visible_tags,
+            from_pipeline=True,
+        )
         self.advanced_search.show_search()
         self.advanced_search.apply_filter(filter_to_apply)
 
@@ -767,9 +848,10 @@ class FilterWidget(QWidget):
 
         sources_images_dir = Config().getSourceImageDir()
 
-        self.button_cross.setStyleSheet('background-color:rgb(255, 255, 255);')
-        self.button_cross.setIcon(QIcon(os.path.join(sources_images_dir,
-                                                     'gray_cross.png')))
+        self.button_cross.setStyleSheet("background-color:rgb(255, 255, 255);")
+        self.button_cross.setIcon(
+            QIcon(os.path.join(sources_images_dir, "gray_cross.png"))
+        )
         self.button_cross.clicked.connect(self.reset_search_bar)
 
         search_bar_layout = QHBoxLayout()
@@ -811,13 +893,25 @@ class FilterWidget(QWidget):
     def ok_clicked(self):
         """Set the filter to the process and closes the widget."""
         if isinstance(self.process, ProcessMIA):
-            (fields, conditions,
-             values, links, nots) = self.advanced_search.get_filters(False)
-            filt = Filter(None, nots, values,
-                          fields, links, conditions, self.rapid_search.text())
+            (
+                fields,
+                conditions,
+                values,
+                links,
+                nots,
+            ) = self.advanced_search.get_filters(False)
+            filt = Filter(
+                None,
+                nots,
+                values,
+                fields,
+                links,
+                conditions,
+                self.rapid_search.text(),
+            )
             self.process.filter = filt
 
-        #self.set_output_value()
+        # self.set_output_value()
         self.close()
 
     def reset_search_bar(self):
@@ -847,15 +941,19 @@ class FilterWidget(QWidget):
             # Scans with at least a not defined value
             if str_search == not_defined_value:
                 filter = self.prepare_not_defined_filter(
-                    self.project.session.get_shown_tags())
+                    self.project.session.get_shown_tags()
+                )
             # Scans matching the search
             else:
                 filter = self.rapid_search.prepare_filter(
-                    str_search, self.project.session.get_shown_tags(),
-                    old_scan_list)
+                    str_search,
+                    self.project.session.get_shown_tags(),
+                    old_scan_list,
+                )
 
             generator = self.project.session.filter_documents(
-                COLLECTION_CURRENT, filter)
+                COLLECTION_CURRENT, filter
+            )
 
             # Creating the list of scans
             return_list = [getattr(scan, TAG_FILENAME) for scan in generator]
@@ -866,34 +964,35 @@ class FilterWidget(QWidget):
         # Rows updated
         self.table_data.update_visualized_rows(old_scan_list)
 
-#    def set_output_value(self):
-#        """Set the output of the filter to the output of the node."""
-#
-#        result_names = []
-#        filter = self.table_data.get_current_filter()
-#        for i in range(len(filter)):
-#            scan_name = filter[i]
-#            tag_name = self.push_button_tag_filter.text().replace('&', '')
-#            value = self.project.session.get_value(COLLECTION_CURRENT,
-#                                                   scan_name, tag_name)
-#            if tag_name == TAG_FILENAME:
-#                value = os.path.abspath(os.path.join(self.project.folder,
-#                                                     value))
-#            result_names.append(value)
-#
-#        result_files = []
-#        for result_name in result_names:
-#            full_path = os.path.abspath(os.path.join(self.project.folder,
-#                                                     result_name))
-#            result_files.append(full_path)
-#
-#        self.node.set_plug_value("output", result_files)
+    #    def set_output_value(self):
+    #        """Set the output of the filter to the output of the node."""
+    #
+    #        result_names = []
+    #        filter = self.table_data.get_current_filter()
+    #        for i in range(len(filter)):
+    #            scan_name = filter[i]
+    #            tag_name = self.push_button_tag_filter.text().replace('&', '')
+    #            value = self.project.session.get_value(COLLECTION_CURRENT,
+    #                                                   scan_name, tag_name)
+    #            if tag_name == TAG_FILENAME:
+    #                value = os.path.abspath(os.path.join(self.project.folder,
+    #                                                     value))
+    #            result_names.append(value)
+    #
+    #        result_files = []
+    #        for result_name in result_names:
+    #            full_path = os.path.abspath(os.path.join(self.project.folder,
+    #                                                     result_name))
+    #            result_files.append(full_path)
+    #
+    #        self.node.set_plug_value("output", result_files)
 
     def update_tag_to_filter(self):
         """Update the tag to Filter."""
 
-        pop_up = PopUpSelectTagCountTable(self.project, self.visible_tags,
-                                          self.push_button_tag_filter.text())
+        pop_up = PopUpSelectTagCountTable(
+            self.project, self.visible_tags, self.push_button_tag_filter.text()
+        )
         if pop_up.exec_():
             self.push_button_tag_filter.setText(pop_up.selected_tag)
 
@@ -905,8 +1004,9 @@ class FilterWidget(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(visualized_tags)
         buttons_layout = QHBoxLayout()
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok |
-                                   QDialogButtonBox.Cancel)
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        )
         buttons.accepted.connect(dialog.accept)
         buttons.rejected.connect(dialog.reject)
         buttons_layout.addWidget(buttons)
@@ -919,12 +1019,14 @@ class FilterWidget(QWidget):
             new_visibilities = []
             for x in range(visualized_tags.list_widget_selected_tags.count()):
                 visible_tag = visualized_tags.list_widget_selected_tags.item(
-                    x).text()
+                    x
+                ).text()
                 new_visibilities.append(visible_tag)
             new_visibilities.append(TAG_FILENAME)
-            self.table_data.update_visualized_columns(self.visible_tags,
-                                                      new_visibilities)
-            #self.node_controller.visibles_tags = new_visibilities
+            self.table_data.update_visualized_columns(
+                self.visible_tags, new_visibilities
+            )
+            # self.node_controller.visibles_tags = new_visibilities
             for row in self.advanced_search.rows:
                 fields = row[2]
                 fields.clear()
@@ -968,7 +1070,9 @@ class NodeController(QWidget):
         self.scan_list = scan_list
         self.main_window = main_window
         self.node_name = ""
-        self.pipeline = pipeline_manager_tab.pipelineEditorTabs.get_current_pipeline()
+        self.pipeline = (
+            pipeline_manager_tab.pipelineEditorTabs.get_current_pipeline()
+        )
 
         # Layouts
         self.v_box_final = QVBoxLayout()
@@ -983,12 +1087,15 @@ class NodeController(QWidget):
         for i in reversed(range(len(layout.children()))):
             if type(layout.layout().itemAt(i)) == QtWidgets.QWidgetItem:
                 layout.layout().itemAt(i).widget().setParent(None)
-            if type(layout.layout().itemAt(i)) == QtWidgets.QHBoxLayout or \
-                    type(layout.layout().itemAt(i)) == QtWidgets.QVBoxLayout:
+            if (
+                type(layout.layout().itemAt(i)) == QtWidgets.QHBoxLayout
+                or type(layout.layout().itemAt(i)) == QtWidgets.QVBoxLayout
+            ):
                 layout.layout().itemAt(i).deleteLater()
                 for j in reversed(range(len(layout.layout().itemAt(i)))):
                     layout.layout().itemAt(i).itemAt(j).widget().setParent(
-                        None)
+                        None
+                    )
 
         if layout.layout() is not None:
             sip.delete(layout.layout())
@@ -1002,13 +1109,21 @@ class NodeController(QWidget):
                            pipeline instance and the type of the plug value
         :param process: process of the node
         """
-        self.pop_up = PlugFilter(self.project, self.scan_list, process,
-                                 node_name, plug_name, self, self.main_window)
+        self.pop_up = PlugFilter(
+            self.project,
+            self.scan_list,
+            process,
+            node_name,
+            plug_name,
+            self,
+            self.main_window,
+        )
         self.pop_up.show()
         self.pop_up.plug_value_changed.connect(
-            partial(self.update_plug_value_from_filter, plug_name, parameters))
+            partial(self.update_plug_value_from_filter, plug_name, parameters)
+        )
 
-    #def display_parameters(self, node_name: object, process: object, pipeline: object) -> object:
+    # def display_parameters(self, node_name: object, process: object, pipeline: object) -> object:
     def display_parameters(self, node_name, process, pipeline):
         """Display the parameters of the selected node.
 
@@ -1036,18 +1151,19 @@ class NodeController(QWidget):
 
         # Node name
         label_node_name = QLabel()
-        label_node_name.setText('Node name:')
+        label_node_name.setText("Node name:")
 
         self.line_edit_node_name = QLineEdit()
         self.pipeline = pipeline
         # The pipeline global inputs and outputs node name cannot be modified
-        if self.node_name not in ('inputs', 'outputs'):
+        if self.node_name not in ("inputs", "outputs"):
             self.line_edit_node_name.setText(self.node_name)
             self.line_edit_node_name.returnPressed.connect(
-                self.update_node_name)
+                self.update_node_name
+            )
 
         else:
-            self.line_edit_node_name.setText('Pipeline inputs/outputs')
+            self.line_edit_node_name.setText("Pipeline inputs/outputs")
             self.line_edit_node_name.setReadOnly(True)
 
         self.h_box_node_name = QHBoxLayout()
@@ -1055,12 +1171,12 @@ class NodeController(QWidget):
         self.h_box_node_name.addWidget(self.line_edit_node_name)
 
         # Inputs
-        self.button_group_inputs = QGroupBox('Inputs')
+        self.button_group_inputs = QGroupBox("Inputs")
         self.v_box_inputs = QVBoxLayout()
         idx = 0
 
         for name, trait in process.user_traits().items():
-            if name == 'nodes_activation':
+            if name == "nodes_activation":
                 continue
             if not trait.output:
                 label_input = QLabel()
@@ -1075,8 +1191,14 @@ class NodeController(QWidget):
                 self.line_edit_input.insert(idx, QLineEdit())
                 self.line_edit_input[idx].setText(str(value))
                 self.line_edit_input[idx].returnPressed.connect(
-                    partial(self.update_plug_value, 'in', name, pipeline,
-                            type(value)))
+                    partial(
+                        self.update_plug_value,
+                        "in",
+                        name,
+                        pipeline,
+                        type(value),
+                    )
+                )
 
                 h_box = QHBoxLayout()
                 h_box.addWidget(label_input)
@@ -1087,10 +1209,16 @@ class NodeController(QWidget):
                 # which means that the scans will be filtered with InputFilter
                 if self.node_name == "inputs" and name != "database_scans":
                     parameters = (idx, pipeline, type(value))
-                    push_button = QPushButton('Filter')
+                    push_button = QPushButton("Filter")
                     push_button.clicked.connect(
-                        partial(self.display_filter, self.node_name, name,
-                                parameters, process))
+                        partial(
+                            self.display_filter,
+                            self.node_name,
+                            name,
+                            parameters,
+                            process,
+                        )
+                    )
                     h_box.addWidget(push_button)
 
                 self.v_box_inputs.addLayout(h_box)
@@ -1100,7 +1228,7 @@ class NodeController(QWidget):
         self.button_group_inputs.setLayout(self.v_box_inputs)
 
         # Outputs
-        self.button_group_outputs = QGroupBox('Outputs')
+        self.button_group_outputs = QGroupBox("Outputs")
         self.v_box_outputs = QVBoxLayout()
         idx = 0
         for name, trait in process.traits(output=True).items():
@@ -1114,8 +1242,10 @@ class NodeController(QWidget):
             self.line_edit_output.insert(idx, QLineEdit())
             self.line_edit_output[idx].setText(str(value))
             self.line_edit_output[idx].returnPressed.connect(
-                partial(self.update_plug_value, 'out', name, pipeline,
-                        type(value)))
+                partial(
+                    self.update_plug_value, "out", name, pipeline, type(value)
+                )
+            )
 
             h_box = QHBoxLayout()
             h_box.addWidget(label_output)
@@ -1131,21 +1261,33 @@ class NodeController(QWidget):
         self.v_box_final.addWidget(self.button_group_inputs)
         self.v_box_final.addWidget(self.button_group_outputs)
 
-        self.main_window.pipeline_manager.pipelineEditorTabs \
-            .get_current_editor().node_parameters_tmp[node_name] = {}
+        self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().node_parameters_tmp[
+            node_name
+        ] = {}
 
-        self.main_window.pipeline_manager.pipelineEditorTabs \
-            .get_current_editor().node_parameters_tmp[node_name]["inputs"] = \
-            [x.text() for x in self.line_edit_input]
+        self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().node_parameters_tmp[
+            node_name
+        ][
+            "inputs"
+        ] = [
+            x.text() for x in self.line_edit_input
+        ]
 
-        self.main_window.pipeline_manager.pipelineEditorTabs \
-            .get_current_editor().node_parameters_tmp[node_name]["outputs"] = [
-            x.text() for x in self.line_edit_output]
+        self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().node_parameters_tmp[
+            node_name
+        ][
+            "outputs"
+        ] = [
+            x.text() for x in self.line_edit_output
+        ]
 
-        if "outputs" in self.main_window.pipeline_manager.pipelineEditorTabs.\
-                get_current_editor().node_parameters_tmp:
-            del self.main_window.pipeline_manager.pipelineEditorTabs \
-                .get_current_editor().node_parameters_tmp["outputs"]
+        if (
+            "outputs"
+            in self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().node_parameters_tmp
+        ):
+            del self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().node_parameters_tmp[
+                "outputs"
+            ]
 
         # Commented on January, 4th 2020
         # if self.main_window.pipeline_manager.pipelineEditorTabs\
@@ -1165,7 +1307,9 @@ class NodeController(QWidget):
         #     self.main_window.pipeline_manager.run_pipeline_action\
         #         .setDisabled(False)
 
-        self.main_window.pipeline_manager.run_pipeline_action.setDisabled(False)
+        self.main_window.pipeline_manager.run_pipeline_action.setDisabled(
+            False
+        )
         # End - commented on January, 4th 2020
 
         self.setLayout(self.v_box_final)
@@ -1205,9 +1349,11 @@ class NodeController(QWidget):
         if not new_node_name:
             new_node_name = self.line_edit_node_name.text()
 
-        if isinstance(self.pipeline.list_process_in_pipeline[0], ProcessIteration):
-            if not new_node_name.startswith('iterated_'):
-                new_node_name = 'iterated_' + new_node_name
+        if isinstance(
+            self.pipeline.list_process_in_pipeline[0], ProcessIteration
+        ):
+            if not new_node_name.startswith("iterated_"):
+                new_node_name = "iterated_" + new_node_name
                 self.line_edit_node_name.setText(new_node_name)
 
         if new_node_name in list(self.pipeline.nodes.keys()):
@@ -1215,33 +1361,46 @@ class NodeController(QWidget):
 
         else:
             self.pipeline.rename_node(old_node_name, new_node_name)
-            self.rename_subprocesses(self.pipeline.nodes[new_node_name], new_node_name)
+            self.rename_subprocesses(
+                self.pipeline.nodes[new_node_name], new_node_name
+            )
 
             # Updating the node_name attribute
             self.node_name = new_node_name
 
             # To undo/redo
-            self.value_changed.emit(["node_name",
-                                     self.pipeline.nodes[new_node_name],
-                                     new_node_name, old_node_name])
+            self.value_changed.emit(
+                [
+                    "node_name",
+                    self.pipeline.nodes[new_node_name],
+                    new_node_name,
+                    old_node_name,
+                ]
+            )
 
             self.main_window.statusBar().showMessage(
                 'Node name "{0}" has been changed to "{1}".'.format(
-                    old_node_name, new_node_name))
+                    old_node_name, new_node_name
+                )
+            )
 
     def rename_subprocesses(self, node, parent_node_name):
-        if node.process.context_name.split('.')[0] == 'Pipeline':
-            if len(node.process.context_name.split('.')) >= 3:
-                node.process.context_name = 'Pipeline.' + parent_node_name + '.' + '.'.join(
-                    node.process.context_name.split('.')[2:])
+        if node.process.context_name.split(".")[0] == "Pipeline":
+            if len(node.process.context_name.split(".")) >= 3:
+                node.process.context_name = (
+                    "Pipeline."
+                    + parent_node_name
+                    + "."
+                    + ".".join(node.process.context_name.split(".")[2:])
+                )
             else:
-                node.process.context_name = 'Pipeline.' + parent_node_name
+                node.process.context_name = "Pipeline." + parent_node_name
         else:
             node.process.context_name = parent_node_name
 
         if isinstance(node, PipelineNode):
             for name, subnode in node.process.nodes.items():
-                if name == '':
+                if name == "":
                     continue
                 else:
                     self.rename_subprocesses(subnode, parent_node_name)
@@ -1263,7 +1422,7 @@ class NodeController(QWidget):
 
         idx = 0
         for name, trait in process.user_traits().items():
-            if name == 'nodes_activation':
+            if name == "nodes_activation":
                 continue
             if not trait.output:
                 try:
@@ -1285,8 +1444,9 @@ class NodeController(QWidget):
         # self.main_window.pipeline_manager.pipelineEditorTabs\
         #     .update_current_node()
 
-    def update_plug_value(self, in_or_out, plug_name, pipeline, value_type,
-                          new_value=None):
+    def update_plug_value(
+        self, in_or_out, plug_name, pipeline, value_type, new_value=None
+    ):
         """Update the value of a node plug.
 
         :param in_or_out: "in" if the plug is an input plug, "out" else
@@ -1302,9 +1462,9 @@ class NodeController(QWidget):
         # Reading the value from the plug's line edit
         if not new_value:
 
-            if in_or_out == 'in':
+            if in_or_out == "in":
                 new_value = self.line_edit_input[index].text()
-            elif in_or_out == 'out':
+            elif in_or_out == "out":
                 new_value = self.line_edit_output[index].text()
             else:
                 new_value = None
@@ -1325,8 +1485,8 @@ class NodeController(QWidget):
             if value_type not in [float, int, str, list]:
                 value_type = str
 
-        if self.node_name in ['inputs', 'outputs']:
-            node_name = ''
+        if self.node_name in ["inputs", "outputs"]:
+            node_name = ""
 
         else:
             node_name = self.node_name
@@ -1343,30 +1503,41 @@ class NodeController(QWidget):
             msg.setWindowTitle(err.__class__.__name__)
             msg.exec_()
 
-            if in_or_out == 'in':
+            if in_or_out == "in":
                 self.line_edit_input[index].setText(str(old_value))
-            elif in_or_out == 'out':
+            elif in_or_out == "out":
                 self.line_edit_output[index].setText(str(old_value))
             return
 
         # Update pipeline to "propagate" the node value
         pipeline.update_nodes_and_plugs_activation()
 
-        if in_or_out == 'in':
+        if in_or_out == "in":
             self.line_edit_input[index].setText(str(new_value))
-        elif in_or_out == 'out':
+        elif in_or_out == "out":
             self.line_edit_output[index].setText(str(new_value))
 
         # To undo/redo
-        self.value_changed.emit(["plug_value", self.node_name, old_value,
-                                 plug_name, value_type, new_value])
+        self.value_changed.emit(
+            [
+                "plug_value",
+                self.node_name,
+                old_value,
+                plug_name,
+                value_type,
+                new_value,
+            ]
+        )
 
         self.main_window.statusBar().showMessage(
             'Plug "{0}" of node "{1}" has been changed to "{2}".'.format(
-                plug_name, node_name, new_value))
+                plug_name, node_name, new_value
+            )
+        )
 
-    def update_plug_value_from_filter(self, plug_name, parameters,
-                                      filter_res_list):
+    def update_plug_value_from_filter(
+        self, plug_name, parameters, filter_res_list
+    ):
         """Update the plug value from a filter result.
 
         :param plug_name: name of the plug
@@ -1397,7 +1568,3 @@ class NodeController(QWidget):
         """
         # only implemented in CapsulNodeController
         pass
-
-
-
-

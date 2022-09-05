@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- #
+# -*- coding: utf-8 -*-
 """
 Module to define the mini viewer.
 
@@ -14,30 +14,30 @@ Contains:
 # for details.
 ##########################################################################
 
-import nibabel as nib
-import numpy as np  # a N-dimensional array object
 import os
-import skimage as sk
 import traceback
 from functools import partial
-# from scipy.ndimage import rotate  # to work with NumPy arrays
-from skimage.transform import resize
 
-# PyQt5 imports
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout
-from PyQt5 import QtCore
-from PyQt5.QtGui import QImage, QPixmap, QFont
-from PyQt5.QtWidgets import (
-    QLabel, QScrollArea, QFrame, QSlider, QLineEdit, QSizePolicy, QCheckBox)
-
+import nibabel as nib
+import numpy as np  # a N-dimensional array object
+import skimage as sk
 # Populse_MIA imports
 # from populse_mia.software_properties import verCmp
 from packaging import version
-from populse_mia.user_interface.pop_ups import ClickableLabel, PopUpSelectTag
+from PyQt5 import QtCore
+# PyQt5 imports
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont, QImage, QPixmap
+from PyQt5.QtWidgets import (QCheckBox, QFrame, QHBoxLayout, QLabel, QLineEdit,
+                             QScrollArea, QSizePolicy, QSlider, QVBoxLayout,
+                             QWidget)
+# from scipy.ndimage import rotate  # to work with NumPy arrays
+from skimage.transform import resize
+
+from populse_mia.data_manager.project import COLLECTION_CURRENT
 from populse_mia.software_properties import Config
 from populse_mia.user_interface.data_browser import data_browser
-from populse_mia.data_manager.project import COLLECTION_CURRENT
+from populse_mia.user_interface.pop_ups import ClickableLabel, PopUpSelectTag
 
 
 class MiniViewer(QWidget):
@@ -67,7 +67,7 @@ class MiniViewer(QWidget):
         - changePosValue: change the value of a cursor for the selected index
         - check_box_cursors_state_changed: updates the config file
         - clear: remove the Nibabel images to be able to remove it in the
-          unit tests 
+          unit tests
         - clearLayouts: clear the final layout
         - create_slider: create a slider
         - createDimensionLabels: create the dimension labels for the
@@ -159,23 +159,27 @@ class MiniViewer(QWidget):
         self.setLayout(self.v_box_final)
 
         # Checkboxes
-        self.check_box_slices = QCheckBox('Show all slices (no cursors)')
+        self.check_box_slices = QCheckBox("Show all slices (no cursors)")
         if self.config.getShowAllSlices() is True:
             self.check_box_slices.setCheckState(Qt.Checked)
         else:
             self.check_box_slices.setCheckState(Qt.Unchecked)
         self.check_box_slices.stateChanged.connect(
-            self.update_visualization_method)
+            self.update_visualization_method
+        )
 
-        self.check_box_cursors = QCheckBox('Chain cursors')
-        self.check_box_cursors.setToolTip("Allows to connect all cursors "
-                                          "when selecting multiple documents")
+        self.check_box_cursors = QCheckBox("Chain cursors")
+        self.check_box_cursors.setToolTip(
+            "Allows to connect all cursors "
+            "when selecting multiple documents"
+        )
         if self.config.getChainCursors() is True:
             self.check_box_cursors.setCheckState(Qt.Checked)
         else:
             self.check_box_cursors.setCheckState(Qt.Unchecked)
         self.check_box_cursors.stateChanged.connect(
-            self.check_box_cursors_state_changed)
+            self.check_box_cursors_state_changed
+        )
 
         self.file_paths = ""
 
@@ -189,11 +193,14 @@ class MiniViewer(QWidget):
         self.slider_5D.insert(idx, self.create_slider(0, 0, 0))
 
         self.slider_3D[idx].valueChanged.connect(
-            partial(self.changePosValue, idx, 1))
+            partial(self.changePosValue, idx, 1)
+        )
         self.slider_4D[idx].valueChanged.connect(
-            partial(self.changePosValue, idx, 2))
+            partial(self.changePosValue, idx, 2)
+        )
         self.slider_5D[idx].valueChanged.connect(
-            partial(self.changePosValue, idx, 3))
+            partial(self.changePosValue, idx, 3)
+        )
 
         self.txt_slider_3D.insert(idx, self.createFieldValue())
         self.txt_slider_4D.insert(idx, self.createFieldValue())
@@ -211,10 +218,10 @@ class MiniViewer(QWidget):
 
     def clear(self):
         """
-        Remove the Nibabel images to be able to remove it in the unit tests 
+        Remove the Nibabel images to be able to remove it in the unit tests
         """
         try:
-            delattr(self, 'img')
+            delattr(self, "img")
         except AttributeError:
             pass
 
@@ -261,9 +268,11 @@ class MiniViewer(QWidget):
                     else:
                         # Updating the new value as the value of the cursor
                         # that has been changed by the user
-                        value = round((cursor[idx_loop].maximum() + 1) *
-                                      (cursor[idx].value() + 1) /
-                                      max(1, cursor[idx].maximum() + 1))
+                        value = round(
+                            (cursor[idx_loop].maximum() + 1)
+                            * (cursor[idx].value() + 1)
+                            / max(1, cursor[idx].maximum() + 1)
+                        )
                         value = min(cursor[idx_loop].maximum(), value - 1)
                         value = max(0, int(value))
                     cursor[idx_loop].setValue(value)
@@ -272,7 +281,8 @@ class MiniViewer(QWidget):
                 self.navigImage(idx_loop)
                 # Reconnecting
                 cursor[idx_loop].valueChanged.connect(
-                    partial(self.changePosValue, idx_loop, cursor_to_change))
+                    partial(self.changePosValue, idx_loop, cursor_to_change)
+                )
 
     def createDimensionLabels(self, idx):
         """Create the dimension labels for the selected index.
@@ -290,9 +300,9 @@ class MiniViewer(QWidget):
         self.label4D[idx].setFont(font)
         self.label5D[idx].setFont(font)
 
-        self.label3D[idx].setText('3D: ')
-        self.label4D[idx].setText('4D: ')
-        self.label5D[idx].setText('5D: ')
+        self.label3D[idx].setText("3D: ")
+        self.label4D[idx].setText("4D: ")
+        self.label5D[idx].setText("5D: ")
 
     def createFieldValue(self):
         """Create a field where will be displayed the position of a cursor.
@@ -348,14 +358,20 @@ class MiniViewer(QWidget):
         :param idx: the selected index
         """
         self.txt_slider_3D[idx].setText(
-            str(self.slider_3D[idx].value() + 1) + ' / ' +
-            str(self.slider_3D[idx].maximum() + 1))
+            str(self.slider_3D[idx].value() + 1)
+            + " / "
+            + str(self.slider_3D[idx].maximum() + 1)
+        )
         self.txt_slider_4D[idx].setText(
-            str(self.slider_4D[idx].value() + 1) + ' / ' +
-            str(self.slider_4D[idx].maximum() + 1))
+            str(self.slider_4D[idx].value() + 1)
+            + " / "
+            + str(self.slider_4D[idx].maximum() + 1)
+        )
         self.txt_slider_5D[idx].setText(
-            str(self.slider_5D[idx].value() + 1) + ' / ' +
-            str(self.slider_5D[idx].maximum() + 1))
+            str(self.slider_5D[idx].value() + 1)
+            + " / "
+            + str(self.slider_5D[idx].maximum() + 1)
+        )
 
     def enableSliders(self, idx):
         """Enable all the horizontal slider.
@@ -377,13 +393,13 @@ class MiniViewer(QWidget):
         # The image to display depends on the dimension of the image
         # In the 3D case, each slice is displayed
         if len(im.shape) == 3:
-            #im_2D = im.get_fdata()[:, :, i].copy()
+            # im_2D = im.get_fdata()[:, :, i].copy()
             im_2D = np.asarray(im.dataobj)[:, :, i].copy()
 
         # In the 4D case, each middle slice of the 3D dimension is displayed
         # for each time in the 4D dimension
         elif len(im.shape) == 4:
-            #im_3D = im.get_fdata()[:, :, :, i].copy()
+            # im_3D = im.get_fdata()[:, :, :, i].copy()
             im_3D = np.asarray(im.dataobj)[:, :, :, i].copy()
             middle_slice = int(im_3D.shape[2] / 2)
             im_2D = im_3D[:, :, middle_slice]
@@ -391,8 +407,8 @@ class MiniViewer(QWidget):
         # In the 5D case, each first time of the 4D dimension and
         # its middle slice of the 3D dimension is displayed
         elif len(im.shape) == 5:
-            #im_4D = im.get_fdata()[:, :, :, :, i].copy()
-            im_4D =  np.asarray(im.dataobj)[:, :, :, :, i].copy()
+            # im_4D = im.get_fdata()[:, :, :, :, i].copy()
+            im_4D = np.asarray(im.dataobj)[:, :, :, :, i].copy()
             im_3D = im_4D[:, :, :, 1]
             middle_slice = int(im_3D.shape[2] / 2)
             im_2D = im_3D[:, :, middle_slice]
@@ -420,7 +436,7 @@ class MiniViewer(QWidget):
         display_size = (128, 128)
         display_type = np.uint8  # this MUST be an integer data type
         display_pctl = 0.5  # percentile (0.5%) of values to clip at the
-                            # low and high end of intensities.
+        # low and high end of intensities.
         display_max = np.iinfo(display_type).max
         display_min = np.iinfo(display_type).min
 
@@ -440,20 +456,28 @@ class MiniViewer(QWidget):
         if version.parse(sk.__version__) >= version.Version("0.14.0"):
 
             try:
-                im2D = resize(im2D, display_size, mode='constant',
-                              anti_aliasing=False)
+                im2D = resize(
+                    im2D, display_size, mode="constant", anti_aliasing=False
+                )
 
             except ValueError:
-                im2D = resize(im2D.byteswap().newbyteorder(), display_size,
-                              mode='constant', anti_aliasing=False)
+                im2D = resize(
+                    im2D.byteswap().newbyteorder(),
+                    display_size,
+                    mode="constant",
+                    anti_aliasing=False,
+                )
         else:
 
             try:
-                im2D = resize(im2D, display_size, mode='constant')
+                im2D = resize(im2D, display_size, mode="constant")
 
             except ValueError:
-                im2D = resize(im2D.byteswap().newbyteorder(), display_size,
-                              mode='constant')
+                im2D = resize(
+                    im2D.byteswap().newbyteorder(),
+                    display_size,
+                    mode="constant",
+                )
 
         # Rescale image while handling Nans and infinite values
         im_mask = np.isfinite(im2D)
@@ -467,7 +491,7 @@ class MiniViewer(QWidget):
                 im2D *= (display_max - display_min) / im_max
             # shift lowest value to lower limit of display range
             im2D += display_min
-            
+
         # clip all values to display range, remove infinite values
         np.clip(im2D, display_min, display_max, im2D)
         # convert to integer display data type. NaNs get converted to 0.
@@ -475,10 +499,10 @@ class MiniViewer(QWidget):
 
         # Rotate. Copy array to avoid negative strides (Qt doesn't handle that)
         if self.config.isRadioView() is True:
-            im2D = np.rot90(im2D.T, 2).copy() # radiological
+            im2D = np.rot90(im2D.T, 2).copy()  # radiological
 
         else:
-            im2D = np.rot90(im2D, 1).copy() # neurological
+            im2D = np.rot90(im2D, 1).copy()  # neurological
 
         if im2d_provided:
             return im2D
@@ -500,22 +524,27 @@ class MiniViewer(QWidget):
         # changing the cursors maximum
         if len(self.img[idx].shape) == 3:
             self.im_2D.insert(
-                idx, np.asarray(self.img[idx].dataobj)[:, :, sl3D].copy())
+                idx, np.asarray(self.img[idx].dataobj)[:, :, sl3D].copy()
+            )
             self.slider_3D[idx].setMaximum(self.img[idx].shape[2] - 1)
             self.slider_4D[idx].setMaximum(0)
             self.slider_5D[idx].setMaximum(0)
 
         if len(self.img[idx].shape) == 4:
             self.im_2D.insert(
-                idx, np.asarray(self.img[idx].dataobj)[:, :, sl3D, sl4D].copy())
+                idx, np.asarray(self.img[idx].dataobj)[:, :, sl3D, sl4D].copy()
+            )
             self.slider_3D[idx].setMaximum(self.img[idx].shape[2] - 1)
             self.slider_4D[idx].setMaximum(self.img[idx].shape[3] - 1)
             self.slider_5D[idx].setMaximum(0)
 
         if len(self.img[idx].shape) == 5:
             self.im_2D.insert(
-                idx, np.asarray(self.img[idx].dataobj)[:, :, sl3D,
-                                                       sl4D, sl5D].copy())
+                idx,
+                np.asarray(self.img[idx].dataobj)[
+                    :, :, sl3D, sl4D, sl5D
+                ].copy(),
+            )
             self.slider_3D[idx].setMaximum(self.img[idx].shape[2] - 1)
             self.slider_4D[idx].setMaximum(self.img[idx].shape[3] - 1)
             self.slider_5D[idx].setMaximum(self.img[idx].shape[4] - 1)
@@ -569,18 +598,23 @@ class MiniViewer(QWidget):
         """
         # Looking for the tag value to display as a legend of the thumbnail
         for scan in self.project.session.get_documents_names(
-                COLLECTION_CURRENT):
+            COLLECTION_CURRENT
+        ):
             if scan == file_path_base_name:
                 value = self.project.session.get_value(
-                    COLLECTION_CURRENT, scan, self.config.getThumbnailTag())
+                    COLLECTION_CURRENT, scan, self.config.getThumbnailTag()
+                )
                 if value is not None:
                     self.label_description[idx].setText(
-                        str(value)[:self.nb_char_max])
+                        str(value)[: self.nb_char_max]
+                    )
                 else:
                     self.label_description[idx].setText(
-                        data_browser.not_defined_value[:self.nb_char_max])
+                        data_browser.not_defined_value[: self.nb_char_max]
+                    )
                 self.label_description[idx].setToolTip(
-                    os.path.basename(self.config.getThumbnailTag()))
+                    os.path.basename(self.config.getThumbnailTag())
+                )
 
     def show_slices(self, file_paths):
         """Creates the thumbnails from the selected file paths.
@@ -618,34 +652,48 @@ class MiniViewer(QWidget):
             for idx, file_path in enumerate(self.file_paths.copy()):
 
                 try:
-                    chk = nib.as_closest_canonical(nib.load(file_path, mmap=False))
-                    #chk = nib.as_closest_canonical(nib.load(file_path))
-                    #chk = nib.load(file_path)
+                    chk = nib.as_closest_canonical(
+                        nib.load(file_path, mmap=False)
+                    )
+                    # chk = nib.as_closest_canonical(nib.load(file_path))
+                    # chk = nib.load(file_path)
 
                 except nib.filebasedimages.ImageFileError as e:
-                    print("Error while trying to display the {} image ...!\n"
-                          "Traceback:".format(os.path.abspath(file_path)))
-                    print(''.join(traceback.format_tb(e.__traceback__)), end='')
-                    print('{0}: {1}\n'.format(e.__class__.__name__, e))
+                    print(
+                        "Error while trying to display the {} image ...!\n"
+                        "Traceback:".format(os.path.abspath(file_path))
+                    )
+                    print(
+                        "".join(traceback.format_tb(e.__traceback__)), end=""
+                    )
+                    print("{0}: {1}\n".format(e.__class__.__name__, e))
                     self.file_paths.remove(file_path)
                     chk = False
-            
+
                 except FileNotFoundError as e:
-                    print("File " + os.path.abspath(file_path) +
-                          " is not existing ...")
+                    print(
+                        "File "
+                        + os.path.abspath(file_path)
+                        + " is not existing ..."
+                    )
                     self.file_paths.remove(file_path)
                     chk = False
 
                 if chk is not False:
-                    
+
                     try:
                         np.asarray(chk.dataobj)
 
                     except Exception as e:
-                        print("\nError while trying to display the {} image ...!\n"
-                              "Traceback:".format(os.path.abspath(file_path)))
-                        print(''.join(traceback.format_tb(e.__traceback__)), end='')
-                        print('{0}: {1}\n'.format(e.__class__.__name__, e))
+                        print(
+                            "\nError while trying to display the {} image ...!\n"
+                            "Traceback:".format(os.path.abspath(file_path))
+                        )
+                        print(
+                            "".join(traceback.format_tb(e.__traceback__)),
+                            end="",
+                        )
+                        print("{0}: {1}\n".format(e.__class__.__name__, e))
                         self.file_paths.remove(file_path)
 
                     else:
@@ -677,12 +725,14 @@ class MiniViewer(QWidget):
 
                     w, h = self.im_2D[idx].shape
 
-                    im_Qt = QImage(self.im_2D[idx].data, w, h,
-                                   QImage.Format_Indexed8)
+                    im_Qt = QImage(
+                        self.im_2D[idx].data, w, h, QImage.Format_Indexed8
+                    )
                     pixm = QPixmap.fromImage(im_Qt)
 
                     file_path_base_name = os.path.basename(
-                        self.file_paths[idx])
+                        self.file_paths[idx]
+                    )
 
                     # imageLabel is the label where the image is displayed
                     # (as a pixmap)
@@ -693,12 +743,14 @@ class MiniViewer(QWidget):
                     self.label_description.insert(idx, ClickableLabel())
                     self.label_description[idx].setFont(font)
                     self.label_description[idx].clicked.connect(
-                        self.openTagsPopUp)
+                        self.openTagsPopUp
+                    )
 
                     # Looking for the tag value to display as a
                     # legend of the thumbnail
                     file_path_base_name = os.path.relpath(
-                        self.file_paths[idx], self.project.folder)
+                        self.file_paths[idx], self.project.folder
+                    )
                     self.setThumbnail(file_path_base_name, idx)
 
                     # Layout that corresponds to the 3D dimension
@@ -751,12 +803,14 @@ class MiniViewer(QWidget):
                 # idx represents the index of the selected image
                 for idx in range(len(self.file_paths)):
                     file_path_base_name = os.path.relpath(
-                        self.file_paths[idx], self.project.folder)
+                        self.file_paths[idx], self.project.folder
+                    )
 
                     self.label_description.insert(idx, ClickableLabel())
                     self.label_description[idx].setFont(font)
                     self.label_description[idx].clicked.connect(
-                        self.openTagsPopUp)
+                        self.openTagsPopUp
+                    )
 
                     # Looking for the tag value to display as a legend
                     # of the thumbnail
@@ -780,8 +834,11 @@ class MiniViewer(QWidget):
 
                         # Limiting the number of images to the number
                         # chosen by the user
-                        for i in range(min(nb_slices, int(
-                                self.line_edit_nb_slices.text()))):
+                        for i in range(
+                            min(
+                                nb_slices, int(self.line_edit_nb_slices.text())
+                            )
+                        ):
                             pixm = self.image_to_pixmap(self.img[idx], i)
 
                             self.v_box = QVBoxLayout()
@@ -790,8 +847,9 @@ class MiniViewer(QWidget):
                             # is displayed
                             label = QLabel(self)
                             label.setPixmap(pixm)
-                            label.setToolTip(os.path.basename(
-                                self.file_paths[idx]))
+                            label.setToolTip(
+                                os.path.basename(self.file_paths[idx])
+                            )
 
                             # Legend of the image (depends on the number
                             # of dimensions)

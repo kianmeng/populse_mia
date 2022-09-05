@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- #
+# -*- coding: utf-8 -*-
 """Module that contains the class to handle the projects saved in the software.
 
 Contains:
@@ -16,12 +16,12 @@ Contains:
 ##########################################################################
 
 import os
+
 import yaml
 from packaging import version
 
 # Populse_MIA imports
-from populse_mia.software_properties import verCmp
-from populse_mia.software_properties import Config
+from populse_mia.software_properties import Config, verCmp
 
 
 class SavedProjects:
@@ -49,10 +49,11 @@ class SavedProjects:
         """
         self.savedProjects = self.loadSavedProjects()
 
-        if ((isinstance(self.savedProjects, dict)) and
-            ('paths' in self.savedProjects)):
+        if (isinstance(self.savedProjects, dict)) and (
+            "paths" in self.savedProjects
+        ):
             self.pathsList = self.savedProjects["paths"]
-            
+
             if self.pathsList is None:
                 self.pathsList = []
 
@@ -73,17 +74,17 @@ class SavedProjects:
 
         """
         if self.pathsList:
-            
+
             if newPath not in self.pathsList:
                 self.pathsList.insert(0, newPath)
-                
+
             elif newPath != self.pathsList[0]:
                 self.pathsList.remove(newPath)
                 self.pathsList.insert(0, newPath)
-                
+
         else:
             self.pathsList.insert(0, newPath)
-            
+
         self.savedProjects["paths"] = self.pathsList
         self.saveSavedProjects()
         return self.pathsList
@@ -100,27 +101,30 @@ class SavedProjects:
         config = Config()
 
         try:
-            
-            with open(os.path.join(config.get_config_path(),
-                               'saved_projects.yml'), 'r') as stream:
-                
+
+            with open(
+                os.path.join(config.get_config_path(), "saved_projects.yml"),
+                "r",
+            ) as stream:
+
                 try:
-                    if version.parse(
-                                yaml.__version__) > version.parse("5.1"):
+                    if version.parse(yaml.__version__) > version.parse("5.1"):
                         return yaml.load(stream, Loader=yaml.FullLoader)
-                    else:    
+                    else:
                         return yaml.load(stream)
-            
+
                 except yaml.YAMLError as exc:
                     print(exc)
 
         except FileNotFoundError as exc:
-            
-            with open(os.path.join(config.get_config_path(),
-                                   'saved_projects.yml'), 'w') as stream:
-                yaml.dump({'paths' : []}, stream, default_flow_style=False)
 
-                return {'paths' : []}
+            with open(
+                os.path.join(config.get_config_path(), "saved_projects.yml"),
+                "w",
+            ) as stream:
+                yaml.dump({"paths": []}, stream, default_flow_style=False)
+
+                return {"paths": []}
 
     def removeSavedProject(self, path):
         """Removes a saved project from the saved_projects.yml file.
@@ -139,9 +143,17 @@ class SavedProjects:
         file."""
 
         config = Config()
-        
-        with (open(os.path.join(config.get_config_path(),
-                                'saved_projects.yml'), 'w', encoding='utf8')
-              ) as configfile:
-            yaml.dump(self.savedProjects, configfile,
-                      default_flow_style=False, allow_unicode=True)
+
+        with (
+            open(
+                os.path.join(config.get_config_path(), "saved_projects.yml"),
+                "w",
+                encoding="utf8",
+            )
+        ) as configfile:
+            yaml.dump(
+                self.savedProjects,
+                configfile,
+                default_flow_style=False,
+                allow_unicode=True,
+            )

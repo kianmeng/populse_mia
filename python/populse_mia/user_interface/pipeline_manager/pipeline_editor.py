@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- #
+# -*- coding: utf-8 -*-
 """
 Module that execute the pipeline manager tab menu actions
 and allow to edit graphically a pipeline.
@@ -23,36 +23,33 @@ Contains:
 # for details.
 ##########################################################################
 
+import json
 import os
 import re
 import sys
+
 import six
-import json
 import yaml
-from traits.api import TraitError
-
-# PyQt5 imports
-from PyQt5 import QtGui, QtWidgets, QtCore, Qt
-from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox
-
 # Capsul imports
-from capsul.api import (get_process_instance, Process, PipelineNode, Switch,
-                        capsul_engine, Node)
+from capsul.api import (Node, PipelineNode, Process, Switch, capsul_engine,
+                        get_process_instance)
 from capsul.pipeline.pipeline_nodes import ProcessNode
-from capsul.qt_gui.widgets.pipeline_developer_view import (
-                                            NodeGWidget, PipelineDeveloperView)
-from capsul.pipeline.xml import save_xml_pipeline
 from capsul.pipeline.python_export import save_py_pipeline
-
+from capsul.pipeline.xml import save_xml_pipeline
+from capsul.qt_gui.widgets.pipeline_developer_view import (
+    NodeGWidget, PipelineDeveloperView)
+# PyQt5 imports
+from PyQt5 import Qt, QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox
 # soma-base imports
 from soma.utils.weak_proxy import weak_proxy
+from traits.api import TraitError
 
+from populse_mia.software_properties import Config, verCmp
 # Populse_MIA imports
-from populse_mia.user_interface.pipeline_manager.node_controller import (
-                                                                   FilterWidget)
+from populse_mia.user_interface.pipeline_manager.node_controller import \
+    FilterWidget
 from populse_mia.user_interface.pop_ups import PopUpClosePipeline
-from populse_mia.software_properties import Config
-from populse_mia.software_properties import verCmp
 
 unicode = str
 
@@ -94,10 +91,13 @@ class PipelineEditor(PipelineDeveloperView):
         :param main_window: current main window
         """
 
-        PipelineDeveloperView.__init__(self, pipeline=None,
-                                        allow_open_controller=True,
-                                        show_sub_pipelines=True,
-                                        enable_edition=True)
+        PipelineDeveloperView.__init__(
+            self,
+            pipeline=None,
+            allow_open_controller=True,
+            show_sub_pipelines=True,
+            enable_edition=True,
+        )
 
         engine = Config.get_capsul_engine()
         self.scene.pipeline.set_study_config(engine.study_config)
@@ -126,19 +126,40 @@ class PipelineEditor(PipelineDeveloperView):
         else:
             self._current_link = link
 
-        (source_node_name, source_plug_name, source_node,
-         source_plug, dest_node_name, dest_plug_name, dest_node,
-         dest_plug) = self.scene.pipeline.parse_link(link)
-        (dest_node_name, dest_parameter, dest_node, dest_plug,
-         weak_link) = list(source_plug.links_to)[0]
+        (
+            source_node_name,
+            source_plug_name,
+            source_node,
+            source_plug,
+            dest_node_name,
+            dest_plug_name,
+            dest_node,
+            dest_plug,
+        ) = self.scene.pipeline.parse_link(link)
+        (
+            dest_node_name,
+            dest_parameter,
+            dest_node,
+            dest_plug,
+            weak_link,
+        ) = list(source_plug.links_to)[0]
         active = source_plug.activated and dest_plug.activated
-        self._current_link_def = (source_node, source_plug, dest_node,
-                                  dest_plug)
+        self._current_link_def = (
+            source_node,
+            source_plug,
+            dest_node,
+            dest_plug,
+        )
         # Calling the original method
         PipelineDeveloperView._del_link(self)
         # For history
-        history_maker = ["delete_link", (source_node_name, source_plug_name),
-                         (dest_node_name, dest_plug_name), active, weak_link]
+        history_maker = [
+            "delete_link",
+            (source_node_name, source_plug_name),
+            (dest_node_name, dest_plug_name),
+            active,
+            weak_link,
+        ]
         self.update_history(history_maker, from_undo, from_redo)
 
         # Commented on January, 4th 2020
@@ -149,11 +170,19 @@ class PipelineEditor(PipelineDeveloperView):
         # End - commented on January, 4th 2020
 
         self.main_window.statusBar().showMessage(
-            'Link {0} has been deleted.'.format(link))
+            "Link {0} has been deleted.".format(link)
+        )
 
-    def _export_plug(self, pipeline_parameter=False, optional=None,
-                     weak_link=None, from_undo=False, from_redo=False,
-                     temp_plug_name=None, multi_export=False):
+    def _export_plug(
+        self,
+        pipeline_parameter=False,
+        optional=None,
+        weak_link=None,
+        from_undo=False,
+        from_redo=False,
+        temp_plug_name=None,
+        multi_export=False,
+    ):
         """Export a plug to a pipeline global input or output.
 
         :param pipeline_parameter: name of the pipeline input/output
@@ -171,7 +200,7 @@ class PipelineEditor(PipelineDeveloperView):
 
         if temp_plug_name is None:
             temp_plug_name = self._temp_plug_name
-        
+
         if not pipeline_parameter:
             dial = self._PlugEdit()
             dial.name_line.setText(temp_plug_name[1])
@@ -184,7 +213,7 @@ class PipelineEditor(PipelineDeveloperView):
         if res:
             allow_existing_plug = False
             check_plug = True
-            
+
             if not pipeline_parameter:
                 plug_name = str(dial.name_line.text())
 
@@ -192,40 +221,46 @@ class PipelineEditor(PipelineDeveloperView):
                 plug_name = pipeline_parameter
 
             while check_plug is True:
-            
+
                 if plug_name in self.scene.pipeline.pipeline_node.plugs:
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Warning)
                     title = "populse_mia - Warning: Duplicate pipeline plug"
-                    msgtext = ('The "{0}" pipeline plug already exists, do '
-                               'you want to connect to this existing '
-                               'plug ?'.format(plug_name))
-                    reply = msg.question(self, title, msgtext,
-                                         QMessageBox.Yes |
-                                         QMessageBox.No)
+                    msgtext = (
+                        'The "{0}" pipeline plug already exists, do '
+                        "you want to connect to this existing "
+                        "plug ?".format(plug_name)
+                    )
+                    reply = msg.question(
+                        self, title, msgtext, QMessageBox.Yes | QMessageBox.No
+                    )
 
                     if reply == QMessageBox.Yes:
                         allow_existing_plug = True
                         check_plug = False
-                    
-                    elif reply == QMessageBox.No:
-                        new_name, ok = QInputDialog.getText(self,
-                                                            'Plug name Input '
-                                                            'Dialog',
-                                                            'The plug {0} '
-                                                            'already exists, '
-                                                            'please choose a '
-                                                            'new name.'.format(
-                                                                     plug_name))
 
-                        if (ok and
-                               new_name and
-                               not new_name.isspace() and
-                               plug_name != new_name):
+                    elif reply == QMessageBox.No:
+                        new_name, ok = QInputDialog.getText(
+                            self,
+                            "Plug name Input " "Dialog",
+                            "The plug {0} "
+                            "already exists, "
+                            "please choose a "
+                            "new name.".format(plug_name),
+                        )
+
+                        if (
+                            ok
+                            and new_name
+                            and not new_name.isspace()
+                            and plug_name != new_name
+                        ):
                             plug_name = new_name
 
-                            if (not plug_name in
-                                       self.scene.pipeline.pipeline_node.plugs):
+                            if (
+                                not plug_name
+                                in self.scene.pipeline.pipeline_node.plugs
+                            ):
                                 check_plug = False
 
                 else:
@@ -250,24 +285,28 @@ class PipelineEditor(PipelineDeveloperView):
                 except UnboundLocalError:
                     weak_link = False
 
-
             try:
-                self.scene.pipeline.export_parameter(temp_plug_name[0],
-                                                     temp_plug_name[1],
-                                                     pipeline_parameter,
-                                                     weak_link=weak_link,
-                                                     is_optional=optional,
-                                  allow_existing_plug=allow_existing_plug)
+                self.scene.pipeline.export_parameter(
+                    temp_plug_name[0],
+                    temp_plug_name[1],
+                    pipeline_parameter,
+                    weak_link=weak_link,
+                    is_optional=optional,
+                    allow_existing_plug=allow_existing_plug,
+                )
 
             except TraitError:
-                print("Cannot export {0}.{1} plug".format(temp_plug_name[0],
-                                                              plug_name))
+                print(
+                    "Cannot export {0}.{1} plug".format(
+                        temp_plug_name[0], plug_name
+                    )
+                )
 
                 if multi_export:
                     return None
 
             except ValueError as e:
-                print('\n{}'.format(e))
+                print("\n{}".format(e))
 
                 if multi_export:
                     return None
@@ -279,11 +318,13 @@ class PipelineEditor(PipelineDeveloperView):
 
                 else:
                     self.scene.update_pipeline()
-                    #history_maker = ["export_plug", ('inputs', pipeline_parameter),
+                    # history_maker = ["export_plug", ('inputs', pipeline_parameter),
                     #                 pipeline_parameter, optional, weak_link]
-                    history_maker = ["export_plugs",
-                                     plug_name,
-                                     temp_plug_name[0]]                
+                    history_maker = [
+                        "export_plugs",
+                        plug_name,
+                        temp_plug_name[0],
+                    ]
                     self.update_history(history_maker, from_undo, from_redo)
 
                     # Commented on January, 4th 2020
@@ -294,7 +335,8 @@ class PipelineEditor(PipelineDeveloperView):
                     # End - commented on January, 4th 2020
 
                     self.main_window.statusBar().showMessage(
-                        "Plug {0} has been exported.".format(plug_name))
+                        "Plug {0} has been exported.".format(plug_name)
+                    )
 
     def _release_grab_link(self, event, ret=False):
         """Method called when a link is released.
@@ -318,10 +360,16 @@ class PipelineEditor(PipelineDeveloperView):
         #         True)
         # End - commented on January, 4th 2020
         self.main_window.statusBar().showMessage(
-            'Link {0} has been added.'.format(link))
+            "Link {0} has been added.".format(link)
+        )
 
-    def _remove_plug(self, _temp_plug_name=None, from_undo=False,
-                     from_redo=False, from_export_plugs=False):
+    def _remove_plug(
+        self,
+        _temp_plug_name=None,
+        from_undo=False,
+        from_redo=False,
+        from_export_plugs=False,
+    ):
         """Remove a plug
 
         :param _temp_plug_name: tuple containing (the name of the node,
@@ -331,7 +379,7 @@ class PipelineEditor(PipelineDeveloperView):
         :param from_export_plugs: True if this method is called from a
            "from_export_plugs" undo or redo action
         """
-        tot_plug_name =[]
+        tot_plug_name = []
 
         if not _temp_plug_name:
             _temp_plug_name = self._temp_plug_name
@@ -341,7 +389,7 @@ class PipelineEditor(PipelineDeveloperView):
 
         for pip_plug_name in _temp_plug_name:
 
-            if pip_plug_name[0] in ('inputs', 'outputs'):
+            if pip_plug_name[0] in ("inputs", "outputs"):
                 plug_name = pip_plug_name[1]
                 plug = self.scene.pipeline.pipeline_node.plugs[plug_name]
                 optional = plug.optional
@@ -359,9 +407,9 @@ class PipelineEditor(PipelineDeveloperView):
 
                 # To avoid the "_items" bug: setting the has_items attribute
                 # of the trait's handler to False
-                node = self.scene.pipeline.nodes['']
+                node = self.scene.pipeline.nodes[""]
                 source_trait = node.get_trait(plug_name)
-                
+
                 if source_trait.handler.has_items:
                     source_trait.handler.has_items = False
 
@@ -380,16 +428,26 @@ class PipelineEditor(PipelineDeveloperView):
             # End - commented on January, 4th 2020
 
             if len(tot_plug_name) == 1:
-                self.main_window.statusBar().showMessage("'{0}' plug has been "
-                                                         "removed.".format(
-                                                        tot_plug_name[0][0][1]))
+                self.main_window.statusBar().showMessage(
+                    "'{0}' plug has been "
+                    "removed.".format(tot_plug_name[0][0][1])
+                )
             else:
-                self.main_window.statusBar().showMessage("{0} plugs has been "
-                                                         "removed.".format(
-                                       tuple((i[0][1] for i in tot_plug_name))))
+                self.main_window.statusBar().showMessage(
+                    "{0} plugs has been "
+                    "removed.".format(tuple((i[0][1] for i in tot_plug_name)))
+                )
 
-    def add_link(self, source, dest, active, weak,
-                 from_undo=False, from_redo=False, allow_export=False):
+    def add_link(
+        self,
+        source,
+        dest,
+        active,
+        weak,
+        from_undo=False,
+        from_redo=False,
+        allow_export=False,
+    ):
         """Add a link between two nodes.
 
         :param source: tuple containing the node and plug source names
@@ -401,8 +459,8 @@ class PipelineEditor(PipelineDeveloperView):
         :param from_redo: boolean that is True if the action has been made
            using a redo
         """
-        #self.scene.add_link(source, dest, active, weak,
-                            #allow_export=allow_export)
+        # self.scene.add_link(source, dest, active, weak,
+        # allow_export=allow_export)
 
         # Writing a string to represent the link
         source_parameters = ".".join(source)
@@ -423,10 +481,17 @@ class PipelineEditor(PipelineDeveloperView):
         #         True)
         # End - commented on January, 4th 2020
         self.main_window.statusBar().showMessage(
-            'Link {0} has been added.'.format(link))
+            "Link {0} has been added.".format(link)
+        )
 
-    def add_named_process(self, class_process, node_name=None,
-                          from_undo=False, from_redo=False, links=[]):
+    def add_named_process(
+        self,
+        class_process,
+        node_name=None,
+        from_undo=False,
+        from_redo=False,
+        links=[],
+    ):
         """Add a process to the pipeline.
 
         :param class_process: process class's name (str)
@@ -439,12 +504,13 @@ class PipelineEditor(PipelineDeveloperView):
         :param links: list of links (using when undo/redo)
         """
         process = super(PipelineEditor, self).add_named_process(
-            class_process, node_name)
+            class_process, node_name
+        )
 
         if node_name is None:
-            node_name = process.context_name.split('.')[-1]
+            node_name = process.context_name.split(".")[-1]
 
-        if hasattr(process, 'use_project') and process.use_project:
+        if hasattr(process, "use_project") and process.use_project:
             process.project = self.project
 
         # If the process is added from a undo, all the links
@@ -483,8 +549,9 @@ class PipelineEditor(PipelineDeveloperView):
         #                                                                    True)
         # End - commented on January, 4th 2020
 
-        self.main_window.statusBar().showMessage("Node {0} has been "
-                                                 "added.".format(node_name))
+        self.main_window.statusBar().showMessage(
+            "Node {0} has been " "added.".format(node_name)
+        )
 
         self.main_window.pipeline_manager.update_user_buttons_states()
 
@@ -503,16 +570,20 @@ class PipelineEditor(PipelineDeveloperView):
             if node_name and isinstance(node, PipelineNode):
                 sub_pipeline_process = node.process
                 current_process_id = sub_pipeline_process.id
-                
+
                 # Reading the process configuration file
-                with open(os.path.join(config.get_mia_path(),
-                                       'properties',
-                                       'process_config.yml'), 'r') as stream:
+                with open(
+                    os.path.join(
+                        config.get_mia_path(),
+                        "properties",
+                        "process_config.yml",
+                    ),
+                    "r",
+                ) as stream:
 
                     try:
-                        if verCmp(yaml.__version__, '5.1', 'sup'):
-                            dic = yaml.load(stream,
-                                            Loader=yaml.FullLoader)
+                        if verCmp(yaml.__version__, "5.1", "sup"):
+                            dic = yaml.load(stream, Loader=yaml.FullLoader)
                         else:
                             dic = yaml.load(stream)
 
@@ -523,45 +594,62 @@ class PipelineEditor(PipelineDeveloperView):
                 sub_pipeline_name = sub_pipeline_process.name
 
                 # Finding from where comes from the pipeline
-                pckg = sub_pipeline_process.__module__.split('.', 1)[0]
+                pckg = sub_pipeline_process.__module__.split(".", 1)[0]
 
-                if pckg == 'mia_processes':
-                    paths_list = [os.path.dirname(
-                                      sys.modules['mia_processes'].__path__[0])]
-        
+                if pckg == "mia_processes":
+                    paths_list = [
+                        os.path.dirname(
+                            sys.modules["mia_processes"].__path__[0]
+                        )
+                    ]
+
                 else:
-                    paths_list = dic['Paths']
-                    
+                    paths_list = dic["Paths"]
+
                 # get_path returns a list that is the package path
                 # to the sub_pipeline file###################
-                sub_pipeline_list = get_path(sub_pipeline_name,
-                                             dic['Packages'], None, pckg)
+                sub_pipeline_list = get_path(
+                    sub_pipeline_name, dic["Packages"], None, pckg
+                )
                 sub_pipeline_name = sub_pipeline_list.pop()
 
                 # Finding the real sub-pipeline filename
-                sub_pipeline_filename = find_filename(paths_list,
-                                                      sub_pipeline_list,
-                                                      sub_pipeline_name)
+                sub_pipeline_filename = find_filename(
+                    paths_list, sub_pipeline_list, sub_pipeline_name
+                )
 
                 saved_process = get_process_instance(sub_pipeline_filename)
 
                 current_inputs = list(sub_pipeline_process.get_inputs().keys())
                 current_outputs = list(
-                    sub_pipeline_process.get_outputs().keys())
+                    sub_pipeline_process.get_outputs().keys()
+                )
                 saved_inputs = list(saved_process.get_inputs().keys())
                 saved_outputs = list(saved_process.get_outputs().keys())
 
-                new_inputs = [item for item in saved_inputs
-                              if item not in current_inputs]
-                new_outputs = [item for item in saved_outputs
-                               if item not in current_outputs]
-                removed_inputs = [item for item in current_inputs
-                                  if item not in saved_inputs]
-                removed_outputs = [item for item in current_outputs
-                                   if item not in saved_outputs]
+                new_inputs = [
+                    item for item in saved_inputs if item not in current_inputs
+                ]
+                new_outputs = [
+                    item
+                    for item in saved_outputs
+                    if item not in current_outputs
+                ]
+                removed_inputs = [
+                    item for item in current_inputs if item not in saved_inputs
+                ]
+                removed_outputs = [
+                    item
+                    for item in current_outputs
+                    if item not in saved_outputs
+                ]
 
-                if new_inputs or new_outputs or removed_inputs or \
-                        removed_outputs:
+                if (
+                    new_inputs
+                    or new_outputs
+                    or removed_inputs
+                    or removed_outputs
+                ):
 
                     # Checking the links of the node
                     link_to_del = set()
@@ -581,11 +669,15 @@ class PipelineEditor(PipelineDeveloperView):
 
                     # Creating a new graphical node
                     gnode = NodeGWidget(
-                        node_name, new_node.plugs, pipeline,
-                        sub_pipeline=saved_process, process=saved_process,
+                        node_name,
+                        new_node.plugs,
+                        pipeline,
+                        sub_pipeline=saved_process,
+                        process=saved_process,
                         colored_parameters=self.scene.colored_parameters,
                         logical_view=self.scene.logical_view,
-                        labels=self.scene.labels)
+                        labels=self.scene.labels,
+                    )
 
                     # Setting the new node to the same position as the
                     # previous one
@@ -603,26 +695,29 @@ class PipelineEditor(PipelineDeveloperView):
                     for link, glink in link_to_del:
                         source = link[0]
                         dest = link[1]
-                        if source[0] == 'inputs':
+                        if source[0] == "inputs":
                             link_plug = source[1]
-                            source = ('', link_plug)
-                        if dest[0] == 'outputs':
+                            source = ("", link_plug)
+                        if dest[0] == "outputs":
                             link_plug = dest[1]
-                            dest = ('', link_plug)
+                            dest = ("", link_plug)
 
                         # Writing a string to represent the link
                         source_parameters = ".".join(source)
                         dest_parameters = ".".join(dest)
-                        pipeline_link = "->".join((source_parameters,
-                                                   dest_parameters))
+                        pipeline_link = "->".join(
+                            (source_parameters, dest_parameters)
+                        )
 
                         # Checking if a connected plug has been deleting
                         if dest[0] == node_name and dest[1] in removed_inputs:
                             removed_links.append(pipeline_link)
                             continue
 
-                        if source[0] == node_name and source[1] in \
-                                removed_outputs:
+                        if (
+                            source[0] == node_name
+                            and source[1] in removed_outputs
+                        ):
                             removed_links.append(pipeline_link)
                             continue
 
@@ -633,17 +728,20 @@ class PipelineEditor(PipelineDeveloperView):
                     self.scene.update_pipeline()
 
         if removed_links:
-            dialog_text = 'Pipeline {0} has been updated.\n' \
-                          'Removed links:'.format(node_name)
+            dialog_text = (
+                "Pipeline {0} has been updated.\n"
+                "Removed links:".format(node_name)
+            )
             for removed_link in removed_links:
-                dialog_text += '\n{0}'.format(removed_link)
+                dialog_text += "\n{0}".format(removed_link)
 
             pop_up = QtWidgets.QMessageBox()
             pop_up.setIcon(QtWidgets.QMessageBox.Warning)
             pop_up.setText(dialog_text)
             pop_up.setWindowTitle("Warning: links have been removed")
             pop_up.setStandardButtons(
-                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
+                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel
+            )
             pop_up.exec_()
 
     def del_node(self, node_name=None, from_undo=False, from_redo=False):
@@ -661,7 +759,7 @@ class PipelineEditor(PipelineDeveloperView):
             node_name = self.current_node_name
 
         invert_io = False
-        if node_name in ('inputs', 'outputs'):
+        if node_name in ("inputs", "outputs"):
             node = pipeline.pipeline_node
             invert_io = True
         else:
@@ -674,15 +772,20 @@ class PipelineEditor(PipelineDeveloperView):
             if plug.output or (invert_io and not plug.output):
 
                 for link_to in plug.links_to:
-                    (dest_node_name, dest_parameter,
-                     dest_node, dest_plug, weak_link) = link_to
+                    (
+                        dest_node_name,
+                        dest_parameter,
+                        dest_node,
+                        dest_plug,
+                        weak_link,
+                    ) = link_to
                     active = plug.activated
 
                     # Looking for the name of dest_plug in dest_node
                     dest_plug_name = None
 
                     for plug_name_d, plug_d in dest_node.plugs.items():
-        
+
                         if plug_d == dest_plug:
                             dest_plug_name = plug_name_d
                             break
@@ -697,8 +800,13 @@ class PipelineEditor(PipelineDeveloperView):
             else:
 
                 for link_from in plug.links_from:
-                    (source_node_name, source_parameter,
-                     source_node, source_plug, weak_link) = link_from
+                    (
+                        source_node_name,
+                        source_parameter,
+                        source_node,
+                        source_plug,
+                        weak_link,
+                    ) = link_from
                     active = plug.activated
 
                     # Looking for the name of source_plug in source_node
@@ -738,7 +846,8 @@ class PipelineEditor(PipelineDeveloperView):
         # End - commented on January, 4th 2020
 
         self.main_window.statusBar().showMessage(
-            "Node {0} has been deleted.".format(node_name))
+            "Node {0} has been deleted.".format(node_name)
+        )
 
         for node_name, node in pipeline.nodes.items():
             process = node
@@ -746,15 +855,22 @@ class PipelineEditor(PipelineDeveloperView):
             if isinstance(process, ProcessNode):
                 process = node.process
 
-            if node_name != '':
+            if node_name != "":
                 self.main_window.pipeline_manager.displayNodeParameters(
-                                                                      node_name,
-                                                                      process)
+                    node_name, process
+                )
 
         self.main_window.pipeline_manager.update_user_buttons_states()
 
-    def export_node_plugs(self, node_name, inputs=True, outputs=True,
-                          optional=False, from_undo=False, from_redo=False):
+    def export_node_plugs(
+        self,
+        node_name,
+        inputs=True,
+        outputs=True,
+        optional=False,
+        from_undo=False,
+        from_redo=False,
+    ):
         """Export all the plugs of a node
 
         :param node_name: node name
@@ -770,25 +886,32 @@ class PipelineEditor(PipelineDeveloperView):
 
         for parameter_name, plug in six.iteritems(node.plugs):
 
-            if parameter_name in ("nodes_activation",
-                                  "selection_changed",
-                                  "output_directory",
-                                  "use_mcr",
-                                  "paths",
-                                  "matlab_cmd",
-                                  "mfile",
-                                  "spm_script_file"):
+            if parameter_name in (
+                "nodes_activation",
+                "selection_changed",
+                "output_directory",
+                "use_mcr",
+                "paths",
+                "matlab_cmd",
+                "mfile",
+                "spm_script_file",
+            ):
                 continue
 
-            if (((node_name, parameter_name) not in pipeline.do_not_export and
-                 ((outputs and plug.output and not plug.links_to) or
-                  (inputs and not plug.output and not plug.links_from)) and
-                 (optional or not node.get_trait(parameter_name).optional))):
+            if (
+                (node_name, parameter_name) not in pipeline.do_not_export
+                and (
+                    (outputs and plug.output and not plug.links_to)
+                    or (inputs and not plug.output and not plug.links_from)
+                )
+                and (optional or not node.get_trait(parameter_name).optional)
+            ):
 
-                p_name = self._export_plug(parameter_name,
-                                           temp_plug_name=(node_name,
-                                                           parameter_name),
-                                           multi_export=True)
+                p_name = self._export_plug(
+                    parameter_name,
+                    temp_plug_name=(node_name, parameter_name),
+                    multi_export=True,
+                )
                 parameter_list.append(p_name)
 
         parameter_list = list(filter(None, parameter_list))
@@ -806,7 +929,8 @@ class PipelineEditor(PipelineDeveloperView):
         # End - commented on January, 4th 2020
 
         self.main_window.statusBar().showMessage(
-            "Plugs {0} have been exported.".format(str(parameter_list)))
+            "Plugs {0} have been exported.".format(str(parameter_list))
+        )
 
     def get_current_filename(self):
         """Return the relative path the pipeline was last saved to.
@@ -815,10 +939,10 @@ class PipelineEditor(PipelineDeveloperView):
         :return: the current pipeline file name
         """
 
-        if hasattr(self, '_pipeline_filename') and self._pipeline_filename:
+        if hasattr(self, "_pipeline_filename") and self._pipeline_filename:
             return os.path.relpath(self._pipeline_filename)
         else:
-            return ''
+            return ""
 
     def save_pipeline(self, filename=None):
         """Save the pipeline.
@@ -831,28 +955,35 @@ class PipelineEditor(PipelineDeveloperView):
         if len(self.scene.pipeline.nodes) < 2:
             print("\nThe pipeline hasn't been saved because it is empty ...")
             return None
-        
+
         config = Config()
-        
-        if not filename: 
+
+        if not filename:
             pipeline = self.scene.pipeline
-            folder = os.path.abspath(os.path.join(config.get_mia_path(),
-                                                  'processes',
-                                                  'User_processes'))
+            folder = os.path.abspath(
+                os.path.join(
+                    config.get_mia_path(), "processes", "User_processes"
+                )
+            )
 
             if not os.path.isdir(folder):
                 os.mkdir(folder)
 
-            if not os.path.isfile(os.path.abspath(
-                    os.path.join(folder, '__init__.py'))):
-                
-                with open(os.path.abspath(os.path.join(
-                        folder, '__init__.py')), 'w'):
+            if not os.path.isfile(
+                os.path.abspath(os.path.join(folder, "__init__.py"))
+            ):
+
+                with open(
+                    os.path.abspath(os.path.join(folder, "__init__.py")), "w"
+                ):
                     pass
 
             filename = QtWidgets.QFileDialog.getSaveFileName(
-                None, 'Save the pipeline', folder,
-                'Compatible files (*.py);; All (*)')[0]
+                None,
+                "Save the pipeline",
+                folder,
+                "Compatible files (*.py);; All (*)",
+            )[0]
 
             if not filename:  # save widget was cancelled by the user
                 return None
@@ -860,40 +991,49 @@ class PipelineEditor(PipelineDeveloperView):
             if os.path.basename(filename)[0].isdigit():
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Warning)
-                msg.setWindowTitle("populse_mia - "
-                                   "Save pipeline as Warning!")
-                msg.setText("Python does not allow to use a module name "
-                            "starting with a number ...!"
-                            "please change the name of your pipeline!")
+                msg.setWindowTitle(
+                    "populse_mia - " "Save pipeline as Warning!"
+                )
+                msg.setText(
+                    "Python does not allow to use a module name "
+                    "starting with a number ...!"
+                    "please change the name of your pipeline!"
+                )
                 msg.setStandardButtons(QMessageBox.Close)
                 msg.buttonClicked.connect(msg.close)
                 msg.exec()
                 return None
 
             filename_temp = os.path.split(filename)
-            filename = os.path.join(filename_temp[0],
-                                    filename_temp[-1].lower())
+            filename = os.path.join(
+                filename_temp[0], filename_temp[-1].lower()
+            )
 
-            if os.path.splitext(filename)[1] == '':  # which means no extension
-                filename += '.py'
+            if os.path.splitext(filename)[1] == "":  # which means no extension
+                filename += ".py"
 
-            elif os.path.splitext(filename)[1] != '.py':
+            elif os.path.splitext(filename)[1] != ".py":
                 msg = QtWidgets.QMessageBox()
                 msg.setIcon(QtWidgets.QMessageBox.Warning)
-                msg.setText('The pipeline will be saved with a' +
-                            ' ".py" extension instead of {0}'.format(
-                                os.path.splitext(filename)[1]))
+                msg.setText(
+                    "The pipeline will be saved with a"
+                    + ' ".py" extension instead of {0}'.format(
+                        os.path.splitext(filename)[1]
+                    )
+                )
                 msg.setWindowTitle("Warning")
                 msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
                 msg.buttonClicked.connect(msg.close)
                 msg.exec()
-                filename = os.path.splitext(filename)[0] + '.py'
+                filename = os.path.splitext(filename)[0] + ".py"
 
             if os.path.exists(filename) and config.get_user_mode():
                 msg = QtWidgets.QMessageBox()
                 msg.setIcon(QtWidgets.QMessageBox.Warning)
-                msg.setText('This file already exists, you do not have the '
-                            'rights to overwrite it.')
+                msg.setText(
+                    "This file already exists, you do not have the "
+                    "rights to overwrite it."
+                )
                 msg.setWindowTitle("Warning")
                 msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
                 msg.buttonClicked.connect(msg.close)
@@ -901,14 +1041,22 @@ class PipelineEditor(PipelineDeveloperView):
                 return None
 
         if filename:
-            posdict = dict([(key, (value.x(), value.y())) for key, value in
-                            six.iteritems(self.scene.pos)])
-            dimdict = dict([(key, (value[0], value[1])) for key, value in
-                            six.iteritems(self.scene.dim)])
+            posdict = dict(
+                [
+                    (key, (value.x(), value.y()))
+                    for key, value in six.iteritems(self.scene.pos)
+                ]
+            )
+            dimdict = dict(
+                [
+                    (key, (value[0], value[1]))
+                    for key, value in six.iteritems(self.scene.dim)
+                ]
+            )
             pipeline.node_dimension = dimdict
             old_pos = pipeline.node_position
             pipeline.node_position = posdict
-            save_pipeline(pipeline, filename)            
+            save_pipeline(pipeline, filename)
             self._pipeline_filename = unicode(filename)
             pipeline.node_position = old_pos
             self.pipeline_saved.emit(filename)
@@ -1027,13 +1175,13 @@ class PipelineEditor(PipelineDeveloperView):
             if not from_redo:
                 to_redo = None
 
-                if history_maker[0] == 'add_process':
-                    to_redo = 'delete_process'
+                if history_maker[0] == "add_process":
+                    to_redo = "delete_process"
 
-                elif history_maker[0] == 'delete_process':
-                    to_redo = 'add_process'
+                elif history_maker[0] == "delete_process":
+                    to_redo = "add_process"
 
-                elif history_maker[0] == 'update_node_name':
+                elif history_maker[0] == "update_node_name":
                     self.undos.pop()
 
                 for i, item in enumerate(self.redos):
@@ -1043,8 +1191,14 @@ class PipelineEditor(PipelineDeveloperView):
 
         self.pipeline_modified.emit(self)
 
-    def update_node_name(self, old_node, old_node_name, new_node_name,
-                         from_undo=False, from_redo=False):
+    def update_node_name(
+        self,
+        old_node,
+        old_node_name,
+        new_node_name,
+        from_undo=False,
+        from_redo=False,
+    ):
         """Update a node name.
 
         :param old_node: Node object to change
@@ -1060,24 +1214,47 @@ class PipelineEditor(PipelineDeveloperView):
         # Removing links of the selected node and copy the origin/destination
         links_to_copy = []
 
-        for (source_parameter,
-             source_plug) in six.iteritems(old_node.plugs):
+        for (source_parameter, source_plug) in six.iteritems(old_node.plugs):
 
-            for (dest_node_name, dest_parameter, dest_node, dest_plug,
-                 weak_link) in source_plug.links_to.copy():
-                pipeline.remove_link(old_node_name + "." + source_parameter +
-                                     "->" + dest_node_name + "." +
-                                     dest_parameter)
-                links_to_copy.append(("to", source_parameter,
-                                      dest_node_name, dest_parameter))
+            for (
+                dest_node_name,
+                dest_parameter,
+                dest_node,
+                dest_plug,
+                weak_link,
+            ) in source_plug.links_to.copy():
+                pipeline.remove_link(
+                    old_node_name
+                    + "."
+                    + source_parameter
+                    + "->"
+                    + dest_node_name
+                    + "."
+                    + dest_parameter
+                )
+                links_to_copy.append(
+                    ("to", source_parameter, dest_node_name, dest_parameter)
+                )
 
-            for (dest_node_name, dest_parameter, dest_node, dest_plug,
-                 weak_link) in source_plug.links_from.copy():
-                pipeline.remove_link(dest_node_name + "." + dest_parameter +
-                                     "->" + old_node_name + "." +
-                                     source_parameter)
-                links_to_copy.append(("from", source_parameter, dest_node_name,
-                                      dest_parameter))
+            for (
+                dest_node_name,
+                dest_parameter,
+                dest_node,
+                dest_plug,
+                weak_link,
+            ) in source_plug.links_from.copy():
+                pipeline.remove_link(
+                    dest_node_name
+                    + "."
+                    + dest_parameter
+                    + "->"
+                    + old_node_name
+                    + "."
+                    + source_parameter
+                )
+                links_to_copy.append(
+                    ("from", source_parameter, dest_node_name, dest_parameter)
+                )
 
         # Creating a new node with the new name and deleting the previous one
         pipeline.nodes[new_node_name] = pipeline.nodes[old_node_name]
@@ -1087,27 +1264,54 @@ class PipelineEditor(PipelineDeveloperView):
         for link in links_to_copy:
 
             if link[0] == "to":
-                pipeline.add_link(new_node_name + "." + link[1] + "->"
-                                  + link[2] + "." + link[3])
+                pipeline.add_link(
+                    new_node_name
+                    + "."
+                    + link[1]
+                    + "->"
+                    + link[2]
+                    + "."
+                    + link[3]
+                )
             elif link[0] == "from":
-                pipeline.add_link(link[2] + "." + link[3] + "->"
-                                  + new_node_name + "." + link[1])
+                pipeline.add_link(
+                    link[2]
+                    + "."
+                    + link[3]
+                    + "->"
+                    + new_node_name
+                    + "."
+                    + link[1]
+                )
 
         # Updating the pipeline
         pipeline.update_nodes_and_plugs_activation()
 
         # For history
-        history_maker = ["update_node_name", pipeline.nodes[new_node_name],
-                         new_node_name, old_node_name]
+        history_maker = [
+            "update_node_name",
+            pipeline.nodes[new_node_name],
+            new_node_name,
+            old_node_name,
+        ]
 
         self.update_history(history_maker, from_undo, from_redo)
 
         self.main_window.statusBar().showMessage(
             'Node name "{0}" has been changed to "{1}".'.format(
-                old_node_name, new_node_name))
+                old_node_name, new_node_name
+            )
+        )
 
-    def update_plug_value(self, node_name, new_value, plug_name, value_type,
-                          from_undo=False, from_redo=False):
+    def update_plug_value(
+        self,
+        node_name,
+        new_value,
+        plug_name,
+        value_type,
+        from_undo=False,
+        from_redo=False,
+    ):
         """Update a plug value.
 
         :param node_name: name of the node (str)
@@ -1120,26 +1324,36 @@ class PipelineEditor(PipelineDeveloperView):
                           redo
         """
         old_value = self.scene.pipeline.nodes[node_name].get_plug_value(
-            plug_name)
+            plug_name
+        )
         if from_undo or from_redo:
             self.scene.pipeline.nodes[node_name].set_plug_value(
-                plug_name, new_value)
+                plug_name, new_value
+            )
         else:
             self.scene.pipeline.nodes[node_name].set_plug_value(
-                plug_name, value_type(new_value))
+                plug_name, value_type(new_value)
+            )
 
         if from_undo or from_redo:
             self.undos.pop()
 
         # For history
-        history_maker = ["update_plug_value", node_name, old_value,
-                         plug_name, value_type]
+        history_maker = [
+            "update_plug_value",
+            node_name,
+            old_value,
+            plug_name,
+            value_type,
+        ]
 
         self.update_history(history_maker, from_undo, from_redo)
 
         self.main_window.statusBar().showMessage(
             'Plug "{0}" of node "{1}" has been changed to "{2}".'.format(
-                plug_name, node_name, new_value))
+                plug_name, node_name, new_value
+            )
+        )
 
 
 class PipelineEditorTabs(QtWidgets.QTabWidget):
@@ -1203,8 +1417,10 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
 
         self.project = project
         self.main_window = main_window
-        self.setStyleSheet('QTabBar{font-size:12pt;font-family:Arial;'
-                           'text-align: center;color:black;}')
+        self.setStyleSheet(
+            "QTabBar{font-size:12pt;font-family:Arial;"
+            "text-align: center;color:black;}"
+        )
         self.setTabsClosable(True)
         self.tabCloseRequested.connect(self.close_tab)
         self.scan_list = scan_list
@@ -1237,7 +1453,7 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
 
         # Tool button to add a tab
         tb = QtWidgets.QToolButton()
-        tb.setText('+')
+        tb.setText("+")
         tb.clicked.connect(self.new_tab)
 
         self.addTab(QtWidgets.QLabel('Add tabs by pressing "+"'), str())
@@ -1260,7 +1476,7 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
 
         # If the user click on the last tab (with the '+'),
         # it will throw an AttributeError
-        
+
         try:
             if current_index != self.previousIndex:
                 # Commented on January, 4th 2020
@@ -1336,9 +1552,10 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
             self.get_capsul_engine()
 
         for node_name, node in self.get_current_pipeline().nodes.items():
-            process = getattr(node, 'process', node)
+            process = getattr(node, "process", node)
             self.main_window.pipeline_manager.displayNodeParameters(
-                node_name, process)
+                node_name, process
+            )
 
         self.update_iteration_checkbox()
 
@@ -1381,14 +1598,17 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
         # If database_scans is already a pipeline global input, the plug
         # cannot be exported. A link as to be added between database_scans
         # and the input of the filter.
-        if 'database_scans' in \
-                self.get_current_pipeline().user_traits().keys():
-            self.get_current_pipeline().add_link('database_scans->{0}'
-                                                 '.input'.format(node_name))
+        if (
+            "database_scans"
+            in self.get_current_pipeline().user_traits().keys()
+        ):
+            self.get_current_pipeline().add_link(
+                "database_scans->{0}" ".input".format(node_name)
+            )
         else:
             self.get_current_pipeline().export_parameter(
-                node_name, 'input',
-                pipeline_parameter='database_scans')
+                node_name, "input", pipeline_parameter="database_scans"
+            )
         self.get_current_editor().scene.update_pipeline()
 
     def get_capsul_engine(self):
@@ -1400,7 +1620,7 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
         # save completion attributes for the current pipeline (other pipelines
         # will lose their values)
         pipeline = self.get_current_pipeline()
-        completion = getattr(pipeline, 'completion_engine', None)
+        completion = getattr(pipeline, "completion_engine", None)
         if completion:
             att_values = completion.get_attribute_values().export_to_dict()
 
@@ -1408,16 +1628,19 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
 
         study_config = engine.study_config
         study_config.input_directory = os.path.join(
-            os.path.abspath(self.project.folder), 'data', 'raw_data')
+            os.path.abspath(self.project.folder), "data", "raw_data"
+        )
         study_config.output_directory = os.path.join(
-            os.path.abspath(self.project.folder), 'data', 'derived_data')
+            os.path.abspath(self.project.folder), "data", "derived_data"
+        )
 
         # restore completion attributes
         from capsul.attributes.completion_engine import ProcessCompletionEngine
 
         if completion:
-            completion \
-                = ProcessCompletionEngine.get_completion_engine(pipeline)
+            completion = ProcessCompletionEngine.get_completion_engine(
+                pipeline
+            )
             if completion:
                 completion.get_attribute_values().import_from_dict(att_values)
 
@@ -1569,9 +1792,9 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
 
         for idx in range(self.count()):
             p_e = self.widget(idx)
-            if hasattr(p_e, 'scene'):
+            if hasattr(p_e, "scene"):
                 # if the widget is a tab editor
-                if p_e.scene.pipeline.nodes[''].plugs:
+                if p_e.scene.pipeline.nodes[""].plugs:
                     return True
 
         return False
@@ -1583,8 +1806,9 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
           "open_sub_pipeline"
         """
 
-        current_tab_not_empty = len(
-            self.get_current_editor().scene.pipeline.nodes.keys()) > 1
+        current_tab_not_empty = (
+            len(self.get_current_editor().scene.pipeline.nodes.keys()) > 1
+        )
         new_tab_opened = False
 
         if filename is None:
@@ -1595,7 +1819,7 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
                 working_index = self.currentIndex()
                 new_tab_opened = True
             # get only the file name to load
-            filename = self.get_current_editor().load_pipeline('', False)
+            filename = self.get_current_editor().load_pipeline("", False)
             self.get_capsul_engine()
 
         if filename:
@@ -1627,7 +1851,9 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
     def load_pipeline_parameters(self):
         """Load parameters to the pipeline of the current editor"""
 
-        self.get_current_editor().load_pipeline_parameters(os.path.expanduser("~"))
+        self.get_current_editor().load_pipeline_parameters(
+            os.path.expanduser("~")
+        )
 
     def new_tab(self):
         """Create a new tab and a new editor and makes the new tab current."""
@@ -1662,7 +1888,7 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
             self.undos[p_e] = []
             self.redos[p_e] = []
         else:
-            print('Too many tabs in the Pipeline Editor')
+            print("Too many tabs in the Pipeline Editor")
             return
 
         self.insertTab(self.count() - 1, p_e, name)
@@ -1690,13 +1916,16 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
 
         # Reading the process configuration file
         config = Config()
-        
-        with open(os.path.join(config.get_mia_path(),
-                               'properties',
-                               'process_config.yml'), 'r') as stream:
+
+        with open(
+            os.path.join(
+                config.get_mia_path(), "properties", "process_config.yml"
+            ),
+            "r",
+        ) as stream:
 
             try:
-                if verCmp(yaml.__version__, '5.1', 'sup'):
+                if verCmp(yaml.__version__, "5.1", "sup"):
                     dic = yaml.load(stream, Loader=yaml.FullLoader)
 
                 else:
@@ -1709,24 +1938,27 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
         sub_pipeline_name = sub_pipeline.name
 
         # Finding from where comes from the pipeline
-        pckg = sub_pipeline.__module__.split('.', 1)[0]
+        pckg = sub_pipeline.__module__.split(".", 1)[0]
 
-        if pckg == 'mia_processes':
-            paths_list = [os.path.dirname(
-                                      sys.modules['mia_processes'].__path__[0])]
-        
+        if pckg == "mia_processes":
+            paths_list = [
+                os.path.dirname(sys.modules["mia_processes"].__path__[0])
+            ]
+
         else:
-            paths_list = dic['Paths']
+            paths_list = dic["Paths"]
 
         # get_path returns a list that is the package path to
         # the sub_pipeline file
-        sub_pipeline_list = get_path(sub_pipeline_name, dic['Packages'],
-                                     None, pckg)
+        sub_pipeline_list = get_path(
+            sub_pipeline_name, dic["Packages"], None, pckg
+        )
         sub_pipeline_name = sub_pipeline_list.pop()
 
-        # Finding the real sub-pipeline filename   
+        # Finding the real sub-pipeline filename
         sub_pipeline_filename = find_filename(
-                paths_list, sub_pipeline_list, sub_pipeline_name)
+            paths_list, sub_pipeline_list, sub_pipeline_name
+        )
         self.load_pipeline(sub_pipeline_filename)
 
     def reset_pipeline(self):
@@ -1744,9 +1976,11 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
             if new_file_name:
                 new_file_name = os.path.basename(new_file_name)
 
-            if (new_file_name and
-                    os.path.basename(
-                        self.get_current_filename()) != new_file_name):
+            if (
+                new_file_name
+                and os.path.basename(self.get_current_filename())
+                != new_file_name
+            ):
                 self.setTabText(self.currentIndex(), new_file_name)
 
             return new_file_name
@@ -1757,28 +1991,45 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
 
             try:
                 posdict = dict(
-                    [(key, (value.x(), value.y())) for key, value in
-                     six.iteritems(self.get_current_editor().scene.pos)])
+                    [
+                        (key, (value.x(), value.y()))
+                        for key, value in six.iteritems(
+                            self.get_current_editor().scene.pos
+                        )
+                    ]
+                )
 
             except:
                 posdict = dict(
-                    [(key, (value[0], value[1])) for key, value in
-                     six.iteritems(self.get_current_editor().scene.pos)])
+                    [
+                        (key, (value[0], value[1]))
+                        for key, value in six.iteritems(
+                            self.get_current_editor().scene.pos
+                        )
+                    ]
+                )
 
             dimdict = dict(
-                [(key, (value[0], value[1])) for key, value in
-                 six.iteritems(self.get_current_editor().scene.dim)])
+                [
+                    (key, (value[0], value[1]))
+                    for key, value in six.iteritems(
+                        self.get_current_editor().scene.dim
+                    )
+                ]
+            )
             pipeline.node_dimension = dimdict
             old_pos = pipeline.node_position
             pipeline.node_position = posdict
             save_pipeline(pipeline, new_file_name)
             self.get_current_editor()._pipeline_filename = unicode(
-                new_file_name)
+                new_file_name
+            )
             pipeline.node_position = old_pos
             self.pipeline_saved.emit(new_file_name)
-            self.setTabText(self.currentIndex(),
-                            os.path.basename(new_file_name))		    
-            return new_file_name 
+            self.setTabText(
+                self.currentIndex(), os.path.basename(new_file_name)
+            )
+            return new_file_name
 
     def save_pipeline_parameters(self):
         """Save the pipeline parameters of the current editor."""
@@ -1814,7 +2065,7 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
 
         :param index: index of the editor
         """
-        
+
         # self.main_window.pipeline_manager.run_pipeline_action.setDisabled(True) # commented on January, 4th 2020
         self.setCurrentIndex(index)
         self.previousIndex = index
@@ -1822,20 +2073,23 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
 
     def update_iteration_checkbox(self):
         pipeline = self.get_current_pipeline()
-        if not pipeline or not hasattr(pipeline, 'nodes'):
-            self.main_window.pipeline_manager.iterationTable \
-                .check_box_iterate.setCheckState(Qt.Qt.Unchecked)
+        if not pipeline or not hasattr(pipeline, "nodes"):
+            self.main_window.pipeline_manager.iterationTable.check_box_iterate.setCheckState(
+                Qt.Qt.Unchecked
+            )
         else:
             has_iteration = False
             for key in pipeline.nodes.sortedKeys:
-                if 'iterated_' in key:
+                if "iterated_" in key:
                     has_iteration = True
             if has_iteration:
-                self.main_window.pipeline_manager.iterationTable \
-                    .check_box_iterate.setCheckState(Qt.Qt.Checked)
+                self.main_window.pipeline_manager.iterationTable.check_box_iterate.setCheckState(
+                    Qt.Qt.Checked
+                )
             else:
-                self.main_window.pipeline_manager.iterationTable \
-                    .check_box_iterate.setCheckState(Qt.Qt.Unchecked)
+                self.main_window.pipeline_manager.iterationTable.check_box_iterate.setCheckState(
+                    Qt.Qt.Unchecked
+                )
 
     def update_current_node(self, index):
         """Update the node parameters
@@ -1852,7 +2106,8 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
         try:
             for node_name, node in self.get_current_pipeline().nodes.items():
                 self.main_window.pipeline_manager.displayNodeParameters(
-                    node_name, node.process)
+                    node_name, node.process
+                )
         except AttributeError:
             pass
 
@@ -1866,7 +2121,9 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
 
         self.update_iteration_checkbox()
         if self.get_current_editor():
-            self.main_window.pipeline_manager.iterationTable.update_iterated_tag(self.get_current_editor().iterated_tag)
+            self.main_window.pipeline_manager.iterationTable.update_iterated_tag(
+                self.get_current_editor().iterated_tag
+            )
 
     def update_history(self, editor):
         """Update undo/redo history of an editor.
@@ -1876,8 +2133,9 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
 
         self.undos[editor] = editor.undos
         self.redos[editor] = editor.redos
-        self.setTabText(self.currentIndex(),
-                        self.get_current_tab_name() + " *")
+        self.setTabText(
+            self.currentIndex(), self.get_current_tab_name() + " *"
+        )
         # make sure the " *" is there
 
     def update_pipeline_editors(self, editor):
@@ -1894,11 +2152,12 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
 
         for i in range(self.count() - 1):
             pipeline = self.widget(i).scene.pipeline
-            if pipeline.trait('database_scans'):
+            if pipeline.trait("database_scans"):
                 try:
-                    setattr(pipeline, 'database_scans', self.scan_list)
+                    setattr(pipeline, "database_scans", self.scan_list)
                 except Exception as e:
                     import traceback
+
                     traceback.print_exc()
                     # but continue...
 
@@ -1915,28 +2174,29 @@ def find_filename(paths_list, packages_list, file_name):
     :return: name of the corresponding file if it is found, else None
     """
 
-    filenames = [file_name + '.py', file_name + '.xml']
+    filenames = [file_name + ".py", file_name + ".xml"]
 
     for filename in filenames:
-        
+
         for path in paths_list:
             new_path = path
-            
+
             for package in packages_list:
                 new_path = os.path.join(new_path, package)
 
             # Making sure that the filename is found (has somme issues
             # with case sensitivity)
             if os.path.isdir(new_path):
-                
+
                 for f in os.listdir(new_path):
                     new_file = os.path.join(new_path, f)
-                    
-                    if ((os.path.isfile(new_file)) and
-                                               (f.lower() == filename.lower())):
+
+                    if (os.path.isfile(new_file)) and (
+                        f.lower() == filename.lower()
+                    ):
                         return new_file
 
-                    
+
 def get_path(name, dictionary, prev_paths=None, pckg=None):
     """Return the package path to the selected sub-pipeline.
 
@@ -1960,16 +2220,16 @@ def get_path(name, dictionary, prev_paths=None, pckg=None):
         # If the value is a string, this means
         # that this is a "leaf" of the tree
         # so the key is a module name.
-        
+
         if isinstance(value, str):
-            
+
             if key == name:
                 new_paths.append(key)
                 return new_paths
-            
+
             else:
                 continue
-            
+
         # Else, this means that the value is still a dictionary,
         # we are still in the tree
         else:
@@ -1979,11 +2239,11 @@ def get_path(name, dictionary, prev_paths=None, pckg=None):
             # been found in the tree
             if final_res:
                 return final_res
-            
+
             else:
                 new_paths = prev_paths.copy()
 
-                
+
 def save_pipeline(pipeline, filename):
     """Save the pipeline either in XML or .py source file.
 
@@ -1991,8 +2251,7 @@ def save_pipeline(pipeline, filename):
     :param filename: name of the file where to save the pipeline
     """
 
-    formats = {'.py': save_py_pipeline,
-               '.xml': save_xml_pipeline}
+    formats = {".py": save_py_pipeline, ".xml": save_xml_pipeline}
     saved = False
 
     for ext, writer in six.iteritems(formats):
@@ -2014,7 +2273,3 @@ def values(d):
     """
 
     return list(d.values())
-
-
-
-

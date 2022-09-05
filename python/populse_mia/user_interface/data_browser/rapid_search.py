@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- #
+# -*- coding: utf-8 -*-
 """
 Module to define the rapid search.
 
@@ -19,7 +19,7 @@ Contains:
 from PyQt5.QtWidgets import QLineEdit
 
 # Populse_MIA imports
-from populse_mia.data_manager.project import TAG_FILENAME, TAG_BRICKS
+from populse_mia.data_manager.project import TAG_BRICKS, TAG_FILENAME
 
 
 class RapidSearch(QLineEdit):
@@ -46,11 +46,13 @@ class RapidSearch(QLineEdit):
         super().__init__()
 
         self.databrowser = databrowser
-        self.setPlaceholderText("Rapid search, enter % to replace any string,"
-                                " _ to replace any character, *Not Defined* "
-                                "for the scans with missing value(s), "
-                                "dates are in the following format: "
-                                "yyyy-mm-dd hh:mm:ss.fff")
+        self.setPlaceholderText(
+            "Rapid search, enter % to replace any string,"
+            " _ to replace any character, *Not Defined* "
+            "for the scans with missing value(s), "
+            "dates are in the following format: "
+            "yyyy-mm-dd hh:mm:ss.fff"
+        )
 
     def prepare_not_defined_filter(self, tags):
         """Prepare the rapid search filter for not defined values.
@@ -75,9 +77,15 @@ class RapidSearch(QLineEdit):
 
                 or_to_write = True
 
-        query += " AND ({" + TAG_FILENAME + "} IN " + str(
-            self.databrowser.table_data.scans_to_search).replace("'",
-                                                                 "\"") + ")"
+        query += (
+            " AND ({"
+            + TAG_FILENAME
+            + "} IN "
+            + str(self.databrowser.table_data.scans_to_search).replace(
+                "'", '"'
+            )
+            + ")"
+        )
 
         query = "(" + query + ")"
 
@@ -104,11 +112,16 @@ class RapidSearch(QLineEdit):
                 if or_to_write:
                     query += " OR "
 
-                query += "({" + tag + "} LIKE \"%" + search + "%\")"
+                query += "({" + tag + '} LIKE "%' + search + '%")'
 
                 or_to_write = True
 
-        query += ") AND ({" + TAG_FILENAME + "} IN " + str(
-            scans).replace("'", "\"") + ")"
+        query += (
+            ") AND ({"
+            + TAG_FILENAME
+            + "} IN "
+            + str(scans).replace("'", '"')
+            + ")"
+        )
 
         return query

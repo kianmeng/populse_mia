@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- #
+# -*- coding: utf-8 -*-
 """
 Module to handle updates of the databrowser table after modifications.
 
@@ -17,20 +17,19 @@ Contains:
 
 from datetime import datetime
 
+# Populse_db imports
+from populse_db.database import (FIELD_TYPE_LIST_BOOLEAN, FIELD_TYPE_LIST_DATE,
+                                 FIELD_TYPE_LIST_DATETIME,
+                                 FIELD_TYPE_LIST_FLOAT,
+                                 FIELD_TYPE_LIST_INTEGER,
+                                 FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME)
 # PyQt5 imports
-from PyQt5.QtWidgets import (
-    QDialog, QTableWidget, QVBoxLayout, QHBoxLayout,
-    QTableWidgetItem, QPushButton, QMessageBox)
+from PyQt5.QtWidgets import (QDialog, QHBoxLayout, QMessageBox, QPushButton,
+                             QTableWidget, QTableWidgetItem, QVBoxLayout)
 
+from populse_mia.data_manager.project import COLLECTION_CURRENT
 # Populse_MIA imports
 from populse_mia.utils.utils import check_value_type
-from populse_mia.data_manager.project import COLLECTION_CURRENT
-
-# Populse_db imports
-from populse_db.database import (
-    FIELD_TYPE_LIST_INTEGER, FIELD_TYPE_LIST_FLOAT, FIELD_TYPE_LIST_STRING,
-    FIELD_TYPE_LIST_DATE, FIELD_TYPE_LIST_DATETIME, FIELD_TYPE_LIST_TIME,
-    FIELD_TYPE_LIST_BOOLEAN)
 
 
 class ModifyTable(QDialog):
@@ -146,9 +145,12 @@ class ModifyTable(QDialog):
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Warning)
                     msg.setText("Invalid value")
-                    msg.setInformativeText("The value " + text +
-                                           " is invalid with the type " +
-                                           type_problem)
+                    msg.setInformativeText(
+                        "The value "
+                        + text
+                        + " is invalid with the type "
+                        + type_problem
+                    )
                     msg.setWindowTitle("Warning")
                     msg.setStandardButtons(QMessageBox.Ok)
                     msg.buttonClicked.connect(msg.close)
@@ -161,7 +163,8 @@ class ModifyTable(QDialog):
                 scan = self.scans[cell]
                 tag = self.tags[cell]
                 tag_object = self.project.session.get_field(
-                    COLLECTION_CURRENT, tag)
+                    COLLECTION_CURRENT, tag
+                )
                 tag_type = tag_object.field_type
 
                 database_value = []
@@ -194,6 +197,7 @@ class ModifyTable(QDialog):
 
                 # Database updated for every cell
                 self.project.session.set_value(
-                    COLLECTION_CURRENT, scan, tag, database_value)
+                    COLLECTION_CURRENT, scan, tag, database_value
+                )
 
             self.close()

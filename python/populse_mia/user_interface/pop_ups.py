@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- #
+# -*- coding: utf-8 -*-
 """ Module that defines all the pop-ups used across the software
 
 :Contains:
@@ -52,47 +52,56 @@ import os
 import platform
 import shutil
 import subprocess
-
-import six
-import yaml
 from datetime import datetime
 from functools import partial
 
-# PyQt5 imports
-from PyQt5 import Qt, QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSignal, QCoreApplication
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import (
-    QApplication, QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFileDialog,
-    QFormLayout, QHBoxLayout, QHeaderView, QInputDialog, QLabel, QLineEdit,
-    QMessageBox, QPlainTextEdit, QPushButton, QRadioButton, QScrollArea,
-    QTableWidget, QTableWidgetItem, QTreeWidget, QTreeWidgetItem, QVBoxLayout,
-    QWidget, QSplitter)
-
+import six
+import yaml
 # Capsul imports
 from capsul.api import capsul_engine
+from capsul.pipeline.pipeline_nodes import PipelineNode, ProcessNode
 from capsul.qt_gui.widgets.pipeline_developer_view import PipelineDeveloperView
 from capsul.qt_gui.widgets.settings_editor import SettingsEditor
-from capsul.pipeline.pipeline_nodes import PipelineNode, ProcessNode
-
 # Populse_db imports
-from populse_db.database import (
-    FIELD_TYPE_BOOLEAN, FIELD_TYPE_DATE, FIELD_TYPE_DATETIME, FIELD_TYPE_FLOAT,
-    FIELD_TYPE_INTEGER, FIELD_TYPE_LIST_BOOLEAN, FIELD_TYPE_LIST_DATE,
-    FIELD_TYPE_LIST_DATETIME, FIELD_TYPE_LIST_FLOAT, FIELD_TYPE_LIST_INTEGER,
-    FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME, FIELD_TYPE_STRING,
-    FIELD_TYPE_TIME)
+from populse_db.database import (FIELD_TYPE_BOOLEAN, FIELD_TYPE_DATE,
+                                 FIELD_TYPE_DATETIME, FIELD_TYPE_FLOAT,
+                                 FIELD_TYPE_INTEGER, FIELD_TYPE_LIST_BOOLEAN,
+                                 FIELD_TYPE_LIST_DATE,
+                                 FIELD_TYPE_LIST_DATETIME,
+                                 FIELD_TYPE_LIST_FLOAT,
+                                 FIELD_TYPE_LIST_INTEGER,
+                                 FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
+                                 FIELD_TYPE_STRING, FIELD_TYPE_TIME)
+# PyQt5 imports
+from PyQt5 import Qt, QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QCoreApplication, pyqtSignal
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog,
+                             QDialogButtonBox, QFileDialog, QFormLayout,
+                             QHBoxLayout, QHeaderView, QInputDialog, QLabel,
+                             QLineEdit, QMessageBox, QPlainTextEdit,
+                             QPushButton, QRadioButton, QScrollArea, QSplitter,
+                             QTableWidget, QTableWidgetItem, QTreeWidget,
+                             QTreeWidgetItem, QVBoxLayout, QWidget)
 
 # Populse_mia imports
-from populse_mia.data_manager.database_mia import (
-    TAG_ORIGIN_USER, TAG_UNIT_DEGREE, TAG_UNIT_HZPIXEL, TAG_UNIT_MHZ,
-    TAG_UNIT_MM, TAG_UNIT_MS)
-from populse_mia.data_manager.project import (
-    BRICK_EXEC, BRICK_EXEC_TIME, BRICK_INIT, BRICK_INIT_TIME,
-    BRICK_INPUTS, BRICK_NAME, BRICK_OUTPUTS, COLLECTION_BRICK,
-    HISTORY_PIPELINE, HISTORY_BRICKS, COLLECTION_HISTORY,
-    COLLECTION_CURRENT, COLLECTION_INITIAL, Project, TAG_CHECKSUM, TAG_FILENAME,
-    TAG_HISTORY, TAG_TYPE, TYPE_MAT, TYPE_NII, TYPE_TXT, TYPE_UNKNOWN)
+from populse_mia.data_manager.database_mia import (TAG_ORIGIN_USER,
+                                                   TAG_UNIT_DEGREE,
+                                                   TAG_UNIT_HZPIXEL,
+                                                   TAG_UNIT_MHZ, TAG_UNIT_MM,
+                                                   TAG_UNIT_MS)
+from populse_mia.data_manager.project import (BRICK_EXEC, BRICK_EXEC_TIME,
+                                              BRICK_INIT, BRICK_INIT_TIME,
+                                              BRICK_INPUTS, BRICK_NAME,
+                                              BRICK_OUTPUTS, COLLECTION_BRICK,
+                                              COLLECTION_CURRENT,
+                                              COLLECTION_HISTORY,
+                                              COLLECTION_INITIAL,
+                                              HISTORY_BRICKS, HISTORY_PIPELINE,
+                                              TAG_CHECKSUM, TAG_FILENAME,
+                                              TAG_HISTORY, TAG_TYPE, TYPE_MAT,
+                                              TYPE_NII, TYPE_TXT, TYPE_UNKNOWN,
+                                              Project)
 from populse_mia.software_properties import Config, verCmp
 from populse_mia.user_interface.data_browser import data_browser
 from populse_mia.utils import utils
@@ -195,18 +204,20 @@ class DefaultValueListCreation(QDialog):
         # Button to add an element to the list
         sources_images_dir = Config().getSourceImageDir()
         self.add_element_label = ClickableLabel()
-        self.add_element_label.setObjectName('plus')
-        add_element_picture = QtGui.QPixmap(os.path.relpath(os.path.join(
-            sources_images_dir, "green_plus.png")))
+        self.add_element_label.setObjectName("plus")
+        add_element_picture = QtGui.QPixmap(
+            os.path.relpath(os.path.join(sources_images_dir, "green_plus.png"))
+        )
         add_element_picture = add_element_picture.scaledToHeight(15)
         self.add_element_label.setPixmap(add_element_picture)
         self.add_element_label.clicked.connect(self.add_element)
 
         # Button to remove the last element of the list
         self.remove_element_label = ClickableLabel()
-        self.remove_element_label.setObjectName('minus')
-        remove_element_picture = QtGui.QPixmap(os.path.relpath(os.path.join(
-            sources_images_dir, "red_minus.png")))
+        self.remove_element_label.setObjectName("minus")
+        remove_element_picture = QtGui.QPixmap(
+            os.path.relpath(os.path.join(sources_images_dir, "red_minus.png"))
+        )
         remove_element_picture = remove_element_picture.scaledToHeight(20)
         self.remove_element_label.setPixmap(remove_element_picture)
         self.remove_element_label.clicked.connect(self.remove_element)
@@ -229,9 +240,7 @@ class DefaultValueListCreation(QDialog):
         self.setLayout(self.v_box_final)
 
     def add_element(self):
-        """One more element added to the list.
-
-        """
+        """One more element added to the list."""
 
         self.table.setColumnCount(self.table.columnCount() + 1)
         item = QtWidgets.QTableWidgetItem()
@@ -249,9 +258,7 @@ class DefaultValueListCreation(QDialog):
         self.table.setItem(0, 0, item)
 
     def remove_element(self):
-        """Removes the last element of the list.
-
-        """
+        """Removes the last element of the list."""
 
         if self.table.columnCount() > 1:
             self.table.setColumnCount(self.table.columnCount() - 1)
@@ -259,9 +266,7 @@ class DefaultValueListCreation(QDialog):
             self.adjustSize()
 
     def resize_table(self):
-        """To resize the pop up depending on the table.
-
-        """
+        """To resize the pop up depending on the table."""
 
         self.table.resizeColumnsToContents()
         total_width = 0
@@ -279,9 +284,7 @@ class DefaultValueListCreation(QDialog):
             self.table.setFixedHeight(total_height + 40)
 
     def update_default_value(self):
-        """Checks if the values are correct and updates the parent value.
-
-        """
+        """Checks if the values are correct and updates the parent value."""
 
         database_value = []
         valid_values = True
@@ -324,9 +327,12 @@ class DefaultValueListCreation(QDialog):
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Warning)
                 msg.setText("Invalid value")
-                msg.setInformativeText("The value " + text +
-                                       " is invalid with the type " +
-                                       self.type)
+                msg.setInformativeText(
+                    "The value "
+                    + text
+                    + " is invalid with the type "
+                    + self.type
+                )
                 msg.setWindowTitle("Warning")
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.buttonClicked.connect(msg.close)
@@ -359,11 +365,12 @@ class DefaultValueQLineEdit(QtWidgets.QLineEdit):
 
         """
 
-        if self.parent.type.startswith('list_'):
+        if self.parent.type.startswith("list_"):
             # We display the pop up to create the list if the checkbox is
             # checked, otherwise we do nothing
-            self.list_creation = DefaultValueListCreation(self,
-                                                          self.parent.type)
+            self.list_creation = DefaultValueListCreation(
+                self, self.parent.type
+            )
             self.list_creation.show()
 
 
@@ -425,12 +432,11 @@ class PopUpAddPath(QDialog):
         self.setLayout(vbox_layout)
 
     def file_to_choose(self):
-        """Lets the user choose a file to import.
+        """Lets the user choose a file to import."""
 
-        """
-
-        fname = QFileDialog.getOpenFileName(self, 'Choose a document to import',
-                                            os.path.expanduser('~'))
+        fname = QFileDialog.getOpenFileName(
+            self, "Choose a document to import", os.path.expanduser("~")
+        )
 
         if fname[0]:
             self.file_line_edit.setText(fname[0])
@@ -454,19 +460,22 @@ class PopUpAddPath(QDialog):
 
         path = self.file_line_edit.text()
         path_type = self.type_line_edit.text()
-        docInDb = [os.path.basename(i) for i in
-                   self.project.session.get_documents_names(
-                       COLLECTION_CURRENT)]
+        docInDb = [
+            os.path.basename(i)
+            for i in self.project.session.get_documents_names(
+                COLLECTION_CURRENT
+            )
+        ]
         self.project.unsavedModifications = True
 
         if os.path.basename(path) in docInDb:
             self.msg = QMessageBox()
             self.msg.setIcon(QMessageBox.Warning)
-            self.msg.setText(
-                "- {0} -".format(os.path.basename(path)))
+            self.msg.setText("- {0} -".format(os.path.basename(path)))
             self.msg.setInformativeText(
                 "The document '{0}' \n "
-                "already exists in the Data Browser!".format(path))
+                "already exists in the Data Browser!".format(path)
+            )
             self.msg.setWindowTitle("Warning: existing data!")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.buttonClicked.connect(self.msg.close)
@@ -480,25 +489,30 @@ class PopUpAddPath(QDialog):
 
             path = os.path.relpath(path)
             filename = os.path.basename(path)
-            copy_path = os.path.join(self.project.folder, "data",
-                                     "downloaded_data", filename)
+            copy_path = os.path.join(
+                self.project.folder, "data", "downloaded_data", filename
+            )
             shutil.copy(path, copy_path)
-            with open(path, 'rb') as scan_file:
+            with open(path, "rb") as scan_file:
                 data = scan_file.read()
                 checksum = hashlib.md5(data).hexdigest()
             path = os.path.join("data", "downloaded_data", filename)
             self.project.session.add_document(COLLECTION_CURRENT, path)
             self.project.session.add_document(COLLECTION_INITIAL, path)
             values_added = []
-            self.project.session.add_value(COLLECTION_INITIAL, path, TAG_TYPE,
-                                           path_type)
-            self.project.session.add_value(COLLECTION_CURRENT, path, TAG_TYPE,
-                                           path_type)
+            self.project.session.add_value(
+                COLLECTION_INITIAL, path, TAG_TYPE, path_type
+            )
+            self.project.session.add_value(
+                COLLECTION_CURRENT, path, TAG_TYPE, path_type
+            )
             values_added.append([path, TAG_TYPE, path_type, path_type])
-            self.project.session.add_value(COLLECTION_INITIAL, path,
-                                           TAG_CHECKSUM, checksum)
-            self.project.session.add_value(COLLECTION_CURRENT, path,
-                                           TAG_CHECKSUM, checksum)
+            self.project.session.add_value(
+                COLLECTION_INITIAL, path, TAG_CHECKSUM, checksum
+            )
+            self.project.session.add_value(
+                COLLECTION_CURRENT, path, TAG_CHECKSUM, checksum
+            )
             values_added.append([path, TAG_CHECKSUM, checksum, checksum])
 
             # For history
@@ -509,13 +523,13 @@ class PopUpAddPath(QDialog):
 
             # Databrowser updated
 
-            (self.databrowser.table_data.
-             scans_to_visualize) = (self.project.session.
-                                    get_documents_names(COLLECTION_CURRENT))
+            (
+                self.databrowser.table_data.scans_to_visualize
+            ) = self.project.session.get_documents_names(COLLECTION_CURRENT)
 
-            (self.databrowser.table_data.
-             scans_to_search) = (self.project.session.
-                                 get_documents_names(COLLECTION_CURRENT))
+            (
+                self.databrowser.table_data.scans_to_search
+            ) = self.project.session.get_documents_names(COLLECTION_CURRENT)
             self.databrowser.table_data.add_columns()
             self.databrowser.table_data.fill_headers()
             self.databrowser.table_data.add_rows([path])
@@ -526,10 +540,10 @@ class PopUpAddPath(QDialog):
         else:
             self.msg = QMessageBox()
             self.msg.setIcon(QMessageBox.Warning)
-            self.msg.setText(
-                "Invalid arguments")
+            self.msg.setText("Invalid arguments")
             self.msg.setInformativeText(
-                "The path must exist.\nThe path type can't be empty.")
+                "The path must exist.\nThe path type can't be empty."
+            )
             self.msg.setWindowTitle("Warning")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.buttonClicked.connect(self.msg.close)
@@ -588,7 +602,7 @@ class PopUpAddTag(QDialog):
         self.text_edit_default_value = DefaultValueQLineEdit(self)
         self.text_edit_default_value.setObjectName("textEdit_default_value")
         # By default the tag is a string
-        self.text_edit_default_value.setText('Undefined')
+        self.text_edit_default_value.setText("Undefined")
 
         # The 'Description value' label
         self.label_description_value = QtWidgets.QLabel(self)
@@ -597,8 +611,9 @@ class PopUpAddTag(QDialog):
 
         # The 'Description value' text edit
         self.text_edit_description_value = QtWidgets.QLineEdit(self)
-        self.text_edit_description_value.setObjectName("textEdit_"
-                                                       "description_value")
+        self.text_edit_description_value.setObjectName(
+            "textEdit_" "description_value"
+        )
 
         # The 'Unit value' label
         self.label_unit_value = QtWidgets.QLabel(self)
@@ -675,10 +690,12 @@ class PopUpAddTag(QDialog):
         _translate = QtCore.QCoreApplication.translate
         self.push_button_ok.setText(_translate("Add a tag", "OK"))
         self.label_tag_name.setText(_translate("Add a tag", "Tag name:"))
-        self.label_default_value.setText(_translate("Add a tag",
-                                                    "Default value:"))
-        self.label_description_value.setText(_translate("Add a tag",
-                                                        "Description:"))
+        self.label_default_value.setText(
+            _translate("Add a tag", "Default value:")
+        )
+        self.label_description_value.setText(
+            _translate("Add a tag", "Description:")
+        )
         self.label_unit_value.setText(_translate("Add a tag", "Unit:"))
         self.label_type.setText(_translate("Add a tag", "Tag type:"))
 
@@ -691,15 +708,17 @@ class PopUpAddTag(QDialog):
 
     def ok_action(self):
         """Verifies that each field is correct and send the new tag
-           to the data browser.
+        to the data browser.
 
         """
 
         name_already_exists = False
 
         # Tag name checked
-        if (self.text_edit_tag_name.text() in
-                self.project.session.get_fields_names(COLLECTION_CURRENT)):
+        if (
+            self.text_edit_tag_name.text()
+            in self.project.session.get_fields_names(COLLECTION_CURRENT)
+        ):
             name_already_exists = True
 
         # Tag name can't be empty
@@ -726,19 +745,20 @@ class PopUpAddTag(QDialog):
 
         # Default value checked
         wrong_default_value_type = not check_value_type(
-                                            self.text_edit_default_value.text(),
-                                            self.type, False)
-
+            self.text_edit_default_value.text(), self.type, False
+        )
 
         # The default value must be valid
         if wrong_default_value_type:
             self.msg = QMessageBox()
             self.msg.setIcon(QMessageBox.Critical)
             self.msg.setText("Invalid default value")
-            self.msg.setInformativeText("The default value '{0}' is invalid "
-                                        "with the '{1}' type!".format(
-                                            self.text_edit_default_value.text(),
-                                            self.type))
+            self.msg.setInformativeText(
+                "The default value '{0}' is invalid "
+                "with the '{1}' type!".format(
+                    self.text_edit_default_value.text(), self.type
+                )
+            )
             self.msg.setWindowTitle("Error")
             self.msg.setStandardButtons(QMessageBox.Close)
             self.msg.exec()
@@ -751,13 +771,16 @@ class PopUpAddTag(QDialog):
         self.new_tag_description = self.text_edit_description_value.text()
         self.new_tag_unit = self.combo_box_unit.currentText()
 
-        if self.new_tag_unit == '':
+        if self.new_tag_unit == "":
             self.new_tag_unit = None
 
-        self.databrowser.add_tag_infos(self.new_tag_name,
-                                       self.new_default_value, self.type,
-                                       self.new_tag_description,
-                                       self.new_tag_unit)
+        self.databrowser.add_tag_infos(
+            self.new_tag_name,
+            self.new_default_value,
+            self.type,
+            self.new_tag_description,
+            self.new_tag_unit,
+        )
         self.close()
 
     def on_activated(self, text):
@@ -769,7 +792,7 @@ class PopUpAddTag(QDialog):
 
         if text == "String":
             self.type = FIELD_TYPE_STRING
-            self.text_edit_default_value.setText('Undefined')
+            self.text_edit_default_value.setText("Undefined")
         elif text == "Integer":
             self.type = FIELD_TYPE_INTEGER
             self.text_edit_default_value.setText("0")
@@ -782,8 +805,7 @@ class PopUpAddTag(QDialog):
         elif text == "Date":
             self.type = FIELD_TYPE_DATE
             date_value = datetime.now()
-            date_format = date_value.strftime(
-                "%d/%m/%Y")
+            date_format = date_value.strftime("%d/%m/%Y")
             self.text_edit_default_value.setText(date_format)
         elif text == "Datetime":
             self.type = FIELD_TYPE_DATETIME
@@ -811,20 +833,23 @@ class PopUpAddTag(QDialog):
             self.type = FIELD_TYPE_LIST_DATE
             date_value = datetime.now()
             date_format = date_value.strftime("%d/%m/%Y")
-            self.text_edit_default_value.setText("{}".format([date_format,
-                                                              date_format]))
+            self.text_edit_default_value.setText(
+                "{}".format([date_format, date_format])
+            )
         elif text == "Datetime List":
             self.type = FIELD_TYPE_LIST_DATETIME
             datetime_value = datetime.now()
             datetime_format = datetime_value.strftime("%d/%m/%Y %H:%M:%S.%f")
-            self.text_edit_default_value.setText("{}".format([datetime_format,
-                                                              datetime_format]))
+            self.text_edit_default_value.setText(
+                "{}".format([datetime_format, datetime_format])
+            )
         elif text == "Time List":
             self.type = FIELD_TYPE_LIST_TIME
             time_value = datetime.now()
             time_format = time_value.strftime("%H:%M:%S.%f")
-            self.text_edit_default_value.setText("{}".format([time_format,
-                                                              time_format]))
+            self.text_edit_default_value.setText(
+                "{}".format([time_format, time_format])
+            )
 
 
 class PopUpCloneTag(QDialog):
@@ -872,8 +897,9 @@ class PopUpCloneTag(QDialog):
         self.label_new_tag_name = QtWidgets.QLabel(self)
         self.label_new_tag_name.setTextFormat(QtCore.Qt.AutoText)
         self.label_new_tag_name.setObjectName("label_new_tag_name")
-        self.label_new_tag_name.setText(_translate("Clone a tag",
-                                                   "New tag name:"))
+        self.label_new_tag_name.setText(
+            _translate("Clone a tag", "New tag name:")
+        )
 
         hbox_buttons = QHBoxLayout()
         hbox_buttons.addWidget(self.label_new_tag_name)
@@ -885,8 +911,9 @@ class PopUpCloneTag(QDialog):
         self.label_tag_list = QtWidgets.QLabel(self)
         self.label_tag_list.setTextFormat(QtCore.Qt.AutoText)
         self.label_tag_list.setObjectName("label_tag_list")
-        self.label_tag_list.setText(_translate("Clone a tag",
-                                               "Available tags:"))
+        self.label_tag_list.setText(
+            _translate("Clone a tag", "Available tags:")
+        )
 
         self.search_bar = QtWidgets.QLineEdit(self)
         self.search_bar.setObjectName("lineEdit_search_bar")
@@ -902,7 +929,8 @@ class PopUpCloneTag(QDialog):
         self.list_widget_tags = QtWidgets.QListWidget(self)
         self.list_widget_tags.setObjectName("listWidget_tags")
         self.list_widget_tags.setSelectionMode(
-            QtWidgets.QAbstractItemView.SingleSelection)
+            QtWidgets.QAbstractItemView.SingleSelection
+        )
 
         vbox = QVBoxLayout()
         vbox.addLayout(hbox_top)
@@ -966,11 +994,13 @@ class PopUpCloneTag(QDialog):
             self.msg.show()
         else:
             self.accept()
-            self.tag_to_replace = self.list_widget_tags.selectedItems(
-                                  )[0].text()
+            self.tag_to_replace = self.list_widget_tags.selectedItems()[
+                0
+            ].text()
             self.new_tag_name = self.line_edit_new_tag_name.text()
-            self.databrowser.clone_tag_infos(self.tag_to_replace,
-                                             self.new_tag_name)
+            self.databrowser.clone_tag_infos(
+                self.tag_to_replace, self.new_tag_name
+            )
             self.close()
 
     def search_str(self, project, str_search):
@@ -1007,7 +1037,7 @@ class PopUpClosePipeline(QDialog):
 
     :param bool_save_as: boolean to True if the pipeline needs to be saved
     :param bool_exit: boolean to True if we can exit the editor
-    :param save_as_signal: signal emitted to save the pipeline under 
+    :param save_as_signal: signal emitted to save the pipeline under
                            another name
     :param do_not_save_signal: signal emitted to close the editor
     :param cancel_signal: signal emitted to cancel the action
@@ -1041,8 +1071,11 @@ class PopUpClosePipeline(QDialog):
         self.setWindowTitle("Confirm pipeline closing")
 
         label = QLabel(self)
-        label.setText('Do you want to close the pipeline without saving ' +
-                      self.pipeline_name + '?')
+        label.setText(
+            "Do you want to close the pipeline without saving "
+            + self.pipeline_name
+            + "?"
+        )
 
         self.push_button_save_as = QPushButton("Save", self)
         self.push_button_do_not_save = QPushButton("Do not save", self)
@@ -1123,15 +1156,15 @@ class PopUpDataBrowserCurrentSelection(QDialog):
         vbox_layout = QVBoxLayout()
 
         # Adding databrowser table
-        databrowser_table = data_browser.TableDataBrowser(self.project,
-                                                          self.databrowser,
-                                                          [TAG_FILENAME],
-                                                          False, False)
+        databrowser_table = data_browser.TableDataBrowser(
+            self.project, self.databrowser, [TAG_FILENAME], False, False
+        )
         old_scan_list = databrowser_table.scans_to_visualize
         databrowser_table.scans_to_visualize = self.filter
         databrowser_table.update_visualized_rows(old_scan_list)
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok |
-                                   QDialogButtonBox.Cancel)
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        )
         vbox_layout.addWidget(databrowser_table)
         vbox_layout.addWidget(buttons)
         buttons.accepted.connect(self.ok_clicked)
@@ -1146,12 +1179,15 @@ class PopUpDataBrowserCurrentSelection(QDialog):
         """Updates the "scan_list" attribute of several widgets."""
 
         self.main_window.pipeline_manager.scan_list = self.filter
-        self.main_window.pipeline_manager.nodeController.scan_list = \
+        self.main_window.pipeline_manager.nodeController.scan_list = (
             self.filter
-        self.main_window.pipeline_manager.pipelineEditorTabs.scan_list = \
+        )
+        self.main_window.pipeline_manager.pipelineEditorTabs.scan_list = (
             self.filter
-        self.main_window.pipeline_manager.iterationTable.scan_list = \
+        )
+        self.main_window.pipeline_manager.iterationTable.scan_list = (
             self.filter
+        )
         self.databrowser.data_sent = True
         self.close()
 
@@ -1184,9 +1220,7 @@ class PopUpDeleteProject(QDialog):
     """
 
     def __init__(self, main_window):
-        """Initialization.
-
-        """
+        """Initialization."""
 
         super().__init__()
 
@@ -1254,23 +1288,34 @@ class PopUpDeleteProject(QDialog):
         for name in final_values:
             project = os.path.join(self.project_path, name)
             if reply != QMessageBox.YesToAll and reply != QMessageBox.NoToAll:
-                msgtext = "Do you really want to delete the " + name \
-                           + " project ?"
+                msgtext = (
+                    "Do you really want to delete the " + name + " project ?"
+                )
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Warning)
                 title = "populse_mia - Warning: Delete project"
-                reply = msg.question(self, title, msgtext, QMessageBox.Yes|
-                                     QMessageBox.No|QMessageBox.YesToAll|
-                                     QMessageBox.NoToAll)
+                reply = msg.question(
+                    self,
+                    title,
+                    msgtext,
+                    QMessageBox.Yes
+                    | QMessageBox.No
+                    | QMessageBox.YesToAll
+                    | QMessageBox.NoToAll,
+                )
             if reply == QMessageBox.Yes or reply == QMessageBox.YesToAll:
-                if os.path.abspath(self.main_window.project.folder) == \
-                        os.path.abspath(project):
+                if os.path.abspath(
+                    self.main_window.project.folder
+                ) == os.path.abspath(project):
                     self.main_window.project = Project(None, True)
                     self.main_window.update_project("")
-                if os.path.relpath(project) in \
-                        self.main_window.saved_projects.pathsList:
+                if (
+                    os.path.relpath(project)
+                    in self.main_window.saved_projects.pathsList
+                ):
                     self.main_window.saved_projects.removeSavedProject(
-                        os.path.relpath(project))
+                        os.path.relpath(project)
+                    )
                     self.main_window.update_recent_projects_actions()
                 if os.path.relpath(project) in opened_projects:
                     opened_projects.remove(os.path.relpath(project))
@@ -1311,8 +1356,9 @@ class PopUpFilterSelection(QDialog):
         self.label_filter_list = QtWidgets.QLabel(self)
         self.label_filter_list.setTextFormat(QtCore.Qt.AutoText)
         self.label_filter_list.setObjectName("label_filter_list")
-        self.label_filter_list.setText(_translate("main_window",
-                                                  "Available filters:"))
+        self.label_filter_list.setText(
+            _translate("main_window", "Available filters:")
+        )
 
         # The search bar to search in the list of filters
         self.search_bar = QtWidgets.QLineEdit(self)
@@ -1324,7 +1370,8 @@ class PopUpFilterSelection(QDialog):
         self.list_widget_filters = QtWidgets.QListWidget(self)
         self.list_widget_filters.setObjectName("listWidget_tags")
         self.list_widget_filters.setSelectionMode(
-            QtWidgets.QAbstractItemView.SingleSelection)
+            QtWidgets.QAbstractItemView.SingleSelection
+        )
 
         self.push_button_ok = QtWidgets.QPushButton(self)
         self.push_button_ok.setObjectName("pushButton_ok")
@@ -1454,9 +1501,11 @@ class PopUpInheritanceDict(QDialog):
         self.all = False
         self.everything = False
 
-        label = "In the node <b><i>" + node_name + "</i></b>, from which " \
-                "input plug, the output plug <b><i>" + plug_name + "</i></b>" \
-                " should inherit the tags:"
+        label = (
+            "In the node <b><i>" + node_name + "</i></b>, from which "
+            "input plug, the output plug <b><i>" + plug_name + "</i></b>"
+            " should inherit the tags:"
+        )
 
         v_box_values = QtWidgets.QVBoxLayout()
 
@@ -1480,39 +1529,47 @@ class PopUpInheritanceDict(QDialog):
         self.push_button_ok = QtWidgets.QPushButton(self)
         self.push_button_ok.setText("OK")
         self.push_button_ok.clicked.connect(self.ok_clicked)
-        self.push_button_ok.setToolTip("<i>" + plug_name + "</i> will inherit "
-                                       "tags from " + self.key)
+        self.push_button_ok.setToolTip(
+            "<i>" + plug_name + "</i> will inherit " "tags from " + self.key
+        )
         h_box_buttons.addWidget(self.push_button_ok)
 
         self.push_button_ignore = QtWidgets.QPushButton(self)
         self.push_button_ignore.setText("Ignore")
         self.push_button_ignore.clicked.connect(self.ignore_clicked)
-        self.push_button_ignore.setToolTip("<i>" + plug_name + "</i> will "
-                                           "not inherit any tags.")
+        self.push_button_ignore.setToolTip(
+            "<i>" + plug_name + "</i> will " "not inherit any tags."
+        )
         h_box_buttons.addWidget(self.push_button_ignore)
 
         self.push_button_okall = QtWidgets.QPushButton(self)
         self.push_button_okall.setText("OK for all output plugs")
         self.push_button_okall.clicked.connect(self.okall_clicked)
-        self.push_button_okall.setToolTip("All the output plugs from <i>" +
-                                          node_name + "</i> will inherit tags"
-                                          " from " + self.key)
+        self.push_button_okall.setToolTip(
+            "All the output plugs from <i>"
+            + node_name
+            + "</i> will inherit tags"
+            " from " + self.key
+        )
         h_box_buttons.addWidget(self.push_button_okall)
 
         self.push_button_ignoreall = QtWidgets.QPushButton(self)
         self.push_button_ignoreall.setText("Ignore for all output plugs")
         self.push_button_ignoreall.clicked.connect(self.ignoreall_clicked)
-        self.push_button_ignoreall.setToolTip("All the output plugs from <i>" +
-                                              node_name + "</i> will not "
-                                              "inherit any tags.")
+        self.push_button_ignoreall.setToolTip(
+            "All the output plugs from <i>" + node_name + "</i> will not "
+            "inherit any tags."
+        )
         h_box_buttons.addWidget(self.push_button_ignoreall)
 
         self.push_button_ignore_node = QtWidgets.QPushButton(self)
-        self.push_button_ignore_node.setText("Ignore for all nodes in the "
-                                             "pipeline")
+        self.push_button_ignore_node.setText(
+            "Ignore for all nodes in the " "pipeline"
+        )
         self.push_button_ignore_node.clicked.connect(self.ignore_node_clicked)
-        self.push_button_ignore_node.setToolTip("No tags will be inherited "
-                                                "for the whole pipeline.")
+        self.push_button_ignore_node.setToolTip(
+            "No tags will be inherited " "for the whole pipeline."
+        )
         v_box_values.addLayout(h_box_buttons)
 
         v_box_values.addWidget(self.push_button_ignore_node)
@@ -1597,7 +1654,7 @@ class PopUpMultipleSort(QDialog):
         self.values_list = [[], []]
         self.list_tags = []
 
-        self.label_tags = QLabel('Tags: ')
+        self.label_tags = QLabel("Tags: ")
 
         # Each push button will allow the user to add a tag to the count table
         push_button_tag_1 = QPushButton()
@@ -1617,16 +1674,18 @@ class PopUpMultipleSort(QDialog):
         # Labels to add/remove a tag (a push button)
         sources_images_dir = Config().getSourceImageDir()
         self.remove_tag_label = ClickableLabel()
-        remove_tag_picture = QPixmap(os.path.relpath(os.path.join(
-            sources_images_dir, "red_minus.png")))
+        remove_tag_picture = QPixmap(
+            os.path.relpath(os.path.join(sources_images_dir, "red_minus.png"))
+        )
         remove_tag_picture = remove_tag_picture.scaledToHeight(20)
         self.remove_tag_label.setPixmap(remove_tag_picture)
         self.remove_tag_label.clicked.connect(self.remove_tag)
 
         self.add_tag_label = ClickableLabel()
-        self.add_tag_label.setObjectName('plus')
-        add_tag_picture = QPixmap(os.path.relpath(os.path.join(
-            sources_images_dir, "green_plus.png")))
+        self.add_tag_label.setObjectName("plus")
+        add_tag_picture = QPixmap(
+            os.path.relpath(os.path.join(sources_images_dir, "green_plus.png"))
+        )
         add_tag_picture = add_tag_picture.scaledToHeight(15)
         self.add_tag_label.setPixmap(add_tag_picture)
         self.add_tag_label.clicked.connect(self.add_tag)
@@ -1637,7 +1696,7 @@ class PopUpMultipleSort(QDialog):
 
         # Push button that is pressed to launch the computations
         self.push_button_sort = QPushButton()
-        self.push_button_sort.setText('Sort scans')
+        self.push_button_sort.setText("Sort scans")
         self.push_button_sort.clicked.connect(self.sort_scans)
 
         # Layouts
@@ -1649,9 +1708,10 @@ class PopUpMultipleSort(QDialog):
         """Adds a push button."""
 
         push_button = QPushButton()
-        push_button.setText('Tag n°' + str(len(self.push_buttons) + 1))
-        push_button.clicked.connect(lambda: self.select_tag(
-            len(self.push_buttons) - 1))
+        push_button.setText("Tag n°" + str(len(self.push_buttons) + 1))
+        push_button.clicked.connect(
+            lambda: self.select_tag(len(self.push_buttons) - 1)
+        )
         self.push_buttons.insert(len(self.push_buttons), push_button)
         self.refresh_layout()
 
@@ -1668,14 +1728,15 @@ class PopUpMultipleSort(QDialog):
         if self.values_list[idx] is not None:
             self.values_list[idx] = []
         for scan in self.project.session.get_fields_names(COLLECTION_CURRENT):
-            current_value = self.project.session.get_value(COLLECTION_CURRENT,
-                                                           scan, tag_name)
+            current_value = self.project.session.get_value(
+                COLLECTION_CURRENT, scan, tag_name
+            )
             if current_value not in self.values_list[idx]:
                 self.values_list[idx].append(current_value)
 
     def refresh_layout(self):
         """Updates the layouts (especially when a tag push button is added or
-           removed).
+        removed).
 
         """
 
@@ -1696,7 +1757,7 @@ class PopUpMultipleSort(QDialog):
 
     def remove_tag(self):
         """Removes a push buttons and makes the changesn in the list of
-           values.
+        values.
 
         """
 
@@ -1715,8 +1776,10 @@ class PopUpMultipleSort(QDialog):
         """
 
         pop_up = PopUpSelectTagCountTable(
-                            self.project, self.project.session.get_shown_tags(),
-                            self.push_buttons[idx].text())
+            self.project,
+            self.project.session.get_shown_tags(),
+            self.push_buttons[idx].text(),
+        )
 
         if pop_up.exec_():
             self.push_buttons[idx].setText(pop_up.selected_tag)
@@ -1730,7 +1793,8 @@ class PopUpMultipleSort(QDialog):
         for push_button in self.push_buttons:
 
             if push_button.text() in self.project.session.get_fields_names(
-                                                            COLLECTION_CURRENT):
+                COLLECTION_CURRENT
+            ):
                 self.list_tags.append(push_button.text())
 
         self.accept()
@@ -1888,7 +1952,7 @@ class PopUpPreferences(QDialog):
         _translate = QtCore.QCoreApplication.translate
 
         self.setObjectName("Dialog")
-        self.setWindowTitle('MIA preferences')
+        self.setWindowTitle("MIA preferences")
 
         self.clicked = 0
 
@@ -1907,7 +1971,7 @@ class PopUpPreferences(QDialog):
         self.groupbox_global = QtWidgets.QGroupBox("Global preferences")
 
         ## Auto save
-        self.save_checkbox = QCheckBox('', self)
+        self.save_checkbox = QCheckBox("", self)
         self.save_label = QLabel("Auto save")
 
         if config.isAutoSave() is True:
@@ -1919,7 +1983,7 @@ class PopUpPreferences(QDialog):
         h_box_auto_save.addStretch(1)
 
         ## Clinical mode
-        self.clinical_mode_checkbox = QCheckBox('', self)
+        self.clinical_mode_checkbox = QCheckBox("", self)
 
         if config.get_use_clinical() is True:
             self.clinical_mode_checkbox.setChecked(1)
@@ -1931,13 +1995,15 @@ class PopUpPreferences(QDialog):
         h_box_clinical.addStretch(1)
 
         ## Admin mode + Change password + Edit config
-        self.admin_mode_checkbox = QCheckBox('', self)
+        self.admin_mode_checkbox = QCheckBox("", self)
         self.admin_mode_checkbox.clicked.connect(self.admin_mode_switch)
         self.admin_mode_label = QLabel("Admin mode")
-        self.change_psswd = QPushButton("Change password", default=False,
-                                         autoDefault=False)
-        self.edit_config = QPushButton("Edit config", default=False,
-                                        autoDefault=False)
+        self.change_psswd = QPushButton(
+            "Change password", default=False, autoDefault=False
+        )
+        self.edit_config = QPushButton(
+            "Edit config", default=False, autoDefault=False
+        )
         self.change_psswd.clicked.connect(partial(self.change_admin_psswd, ""))
         self.edit_config.clicked.connect(self.edit_config_file)
 
@@ -1965,7 +2031,7 @@ class PopUpPreferences(QDialog):
         h_box_edit_config.addStretch(1)
 
         ## Version 1 controller
-        self.control_checkbox = QCheckBox('', self)
+        self.control_checkbox = QCheckBox("", self)
         self.control_label = QLabel("Version 1 controller")
 
         if config.isControlV1() is True:
@@ -1973,7 +2039,8 @@ class PopUpPreferences(QDialog):
 
         self.control_checkbox_changed = main_window.get_controller_version()
         self.control_checkbox.clicked.connect(
-                            partial(self.control_checkbox_toggled, main_window))
+            partial(self.control_checkbox_toggled, main_window)
+        )
 
         h_box_control = QtWidgets.QHBoxLayout()
         h_box_control.addWidget(self.control_checkbox)
@@ -1981,8 +2048,9 @@ class PopUpPreferences(QDialog):
         h_box_control.addStretch(1)
 
         ## Max thumbnails number at the data browser bottom
-        self.max_thumbnails_label = QLabel('Number of thumbnails '
-                                           'in Data Browser:')
+        self.max_thumbnails_label = QLabel(
+            "Number of thumbnails " "in Data Browser:"
+        )
         self.max_thumbnails_box = QtWidgets.QSpinBox()
         self.max_thumbnails_box.setMinimum(1)
         self.max_thumbnails_box.setMaximum(15)
@@ -1994,9 +2062,10 @@ class PopUpPreferences(QDialog):
         h_box_max_thumbnails.addStretch(1)
 
         ## Radiological vs neurological orientation in miniviewer data browser
-        self.radioView_checkbox = QCheckBox('', self)
-        self.radioView_label = QLabel("Radiological orientation in "
-                                      "miniviewer (data browser)")
+        self.radioView_checkbox = QCheckBox("", self)
+        self.radioView_label = QLabel(
+            "Radiological orientation in " "miniviewer (data browser)"
+        )
 
         if config.isRadioView() is True:
             self.radioView_checkbox.setChecked(1)
@@ -2026,14 +2095,17 @@ class PopUpPreferences(QDialog):
         ### Projects folder label/line edit
         self.projects_save_path_label = QLabel("Projects folder:")
         self.projects_save_path_line_edit = QLineEdit(
-            config.get_projects_save_path())
+            config.get_projects_save_path()
+        )
         self.projects_save_path_browse = QPushButton("Browse")
         self.projects_save_path_browse.clicked.connect(
-            self.browse_projects_save_path)
+            self.browse_projects_save_path
+        )
 
         ### Max projects in "Saved projects"
         self.max_projects_label = QLabel(
-            'Number of projects in "Saved projects":')
+            'Number of projects in "Saved projects":'
+        )
         self.max_projects_box = QtWidgets.QSpinBox()
         self.max_projects_box.setMinimum(1)
         self.max_projects_box.setMaximum(20)
@@ -2066,12 +2138,15 @@ class PopUpPreferences(QDialog):
 
         #### Groupbox "POPULSE third party preferences"
         self.groupbox_populse = QtWidgets.QGroupBox(
-            "POPULSE third party preference")
+            "POPULSE third party preference"
+        )
 
         #### MRI File Manager folder label/line edit
-        self.mri_conv_path_label = QLabel("Absolute path to MRIManager.jar "
-                                          "file (e.g., mri_conv_dir/"
-                                          "MRIFileManager/MRIManager.jar):")
+        self.mri_conv_path_label = QLabel(
+            "Absolute path to MRIManager.jar "
+            "file (e.g., mri_conv_dir/"
+            "MRIFileManager/MRIManager.jar):"
+        )
         self.mri_conv_path_line_edit = QLineEdit(config.get_mri_conv_path())
         self.mri_conv_path_browse = QPushButton("Browse")
         self.mri_conv_path_browse.clicked.connect(self.browse_mri_conv_path)
@@ -2128,29 +2203,34 @@ class PopUpPreferences(QDialog):
         # The 'Pipeline' tab
         self.tab_pipeline = QtWidgets.QWidget()
         self.tab_pipeline.setObjectName("tab_pipeline")
-        self.tab_widget.addTab(self.tab_pipeline,
-                               _translate("Dialog", "Pipeline"))
+        self.tab_widget.addTab(
+            self.tab_pipeline, _translate("Dialog", "Pipeline")
+        )
 
         # Groupbox "Matlab"
         self.groupbox_matlab = QtWidgets.QGroupBox("Matlab")
         self.use_matlab_label = QLabel("Use Matlab")
-        self.use_matlab_checkbox = QCheckBox('', self)
+        self.use_matlab_checkbox = QCheckBox("", self)
 
-        self.matlab_label = QLabel("Matlab path (e.g., matlab_dir/"
-                                   "bin/matlab):")
+        self.matlab_label = QLabel(
+            "Matlab path (e.g., matlab_dir/" "bin/matlab):"
+        )
         self.matlab_choice = QLineEdit(config.get_matlab_path())
         self.matlab_browse = QPushButton("Browse")
         self.matlab_browse.clicked.connect(self.browse_matlab)
 
         self.use_matlab_standalone_label = QLabel("Use Matlab standalone")
-        self.use_matlab_standalone_checkbox = QCheckBox('', self)
-        self.matlab_standalone_label = QLabel("Matlab standalone path (e.g., "
-                                              "MCR_dir/v95):")
+        self.use_matlab_standalone_checkbox = QCheckBox("", self)
+        self.matlab_standalone_label = QLabel(
+            "Matlab standalone path (e.g., " "MCR_dir/v95):"
+        )
         self.matlab_standalone_choice = QLineEdit(
-            config.get_matlab_standalone_path())
+            config.get_matlab_standalone_path()
+        )
         self.matlab_standalone_browse = QPushButton("Browse")
         self.matlab_standalone_browse.clicked.connect(
-            self.browse_matlab_standalone)
+            self.browse_matlab_standalone
+        )
 
         h_box_use_matlab = QtWidgets.QHBoxLayout()
         h_box_use_matlab.addWidget(self.use_matlab_checkbox)
@@ -2167,7 +2247,8 @@ class PopUpPreferences(QDialog):
 
         h_box_use_matlab_standalone = QtWidgets.QHBoxLayout()
         h_box_use_matlab_standalone.addWidget(
-                                            self.use_matlab_standalone_checkbox)
+            self.use_matlab_standalone_checkbox
+        )
         h_box_use_matlab_standalone.addWidget(self.use_matlab_standalone_label)
         h_box_use_matlab_standalone.addStretch(1)
 
@@ -2191,7 +2272,7 @@ class PopUpPreferences(QDialog):
         self.groupbox_spm = QtWidgets.QGroupBox("SPM")
 
         self.use_spm_label = QLabel("Use SPM")
-        self.use_spm_checkbox = QCheckBox('', self)
+        self.use_spm_checkbox = QCheckBox("", self)
 
         self.spm_label = QLabel("SPM path (e.g., spm_dir/spm12):")
         self.spm_choice = QLineEdit(config.get_spm_path())
@@ -2212,13 +2293,16 @@ class PopUpPreferences(QDialog):
         v_box_spm_path.addLayout(h_box_spm_path)
 
         self.use_spm_standalone_label = QLabel("Use SPM standalone")
-        self.use_spm_standalone_checkbox = QCheckBox('', self)
+        self.use_spm_standalone_checkbox = QCheckBox("", self)
 
-        self.spm_standalone_label = QLabel("SPM standalone path (e.g., the "
-                                           "directory hosting the run_spm12.sh "
-                                           "file):")
+        self.spm_standalone_label = QLabel(
+            "SPM standalone path (e.g., the "
+            "directory hosting the run_spm12.sh "
+            "file):"
+        )
         self.spm_standalone_choice = QLineEdit(
-            config.get_spm_standalone_path())
+            config.get_spm_standalone_path()
+        )
         self.spm_standalone_browse = QPushButton("Browse")
         self.spm_standalone_browse.clicked.connect(self.browse_spm_standalone)
 
@@ -2247,10 +2331,11 @@ class PopUpPreferences(QDialog):
         self.groupbox_fsl = QtWidgets.QGroupBox("FSL")
 
         self.use_fsl_label = QLabel("Use FSL")
-        self.use_fsl_checkbox = QCheckBox('', self)
+        self.use_fsl_checkbox = QCheckBox("", self)
 
-        self.fsl_label = QLabel("FSL config file (e.g., "
-                                "fsl_dir/etc/fslconf/fsl.sh):")
+        self.fsl_label = QLabel(
+            "FSL config file (e.g., " "fsl_dir/etc/fslconf/fsl.sh):"
+        )
         self.fsl_choice = QLineEdit(config.get_fsl_config())
         self.fsl_browse = QPushButton("Browse")
         self.fsl_browse.clicked.connect(self.browse_fsl)
@@ -2278,7 +2363,7 @@ class PopUpPreferences(QDialog):
         self.groupbox_afni = QtWidgets.QGroupBox("AFNI")
 
         self.use_afni_label = QLabel("Use AFNI")
-        self.use_afni_checkbox = QCheckBox('', self)
+        self.use_afni_checkbox = QCheckBox("", self)
 
         self.afni_label = QLabel("AFNI path (e.g. dir_containing_abin/abin):")
         self.afni_choice = QLineEdit(config.get_afni_path())
@@ -2308,7 +2393,7 @@ class PopUpPreferences(QDialog):
         self.groupbox_ants = QtWidgets.QGroupBox("ANTS")
 
         self.use_ants_label = QLabel("Use ANTS")
-        self.use_ants_checkbox = QCheckBox('', self)
+        self.use_ants_checkbox = QCheckBox("", self)
 
         self.ants_label = QLabel("ANTS path (e.g. ANTs_dir/bin):")
         self.ants_choice = QLineEdit(config.get_ants_path())
@@ -2336,9 +2421,9 @@ class PopUpPreferences(QDialog):
 
         # Groupbox "CAPSUL"
         groupbox_capsul = Qt.QGroupBox("CAPSUL")
-        capsul_config_button = Qt.QPushButton("Edit CAPSUL config",
-                                              default=False,
-                                              autoDefault=False)
+        capsul_config_button = Qt.QPushButton(
+            "Edit CAPSUL config", default=False, autoDefault=False
+        )
         capsul_config_button.clicked.connect(self.edit_capsul_config)
         h_box_capsul = Qt.QHBoxLayout()
         h_box_capsul.addWidget(capsul_config_button)
@@ -2363,7 +2448,7 @@ class PopUpPreferences(QDialog):
         if config.get_use_spm_standalone():
             archi = platform.architecture()
 
-            if 'Windows' in archi[1]:
+            if "Windows" in archi[1]:
                 self.use_matlab_standalone_checkbox.setChecked(False)
 
             else:
@@ -2372,7 +2457,6 @@ class PopUpPreferences(QDialog):
             self.use_spm_standalone_checkbox.setChecked(True)
             self.use_matlab_checkbox.setChecked(False)
             self.use_spm_checkbox.setChecked(False)
-
 
         elif config.get_use_spm():
             self.use_matlab_checkbox.setChecked(True)
@@ -2416,11 +2500,20 @@ class PopUpPreferences(QDialog):
         # The 'Appearance' tab
         self.tab_appearance = QtWidgets.QWidget()
         self.tab_appearance.setObjectName("tab_appearance")
-        self.tab_widget.addTab(self.tab_appearance,
-                               _translate("Dialog", "Appearance"))
+        self.tab_widget.addTab(
+            self.tab_appearance, _translate("Dialog", "Appearance")
+        )
 
-        colors = ["Black", "Blue", "Green", "Grey", "Orange", "Red",
-                  "Yellow", "White"]
+        colors = [
+            "Black",
+            "Blue",
+            "Green",
+            "Grey",
+            "Orange",
+            "Red",
+            "Yellow",
+            "White",
+        ]
 
         self.appearance_layout = QVBoxLayout()
         self.label_background_color = QLabel("Background color")
@@ -2449,27 +2542,30 @@ class PopUpPreferences(QDialog):
         text_color = config.getTextColor()
         self.text_color_combo.setCurrentText(text_color)
 
-        self.fullscreen_cbox = QCheckBox('Use full screen')
+        self.fullscreen_cbox = QCheckBox("Use full screen")
         mainwindow_size_lay = QHBoxLayout()
-        mainwindow_size_lay.addWidget(QLabel('Main window size'))
+        mainwindow_size_lay.addWidget(QLabel("Main window size"))
         self.mainwindow_size_x_spinbox = QtWidgets.QSpinBox()
         mainwindow_size_lay.addWidget(self.mainwindow_size_x_spinbox)
-        mainwindow_size_lay.addWidget(QLabel(' x '))
+        mainwindow_size_lay.addWidget(QLabel(" x "))
         self.mainwindow_size_y_spinbox = QtWidgets.QSpinBox()
         mainwindow_size_lay.addWidget(self.mainwindow_size_y_spinbox)
         self.fullscreen_cbox.setChecked(config.get_mainwindow_maximized())
         wsize = config.get_mainwindow_size()
         self.mainwindow_size_x_spinbox.setMaximum(
-            QApplication.instance().desktop().width())
+            QApplication.instance().desktop().width()
+        )
         self.mainwindow_size_y_spinbox.setMaximum(
-            QApplication.instance().desktop().height())
+            QApplication.instance().desktop().height()
+        )
         if isinstance(wsize, list) and len(wsize) >= 2:
             self.mainwindow_size_x_spinbox.setValue(wsize[0])
             self.mainwindow_size_y_spinbox.setValue(wsize[1])
-        self.mainwindow_size_button = QPushButton('use current size')
+        self.mainwindow_size_button = QPushButton("use current size")
         mainwindow_size_lay.addWidget(self.mainwindow_size_button)
         self.mainwindow_size_button.clicked.connect(
-            partial(self.use_current_mainwindow_size, main_window))
+            partial(self.use_current_mainwindow_size, main_window)
+        )
 
         self.appearance_layout.addWidget(self.label_background_color)
         self.appearance_layout.addWidget(self.background_color_combo)
@@ -2494,100 +2590,102 @@ class PopUpPreferences(QDialog):
         # Signals
         self.use_matlab_checkbox.stateChanged.connect(self.use_matlab_changed)
         self.use_matlab_standalone_checkbox.stateChanged.connect(
-            self.use_matlab_standalone_changed)
+            self.use_matlab_standalone_changed
+        )
         self.use_spm_checkbox.stateChanged.connect(self.use_spm_changed)
         self.use_spm_standalone_checkbox.stateChanged.connect(
-            self.use_spm_standalone_changed)
-        self.use_fsl_checkbox.stateChanged.connect(
-            self.use_fsl_changed)
-        self.use_afni_checkbox.stateChanged.connect(
-            self.use_afni_changed)
-        self.use_ants_checkbox.stateChanged.connect(
-            self.use_ants_changed)
+            self.use_spm_standalone_changed
+        )
+        self.use_fsl_checkbox.stateChanged.connect(self.use_fsl_changed)
+        self.use_afni_checkbox.stateChanged.connect(self.use_afni_changed)
+        self.use_ants_checkbox.stateChanged.connect(self.use_ants_changed)
 
     def browse_fsl(self):
         """Called when fsl browse button is clicked."""
 
-        fname = QFileDialog.getOpenFileName(self,
-                                            'Choose FSL config file',
-                                            os.path.expanduser('~'))[0]
+        fname = QFileDialog.getOpenFileName(
+            self, "Choose FSL config file", os.path.expanduser("~")
+        )[0]
         if fname:
             self.fsl_choice.setText(fname)
 
     def browse_afni(self):
         """Called when afni browse button is clicked."""
 
-        fname = QFileDialog.getExistingDirectory(self,
-                                                 'Choose AFNI directory',
-                                                 os.path.expanduser('~'))
+        fname = QFileDialog.getExistingDirectory(
+            self, "Choose AFNI directory", os.path.expanduser("~")
+        )
         if fname:
             self.afni_choice.setText(fname)
 
     def browse_ants(self):
         """Called when ants browse button is clicked."""
 
-        fname = QFileDialog.getExistingDirectory(self,
-                                            'Choose ANTS directory',
-                                            os.path.expanduser('~'))
+        fname = QFileDialog.getExistingDirectory(
+            self, "Choose ANTS directory", os.path.expanduser("~")
+        )
         if fname:
             self.ants_choice.setText(fname)
 
     def browse_matlab(self):
         """Called when matlab browse button is clicked."""
 
-        fname = QFileDialog.getOpenFileName(self, 'Choose Matlab file',
-                                            os.path.expanduser('~'))[0]
+        fname = QFileDialog.getOpenFileName(
+            self, "Choose Matlab file", os.path.expanduser("~")
+        )[0]
         if fname:
             self.matlab_choice.setText(fname)
 
     def browse_matlab_standalone(self):
         """Called when matlab browse button is clicked."""
 
-        fname = QFileDialog.getExistingDirectory(self, 'Choose MCR directory',
-                                                 os.path.expanduser('~'))
+        fname = QFileDialog.getExistingDirectory(
+            self, "Choose MCR directory", os.path.expanduser("~")
+        )
         if fname:
             self.matlab_standalone_choice.setText(fname)
 
     def browse_mri_conv_path(self):
         """Called when "MRIFileManager.jar" browse button is clicked."""
 
-        fname = QFileDialog.getOpenFileName(self,
-                                            'Select the location of the '
-                                            'MRIManager.jar file',
-                                            os.path.expanduser('~'))[0]
+        fname = QFileDialog.getOpenFileName(
+            self,
+            "Select the location of the " "MRIManager.jar file",
+            os.path.expanduser("~"),
+        )[0]
         if fname:
             self.mri_conv_path_line_edit.setText(fname)
 
     def browse_projects_save_path(self):
         """Called when "Projects folder" browse button is clicked."""
 
-        fname = QFileDialog.getExistingDirectory(self,
-                                                 'Select a folder where '
-                                                 'to save the projects',
-                                                 os.path.expanduser('~'))
+        fname = QFileDialog.getExistingDirectory(
+            self,
+            "Select a folder where " "to save the projects",
+            os.path.expanduser("~"),
+        )
 
         if fname:
             self.projects_save_path_line_edit.setText(fname)
 
-            with open(os.path.join(fname, '.gitignore'), 'w') as myFile:
+            with open(os.path.join(fname, ".gitignore"), "w") as myFile:
                 myFile.write("/*")
 
     def browse_spm(self):
         """Called when spm browse button is clicked."""
 
-        fname = QFileDialog.getExistingDirectory(self,
-                                                 'Choose SPM directory',
-                                                 os.path.expanduser('~'))
+        fname = QFileDialog.getExistingDirectory(
+            self, "Choose SPM directory", os.path.expanduser("~")
+        )
         if fname:
             self.spm_choice.setText(fname)
 
     def browse_spm_standalone(self):
         """Called when spm standalone browse button is clicked."""
 
-        fname = QFileDialog.getExistingDirectory(self,
-                                                 'Choose SPM standalone '
-                                                 'directory',
-                                                 os.path.expanduser('~'))
+        fname = QFileDialog.getExistingDirectory(
+            self, "Choose SPM standalone " "directory", os.path.expanduser("~")
+        )
         if fname:
             self.spm_standalone_choice.setText(fname)
 
@@ -2609,7 +2707,8 @@ class PopUpPreferences(QDialog):
         change.new_psswd_conf.setEchoMode(QLineEdit.Password)
 
         buttonBox = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self
+        )
 
         layout = QFormLayout()
         layout.addRow("Old password", change.old_psswd)
@@ -2629,22 +2728,26 @@ class PopUpPreferences(QDialog):
             config = Config()
             old_psswd = self.salt + change.old_psswd.text()
             hash_psswd = hashlib.sha256(old_psswd.encode()).hexdigest()
-            if hash_psswd == config.get_admin_hash() and change.new_psswd.text(
-                ) == change.new_psswd_conf.text() and len(
-                change.new_psswd.text()) > 6:
+            if (
+                hash_psswd == config.get_admin_hash()
+                and change.new_psswd.text() == change.new_psswd_conf.text()
+                and len(change.new_psswd.text()) > 6
+            ):
                 new_psswd = self.salt + change.new_psswd.text()
-                config.set_admin_hash(hashlib.sha256(
-                    new_psswd.encode()).hexdigest())
+                config.set_admin_hash(
+                    hashlib.sha256(new_psswd.encode()).hexdigest()
+                )
             elif hash_psswd != config.get_admin_hash():
                 self.change_admin_psswd("The old password is incorrect.")
             elif len(change.new_psswd.text()) <= 6:
-                self.change_admin_psswd("Your password must have more than 6 "
-                                        "characters")
+                self.change_admin_psswd(
+                    "Your password must have more than 6 " "characters"
+                )
             elif change.new_psswd.text() != change.new_psswd_conf.text():
                 self.change_admin_psswd("The new passwords are not the same.")
 
     def control_checkbox_toggled(self, main_window):
-        """ Check if the user really wants to change the controller version.
+        """Check if the user really wants to change the controller version.
 
         :param main_window: main window object of the software
         """
@@ -2661,16 +2764,22 @@ class PopUpPreferences(QDialog):
                 "To change the controller from {0} to {1}, "
                 "MIA must be restarted. Would you like to plan "
                 "this change for next "
-                "start-up?".format("V1" if config.isControlV1() else "V2",
-                                   "V2" if config.isControlV1() else "V1"))
+                "start-up?".format(
+                    "V1" if config.isControlV1() else "V2",
+                    "V2" if config.isControlV1() else "V1",
+                )
+            )
 
         else:
             self.msg.setInformativeText(
                 "Change of controller from {0} to {1} is already "
                 "planned for next start-up. Would you like to "
                 "cancel this "
-                "change?".format("V1" if config.isControlV1() else "V2",
-                                 "V2" if config.isControlV1() else "V1"))
+                "change?".format(
+                    "V1" if config.isControlV1() else "V2",
+                    "V2" if config.isControlV1() else "V1",
+                )
+            )
 
         return_value = self.msg.exec()
 
@@ -2685,11 +2794,13 @@ class PopUpPreferences(QDialog):
         config = Config()
 
         self.editConf = QDialog()
-        self.editConf.setWindowTitle(os.path.join(config.get_config_path(),
-                                                  'config.yml'))
+        self.editConf.setWindowTitle(
+            os.path.join(config.get_config_path(), "config.yml")
+        )
         self.editConf.txt = QPlainTextEdit()
-        stream = yaml.dump(config.config, default_flow_style=False,
-                           allow_unicode=True)
+        stream = yaml.dump(
+            config.config, default_flow_style=False, allow_unicode=True
+        )
         self.editConf.txt.insertPlainText(str(stream))
         textWidth = self.editConf.txt.width() + 100
         textHeight = self.editConf.txt.height() + 200
@@ -2697,7 +2808,8 @@ class PopUpPreferences(QDialog):
         self.editConf.txt.resize(textWidth, textHeight)
 
         buttonBox = QDialogButtonBox(
-                            QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self
+        )
         buttonBox.button(QDialogButtonBox.Ok).setDefault(False)
         buttonBox.button(QDialogButtonBox.Cancel).setDefault(False)
 
@@ -2725,7 +2837,7 @@ class PopUpPreferences(QDialog):
         else:
             stream = self.editConf.txt.toPlainText()
 
-            if verCmp(yaml.__version__, '5.1', 'sup'):
+            if verCmp(yaml.__version__, "5.1", "sup"):
                 config.config = yaml.load(stream, Loader=yaml.FullLoader)
 
             else:
@@ -2746,7 +2858,7 @@ class PopUpPreferences(QDialog):
         self.editConf.txt.setTextCursor(cursor)
         pattern = self.findChar_line_edit.text()
 
-        if pattern == '':
+        if pattern == "":
             return
 
         cursor = self.editConf.txt.textCursor()
@@ -2756,7 +2868,7 @@ class PopUpPreferences(QDialog):
         pos = 0
         index = regex.indexIn(self.editConf.txt.toPlainText(), pos)
 
-        while (index != -1):
+        while index != -1:
             cursor.setPosition(index)
 
             for _ in pattern:
@@ -2773,8 +2885,8 @@ class PopUpPreferences(QDialog):
         MIA preferences, Pipeline tab).
         """
 
-        #from capsul.api import capsul_engine
-        #from capsul.qt_gui.widgets.settings_editor import SettingsEditor
+        # from capsul.api import capsul_engine
+        # from capsul.qt_gui.widgets.settings_editor import SettingsEditor
 
         # validate the current Mia config first
         if not self.validate_and_save():
@@ -2782,24 +2894,34 @@ class PopUpPreferences(QDialog):
 
         config = Config()
         capsul_config = config.get_capsul_config(sync_from_engine=False)
-        modules = capsul_config.get('engine_modules', [])
+        modules = capsul_config.get("engine_modules", [])
 
         # build a temporary new engine (because it may not be validated)
         engine = capsul_engine()
-        for module in modules + ['fom', 'axon', 'python', 'fsl', 'freesurfer',
-                                 'nipype', 'afni', 'ants']:
+        for module in modules + [
+            "fom",
+            "axon",
+            "python",
+            "fsl",
+            "freesurfer",
+            "nipype",
+            "afni",
+            "ants",
+        ]:
             engine.load_module(module)
-        envs = capsul_config.get('engine', {})
+        envs = capsul_config.get("engine", {})
         for env, conf in envs.items():
             c = dict(conf)
-            if 'capsul_engine' not in c \
-                    or 'uses' not in c['capsul_engine']:
-                c['capsul_engine'] = {
-                    'uses': {engine.settings.module_name(m): 'ALL'
-                                for m in conf.keys()}}
-            #for mod, val in conf.items():
-                #if 'config_id' not in val:
-                    #val['config_id'] = mod.split('.')[-1]
+            if "capsul_engine" not in c or "uses" not in c["capsul_engine"]:
+                c["capsul_engine"] = {
+                    "uses": {
+                        engine.settings.module_name(m): "ALL"
+                        for m in conf.keys()
+                    }
+                }
+            # for mod, val in conf.items():
+            # if 'config_id' not in val:
+            # val['config_id'] = mod.split('.')[-1]
             engine.settings.import_configs(env, c, cont_on_error=True)
 
         dialog = SettingsEditor(engine)
@@ -2812,8 +2934,8 @@ class PopUpPreferences(QDialog):
         if result:
             settings = engine.settings.export_config_dict()
 
-            capsul_config['engine'] = settings
-            capsul_config['engine_modules'] = list(engine._loaded_modules)
+            capsul_config["engine"] = settings
+            capsul_config["engine_modules"] = list(engine._loaded_modules)
 
             try:
                 config.set_capsul_config(capsul_config)
@@ -2860,7 +2982,8 @@ class PopUpPreferences(QDialog):
             use_matlab_sa = Qt.Qt.Checked if use_matlab_sa else Qt.Qt.Unchecked
             self.use_matlab_standalone_checkbox.setCheckState(use_matlab_sa)
             self.matlab_standalone_choice.setText(
-                config.get_matlab_standalone_path())
+                config.get_matlab_standalone_path()
+            )
 
             # spm
             use_spm = config.get_use_spm()
@@ -2871,7 +2994,8 @@ class PopUpPreferences(QDialog):
             use_spm_sa = Qt.Qt.Checked if use_spm_sa else Qt.Qt.Unchecked
             self.use_spm_standalone_checkbox.setCheckState(use_spm_sa)
             self.spm_standalone_choice.setText(
-                config.get_spm_standalone_path())
+                config.get_spm_standalone_path()
+            )
 
         del dialog
         del engine
@@ -3016,8 +3140,9 @@ class PopUpPreferences(QDialog):
 
             # Window name
             main_window.windowName += " - "
-            main_window.setWindowTitle(main_window.windowName +
-                                       main_window.projectName)
+            main_window.setWindowTitle(
+                main_window.windowName + main_window.projectName
+            )
 
             # Configuration test
             QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
@@ -3027,7 +3152,7 @@ class PopUpPreferences(QDialog):
             # AFNI config test
             if self.use_afni_checkbox.isChecked():
                 afni_dir = self.afni_choice.text()
-                afni_cmd = 'afni'
+                afni_cmd = "afni"
 
                 if os.path.isdir(afni_dir):
                     afni_cmd = os.path.join(afni_dir, afni_cmd)
@@ -3038,13 +3163,15 @@ class PopUpPreferences(QDialog):
                     return False
 
                 try:
-                    p = subprocess.Popen([afni_cmd, '-version'],
-                                         stdin=subprocess.PIPE,
-                                         stdout=subprocess.PIPE,
-                                         stderr=subprocess.PIPE)
+                    p = subprocess.Popen(
+                        [afni_cmd, "-version"],
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                    )
                     output, err = p.communicate()
 
-                    if err == b'':
+                    if err == b"":
                         config.set_afni_path(afni_dir)
                         config.set_use_afni(True)
 
@@ -3064,7 +3191,7 @@ class PopUpPreferences(QDialog):
             # ANTS config test
             if self.use_ants_checkbox.isChecked():
                 ants_dir = self.ants_choice.text()
-                ants_cmd = 'SmoothImage'
+                ants_cmd = "SmoothImage"
 
                 if os.path.isdir(ants_dir):
                     ants_cmd = os.path.join(ants_dir, ants_cmd)
@@ -3075,13 +3202,15 @@ class PopUpPreferences(QDialog):
                     return False
 
                 try:
-                    p = subprocess.Popen([ants_cmd, '-version'],
-                                         stdin=subprocess.PIPE,
-                                         stdout=subprocess.PIPE,
-                                         stderr=subprocess.PIPE)
+                    p = subprocess.Popen(
+                        [ants_cmd, "-version"],
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                    )
                     output, err = p.communicate()
 
-                    if err == b'':
+                    if err == b"":
                         config.set_ants_path(ants_dir)
                         config.set_use_ants(True)
 
@@ -3102,27 +3231,29 @@ class PopUpPreferences(QDialog):
                 fsl_conf = self.fsl_choice.text()
 
                 if fsl_conf == "":
-                    fsl_cmd = 'flirt'
+                    fsl_cmd = "flirt"
 
                 else:
                     fsl_dir = os.path.dirname(fsl_conf)
 
-                    if fsl_dir.endswith(os.path.join('etc', 'fslconf')):
+                    if fsl_dir.endswith(os.path.join("etc", "fslconf")):
                         fsl_dir = os.path.dirname(os.path.dirname(fsl_dir))
 
-                    elif fsl_dir.endswith('etc'):
+                    elif fsl_dir.endswith("etc"):
                         fsl_dir = os.path.dirname(fsl_dir)
 
-                    fsl_cmd = os.path.join(fsl_dir, 'bin', 'flirt')
+                    fsl_cmd = os.path.join(fsl_dir, "bin", "flirt")
 
                 try:
-                    p = subprocess.Popen([fsl_cmd, '-version'],
-                                         stdin=subprocess.PIPE,
-                                         stdout=subprocess.PIPE,
-                                         stderr=subprocess.PIPE)
+                    p = subprocess.Popen(
+                        [fsl_cmd, "-version"],
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                    )
                     output, err = p.communicate()
 
-                    if err == b'':
+                    if err == b"":
                         config.set_fsl_config(fsl_conf)
                         config.set_use_fsl(True)
 
@@ -3143,16 +3274,19 @@ class PopUpPreferences(QDialog):
             matlab_input = self.matlab_choice.text()
             spm_input = self.spm_choice.text()
 
-            if ((matlab_input != "" and spm_input != "") or
-                                            self.use_spm_checkbox.isChecked()):
+            if (
+                matlab_input != "" and spm_input != ""
+            ) or self.use_spm_checkbox.isChecked():
 
                 if not os.path.isfile(matlab_input):
                     self.wrong_path(matlab_input, "Matlab")
                     QApplication.restoreOverrideCursor()
                     return False
 
-                if (matlab_input == config.get_matlab_path() and
-                                           spm_input == config.get_spm_path()):
+                if (
+                    matlab_input == config.get_matlab_path()
+                    and spm_input == config.get_spm_path()
+                ):
 
                     if self.use_spm_checkbox.isChecked():
                         config.set_use_spm(True)
@@ -3162,20 +3296,29 @@ class PopUpPreferences(QDialog):
                 elif os.path.isdir(spm_input):
 
                     try:
-                        matlab_cmd = ("restoredefaultpath; "
-                                      "addpath('" + spm_input + "'); "
-                                      "[name, ~]=spm('Ver'); "
-                                      "exit")
-                        p = subprocess.Popen([matlab_input, '-nodisplay',
-                                              '-nodesktop', '-nosplash',
-                                              '-singleCompThread', '-r',
-                                              matlab_cmd],
-                                             stdin=subprocess.PIPE,
-                                             stdout=subprocess.PIPE,
-                                             stderr=subprocess.PIPE)
+                        matlab_cmd = (
+                            "restoredefaultpath; "
+                            "addpath('" + spm_input + "'); "
+                            "[name, ~]=spm('Ver'); "
+                            "exit"
+                        )
+                        p = subprocess.Popen(
+                            [
+                                matlab_input,
+                                "-nodisplay",
+                                "-nodesktop",
+                                "-nosplash",
+                                "-singleCompThread",
+                                "-r",
+                                matlab_cmd,
+                            ],
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                        )
                         output, err = p.communicate()
 
-                        if err == b'':
+                        if err == b"":
                             config.set_matlab_path(matlab_input)
 
                             if self.use_spm_checkbox.isChecked():
@@ -3217,17 +3360,24 @@ class PopUpPreferences(QDialog):
                 elif os.path.isfile(matlab_input):
 
                     try:
-                        matlab_cmd = 'ver; exit'
-                        p = subprocess.Popen([matlab_input, '-nodisplay',
-                                              '-nodesktop', '-nosplash',
-                                              '-singleCompThread', '-r',
-                                              matlab_cmd],
-                                             stdin=subprocess.PIPE,
-                                             stdout=subprocess.PIPE,
-                                             stderr=subprocess.PIPE)
+                        matlab_cmd = "ver; exit"
+                        p = subprocess.Popen(
+                            [
+                                matlab_input,
+                                "-nodisplay",
+                                "-nodesktop",
+                                "-nosplash",
+                                "-singleCompThread",
+                                "-r",
+                                matlab_cmd,
+                            ],
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                        )
                         output, err = p.communicate()
 
-                        if err == b'':
+                        if err == b"":
                             config.set_matlab_path(matlab_input)
 
                             if self.use_matlab_checkbox.isChecked():
@@ -3253,22 +3403,25 @@ class PopUpPreferences(QDialog):
             matlab_input = self.matlab_standalone_choice.text()
             archi = platform.architecture()
 
-            if ((matlab_input != "" and spm_input != "") or
-                                 self.use_spm_standalone_checkbox.isChecked()):
+            if (
+                matlab_input != "" and spm_input != ""
+            ) or self.use_spm_standalone_checkbox.isChecked():
 
-                if ((not os.path.isdir(matlab_input)) and
-                                                  (not 'Windows' in archi[1])):
+                if (not os.path.isdir(matlab_input)) and (
+                    not "Windows" in archi[1]
+                ):
                     self.wrong_path(matlab_input, "Matlab standalone")
                     QApplication.restoreOverrideCursor()
                     return False
 
-                if ((matlab_input == config.get_matlab_standalone_path()) and
-                              (spm_input == config.get_spm_standalone_path())):
+                if (matlab_input == config.get_matlab_standalone_path()) and (
+                    spm_input == config.get_spm_standalone_path()
+                ):
 
                     if self.use_spm_standalone_checkbox.isChecked():
                         config.set_use_spm_standalone(True)
 
-                        if 'Windows' in archi[1]:
+                        if "Windows" in archi[1]:
                             config.set_use_matlab(True)
                             config.set_use_matlab_standalone(False)
 
@@ -3277,9 +3430,10 @@ class PopUpPreferences(QDialog):
 
                 elif os.path.isdir(spm_input):
 
-                    if 'Windows' in archi[1]:
-                        mcr = glob.glob(os.path.join(spm_input,
-                                                     'spm*_win*.exe'))
+                    if "Windows" in archi[1]:
+                        mcr = glob.glob(
+                            os.path.join(spm_input, "spm*_win*.exe")
+                        )
                         pos = -1
                         nb_bit_sys = archi[0]
 
@@ -3295,71 +3449,86 @@ class PopUpPreferences(QDialog):
                             return False
 
                     elif os.path.isdir(matlab_input):
-                        mcr = glob.glob(os.path.join(spm_input, 'run_spm*.sh'))
+                        mcr = glob.glob(os.path.join(spm_input, "run_spm*.sh"))
 
                     if mcr:
 
                         try:
 
-                            if 'Windows' in archi[1]:
-                                p = subprocess.Popen([mcr[pos], '--version'],
-                                                     stdin=subprocess.PIPE,
-                                                     stdout=subprocess.PIPE,
-                                                     stderr=subprocess.PIPE)
+                            if "Windows" in archi[1]:
+                                p = subprocess.Popen(
+                                    [mcr[pos], "--version"],
+                                    stdin=subprocess.PIPE,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE,
+                                )
 
                             else:
-                                p = subprocess.Popen([mcr[0], matlab_input,
-                                                      '--version'],
-                                                     stdin=subprocess.PIPE,
-                                                     stdout=subprocess.PIPE,
-                                                     stderr=subprocess.PIPE)
+                                p = subprocess.Popen(
+                                    [mcr[0], matlab_input, "--version"],
+                                    stdin=subprocess.PIPE,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE,
+                                )
 
                             output, err = p.communicate()
 
-                            if ((err == b'' and output != b'') or
-                                                  output.startswith(b'SPM8 ')):
+                            if (
+                                err == b"" and output != b""
+                            ) or output.startswith(b"SPM8 "):
                                 # spm8 standalone doesn't accept --version
                                 # argument but prints a message that we can
                                 # interpret as saying that SPM8 is working
                                 # anyway.
 
-                                if self.use_spm_standalone_checkbox.isChecked():
+                                if (
+                                    self.use_spm_standalone_checkbox.isChecked()
+                                ):
                                     config.set_use_spm_standalone(True)
                                     config.set_use_matlab_standalone(True)
 
                                 config.set_spm_standalone_path(spm_input)
                                 config.set_matlab_standalone_path(matlab_input)
 
-                            elif ((err != b'') and
-                                    (b'version' in output.split()[2:]) and
-                                       (b'(standalone)' in output.split()[2:])):
+                            elif (
+                                (err != b"")
+                                and (b"version" in output.split()[2:])
+                                and (b"(standalone)" in output.split()[2:])
+                            ):
 
-                                if self.use_spm_standalone_checkbox.isChecked():
+                                if (
+                                    self.use_spm_standalone_checkbox.isChecked()
+                                ):
                                     config.set_use_spm_standalone(True)
                                     config.set_use_matlab_standalone(True)
                                 config.set_spm_standalone_path(spm_input)
                                 config.set_matlab_standalone_path(matlab_input)
 
                                 if isinstance(err, bytes):
-                                    err = err.decode('utf-8')
+                                    err = err.decode("utf-8")
 
-                                print("\nWarning: The configuration for Matlab"
-                                      " MCR and SPM standalone as defined in"
-                                      " Mia's preferences seems to be valid "
-                                      "but the following issue has been "
-                                      "detected:\n{}\nPlease fix this issue"
-                                      " to avoid a malfunction ...".format(err))
+                                print(
+                                    "\nWarning: The configuration for Matlab"
+                                    " MCR and SPM standalone as defined in"
+                                    " Mia's preferences seems to be valid "
+                                    "but the following issue has been "
+                                    "detected:\n{}\nPlease fix this issue"
+                                    " to avoid a malfunction ...".format(err)
+                                )
 
-                            elif err != b'':
+                            elif err != b"":
 
                                 if "shared libraries" in str(err):
-                                    self.wrong_path(matlab_input,
-                                                    "Matlab standalone")
+                                    self.wrong_path(
+                                        matlab_input, "Matlab standalone"
+                                    )
                                     QApplication.restoreOverrideCursor()
                                     return False
 
                                 else:
-                                    self.wrong_path(spm_input, "SPM standalone")
+                                    self.wrong_path(
+                                        spm_input, "SPM standalone"
+                                    )
                                     QApplication.restoreOverrideCursor()
                                     return False
 
@@ -3384,12 +3553,16 @@ class PopUpPreferences(QDialog):
                     return False
 
             # Matlab (MCR) alone config test
-            if (matlab_input != "" or
-                              self.use_matlab_standalone_checkbox.isChecked()):
+            if (
+                matlab_input != ""
+                or self.use_matlab_standalone_checkbox.isChecked()
+            ):
 
-                if 'Windows' in archi[1]:
-                    print('WARNING: Matlab Standalone Path enter, this '
-                          'is unnecessary to use SPM12.')
+                if "Windows" in archi[1]:
+                    print(
+                        "WARNING: Matlab Standalone Path enter, this "
+                        "is unnecessary to use SPM12."
+                    )
                     config.set_use_matlab(True)
                     config.set_use_matlab_standalone(False)
                     config.set_matlab_standalone_path(matlab_input)
@@ -3410,11 +3583,13 @@ class PopUpPreferences(QDialog):
             text_color = self.text_color_combo.currentText()
             config.setBackgroundColor(background_color)
             config.setTextColor(text_color)
-            main_window.setStyleSheet("background-color:" +
-                                      background_color +
-                                      ";color:" +
-                                      text_color +
-                                      ";")
+            main_window.setStyleSheet(
+                "background-color:"
+                + background_color
+                + ";color:"
+                + text_color
+                + ";"
+            )
 
             # main window setup
             fullscreen = self.fullscreen_cbox.isChecked()
@@ -3439,9 +3614,11 @@ class PopUpPreferences(QDialog):
                 self.msg = QMessageBox()
                 self.msg.setIcon(QMessageBox.Critical)
                 self.msg.setText("Invalid projects folder path")
-                self.msg.setInformativeText("The projects folder path entered "
-                                            "{0} is "
-                                            "invalid.".format(projects_folder))
+                self.msg.setInformativeText(
+                    "The projects folder path entered "
+                    "{0} is "
+                    "invalid.".format(projects_folder)
+                )
                 self.msg.setWindowTitle("Error")
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.buttonClicked.connect(self.msg.close)
@@ -3456,9 +3633,10 @@ class PopUpPreferences(QDialog):
                 self.msg = QMessageBox()
                 self.msg.setIcon(QMessageBox.Warning)
                 self.msg.setText("Empty MRIFileManager.jar path")
-                self.msg.setInformativeText("No path has been entered for "
-                                            "MRIFileManager.jar.".format(
-                                                                mri_conv_path))
+                self.msg.setInformativeText(
+                    "No path has been entered for "
+                    "MRIFileManager.jar.".format(mri_conv_path)
+                )
                 self.msg.setWindowTitle("Warning")
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.buttonClicked.connect(self.msg.close)
@@ -3472,9 +3650,11 @@ class PopUpPreferences(QDialog):
                 self.msg = QMessageBox()
                 self.msg.setIcon(QMessageBox.Critical)
                 self.msg.setText("Invalid MRIFileManager.jar path")
-                self.msg.setInformativeText("The MRIFileManager.jar path "
-                                            "entered {0} "
-                                            "is invalid.".format(mri_conv_path))
+                self.msg.setInformativeText(
+                    "The MRIFileManager.jar path "
+                    "entered {0} "
+                    "is invalid.".format(mri_conv_path)
+                )
                 self.msg.setWindowTitle("Error")
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.buttonClicked.connect(self.msg.close)
@@ -3485,7 +3665,7 @@ class PopUpPreferences(QDialog):
             self.signal_preferences_change.emit()
             QApplication.restoreOverrideCursor()
 
-        c_c = config.config.setdefault('capsul_config', {})
+        c_c = config.config.setdefault("capsul_config", {})
         c_e = config.get_capsul_engine()
 
         if c_c and c_e:
@@ -3499,16 +3679,18 @@ class PopUpPreferences(QDialog):
                 cif = c_e.settings.config_id_field
 
                 with c_e.settings as settings:
-                    configafni = settings.config('afni', 'global')
+                    configafni = settings.config("afni", "global")
 
                     if configafni:
-                        settings.remove_config('afni', 'global',
-                                               getattr(configafni, cif))
+                        settings.remove_config(
+                            "afni", "global", getattr(configafni, cif)
+                        )
 
                 # TODO: We could use a generic method to deal with c_c?
                 try:
-                    del c_c['engine']['global']['capsul.engine.module.afni'][
-                                                'afni']['directory']
+                    del c_c["engine"]["global"]["capsul.engine.module.afni"][
+                        "afni"
+                    ]["directory"]
 
                 except KeyError:
                     pass
@@ -3520,16 +3702,18 @@ class PopUpPreferences(QDialog):
                 cif = c_e.settings.config_id_field
 
                 with c_e.settings as settings:
-                    configants = settings.config('ants', 'global')
+                    configants = settings.config("ants", "global")
 
                     if configants:
-                        settings.remove_config('ants', 'global',
-                                               getattr(configants, cif))
+                        settings.remove_config(
+                            "ants", "global", getattr(configants, cif)
+                        )
 
                 # TODO: We could use a generic method to deal with c_c?
                 try:
-                    del c_c['engine']['global']['capsul.engine.module.ants'][
-                                                'ants']['directory']
+                    del c_c["engine"]["global"]["capsul.engine.module.ants"][
+                        "ants"
+                    ]["directory"]
 
                 except KeyError:
                     pass
@@ -3540,23 +3724,26 @@ class PopUpPreferences(QDialog):
                 cif = c_e.settings.config_id_field
 
                 with c_e.settings as settings:
-                    configfsl = settings.config('fsl', 'global')
+                    configfsl = settings.config("fsl", "global")
 
                     if configfsl:
-                        settings.remove_config('fsl', 'global',
-                                               getattr(configfsl, cif))
+                        settings.remove_config(
+                            "fsl", "global", getattr(configfsl, cif)
+                        )
 
                 # TODO: We could use a generic method to deal with c_c?
                 try:
-                    del c_c['engine']['global']['capsul.engine.module.fsl'][
-                                                'fsl']['directory']
+                    del c_c["engine"]["global"]["capsul.engine.module.fsl"][
+                        "fsl"
+                    ]["directory"]
 
                 except KeyError:
                     pass
 
                 try:
-                    del c_c['engine']['global']['capsul.engine.module.fsl'][
-                                                'fsl']['config']
+                    del c_c["engine"]["global"]["capsul.engine.module.fsl"][
+                        "fsl"
+                    ]["config"]
 
                 except KeyError:
                     pass
@@ -3565,8 +3752,9 @@ class PopUpPreferences(QDialog):
             if not config.get_use_spm_standalone():
 
                 try:
-                    keys = c_c['engine']['global'][
-                               'capsul.engine.module.spm'].keys()
+                    keys = c_c["engine"]["global"][
+                        "capsul.engine.module.spm"
+                    ].keys()
 
                 except KeyError:
                     pass
@@ -3576,30 +3764,38 @@ class PopUpPreferences(QDialog):
 
                     for i in keys:
 
-                        if ('standalone' in
-                                c_c['engine']['global'][
-                                    'capsul.engine.module.spm'][i]):
+                        if (
+                            "standalone"
+                            in c_c["engine"]["global"][
+                                "capsul.engine.module.spm"
+                            ][i]
+                        ):
 
-                            if c_c['engine']['global'][
-                                   'capsul.engine.module.spm'][i][
-                                   'standalone'] is True:
+                            if (
+                                c_c["engine"]["global"][
+                                    "capsul.engine.module.spm"
+                                ][i]["standalone"]
+                                is True
+                            ):
                                 dict4clean[i] = True
 
                         else:
-                            #TODO: What we do if standalone is not a key ?
+                            # TODO: What we do if standalone is not a key ?
                             pass
 
                     for i in dict4clean:
 
                         if dict4clean[i]:
-                            del c_c['engine']['global'][
-                                    'capsul.engine.module.spm'][i]
+                            del c_c["engine"]["global"][
+                                "capsul.engine.module.spm"
+                            ][i]
 
             if not config.get_use_spm():
 
                 try:
-                    keys = c_c['engine']['global'][
-                               'capsul.engine.module.spm'].keys()
+                    keys = c_c["engine"]["global"][
+                        "capsul.engine.module.spm"
+                    ].keys()
 
                 except KeyError:
                     pass
@@ -3609,24 +3805,31 @@ class PopUpPreferences(QDialog):
 
                     for i in keys:
 
-                        if ('standalone' in
-                                c_c['engine']['global'][
-                                    'capsul.engine.module.spm'][i]):
+                        if (
+                            "standalone"
+                            in c_c["engine"]["global"][
+                                "capsul.engine.module.spm"
+                            ][i]
+                        ):
 
-                            if c_c['engine']['global'][
-                                   'capsul.engine.module.spm'][i][
-                                   'standalone'] is False:
+                            if (
+                                c_c["engine"]["global"][
+                                    "capsul.engine.module.spm"
+                                ][i]["standalone"]
+                                is False
+                            ):
                                 dict4clean[i] = True
 
                     for i in dict4clean:
 
                         if dict4clean[i]:
-                            del c_c['engine']['global'][
-                                    'capsul.engine.module.spm'][i]
+                            del c_c["engine"]["global"][
+                                "capsul.engine.module.spm"
+                            ][i]
 
             try:
-                if not c_c['engine']['global']['capsul.engine.module.spm']:
-                    del c_c['engine']['global']['capsul.engine.module.spm']
+                if not c_c["engine"]["global"]["capsul.engine.module.spm"]:
+                    del c_c["engine"]["global"]["capsul.engine.module.spm"]
 
             except KeyError:
                 pass
@@ -3634,8 +3837,9 @@ class PopUpPreferences(QDialog):
             if not config.get_use_matlab():
 
                 try:
-                    keys = c_c['engine']['global'][
-                               'capsul.engine.module.matlab'].keys()
+                    keys = c_c["engine"]["global"][
+                        "capsul.engine.module.matlab"
+                    ].keys()
 
                 except KeyError:
                     pass
@@ -3645,23 +3849,27 @@ class PopUpPreferences(QDialog):
 
                     for i in keys:
 
-                        if ('executable' in
-                                c_c['engine']['global'][
-                                    'capsul.engine.module.matlab'][i]):
-                                dict4clean[i] = True
+                        if (
+                            "executable"
+                            in c_c["engine"]["global"][
+                                "capsul.engine.module.matlab"
+                            ][i]
+                        ):
+                            dict4clean[i] = True
 
                     for i in dict4clean:
 
                         if dict4clean[i]:
-                            del c_c['engine']['global'][
-                                    'capsul.engine.module.matlab'][i][
-                                    'executable']
+                            del c_c["engine"]["global"][
+                                "capsul.engine.module.matlab"
+                            ][i]["executable"]
 
             if not config.get_use_matlab_standalone():
 
                 try:
-                    keys = c_c['engine']['global'][
-                               'capsul.engine.module.matlab'].keys()
+                    keys = c_c["engine"]["global"][
+                        "capsul.engine.module.matlab"
+                    ].keys()
 
                 except KeyError:
                     pass
@@ -3671,21 +3879,24 @@ class PopUpPreferences(QDialog):
 
                     for i in keys:
 
-                        if ('mcr_directory' in
-                                c_c['engine']['global'][
-                                    'capsul.engine.module.matlab'][i]):
-                                dict4clean[i] = True
+                        if (
+                            "mcr_directory"
+                            in c_c["engine"]["global"][
+                                "capsul.engine.module.matlab"
+                            ][i]
+                        ):
+                            dict4clean[i] = True
 
                     for i in dict4clean:
 
                         if dict4clean[i]:
-                            del c_c['engine']['global'][
-                                    'capsul.engine.module.matlab'][i][
-                                    'mcr_directory']
+                            del c_c["engine"]["global"][
+                                "capsul.engine.module.matlab"
+                            ][i]["mcr_directory"]
 
             try:
-                if not c_c['engine']['global']['capsul.engine.module.matlab']:
-                    del c_c['engine']['global']['capsul.engine.module.matlab']
+                if not c_c["engine"]["global"]["capsul.engine.module.matlab"]:
+                    del c_c["engine"]["global"]["capsul.engine.module.matlab"]
 
             except KeyError:
                 pass
@@ -3900,7 +4111,7 @@ class PopUpPreferences(QDialog):
 
         if not self.use_matlab_standalone_checkbox.isChecked():
             archi = platform.architecture()
-            if not 'Windows' in archi[1]:
+            if not "Windows" in archi[1]:
                 self.spm_standalone_choice.setDisabled(True)
                 self.use_spm_standalone_checkbox.setChecked(False)
                 self.spm_standalone_label.setDisabled(True)
@@ -3942,7 +4153,7 @@ class PopUpPreferences(QDialog):
             self.spm_standalone_browse.setDisabled(True)
         else:
             archi = platform.architecture()
-            if not 'Windows' in archi[1]:
+            if not "Windows" in archi[1]:
                 self.use_matlab_standalone_checkbox.setChecked(True)
             self.spm_standalone_choice.setDisabled(False)
             self.spm_standalone_label.setDisabled(False)
@@ -3958,9 +4169,12 @@ class PopUpPreferences(QDialog):
         config = Config()
 
         if self.admin_mode_checkbox.isChecked():
-            psswd, ok = QInputDialog.getText(self, 'Password Input Dialog',
-                                             'Enter the admin password:',
-                                             QLineEdit.Password)
+            psswd, ok = QInputDialog.getText(
+                self,
+                "Password Input Dialog",
+                "Enter the admin password:",
+                QLineEdit.Password,
+            )
 
             if ok:
                 salt_psswd = self.salt + psswd
@@ -3968,8 +4182,9 @@ class PopUpPreferences(QDialog):
 
                 if hash_psswd != config.get_admin_hash():
                     self.admin_mode_checkbox.setChecked(False)
-                    self.status_label.setText("<i style='color:red'>Wrong "
-                                              "password.</i>")
+                    self.status_label.setText(
+                        "<i style='color:red'>Wrong " "password.</i>"
+                    )
 
                 else:
                     self.change_psswd.setVisible(True)
@@ -3989,11 +4204,13 @@ class PopUpPreferences(QDialog):
         self.msg = QMessageBox()
         self.msg.setIcon(QMessageBox.Critical)
         self.msg.setText("Invalid " + tool + " path")
-        if extra_mess: extra_mess = " " + extra_mess
+        if extra_mess:
+            extra_mess = " " + extra_mess
         self.msg.setInformativeText(
-            "The {0}{1} path entered {2} is invalid.".format(tool,
-                                                             extra_mess,
-                                                             path))
+            "The {0}{1} path entered {2} is invalid.".format(
+                tool, extra_mess, path
+            )
+        )
         self.msg.setWindowTitle("Error")
         self.msg.setStandardButtons(QMessageBox.Ok)
         self.msg.buttonClicked.connect(self.msg.close)
@@ -4033,23 +4250,26 @@ class PopUpProperties(QDialog):
         _translate = QtCore.QCoreApplication.translate
 
         self.setObjectName("Dialog")
-        self.setWindowTitle('project properties')
+        self.setWindowTitle("project properties")
 
         self.tab_widget = QtWidgets.QTabWidget(self)
         self.tab_widget.setEnabled(True)
 
         # The 'Visualized tags" tab
         self.tab_tags = PopUpVisualizedTags(
-            self.project, self.project.session.get_shown_tags())
+            self.project, self.project.session.get_shown_tags()
+        )
         self.tab_tags.setObjectName("tab_tags")
-        self.tab_widget.addTab(self.tab_tags, _translate("Dialog",
-                                                         "Visualized tags"))
+        self.tab_widget.addTab(
+            self.tab_tags, _translate("Dialog", "Visualized tags")
+        )
 
         # The 'Informations" tab
         self.tab_infos = PopUpInformation(self.project)
         self.tab_infos.setObjectName("tab_infos")
-        self.tab_widget.addTab(self.tab_infos, _translate("Dialog",
-                                                          "Informations"))
+        self.tab_widget.addTab(
+            self.tab_infos, _translate("Dialog", "Informations")
+        )
 
         # The 'OK' push button
         self.push_button_ok = QtWidgets.QPushButton("OK")
@@ -4080,7 +4300,8 @@ class PopUpProperties(QDialog):
 
         for x in range(self.tab_tags.list_widget_selected_tags.count()):
             visible_tag = self.tab_tags.list_widget_selected_tags.item(
-                x).text()
+                x
+            ).text()
             new_visibilities.append(visible_tag)
 
         new_visibilities.append(TAG_FILENAME)
@@ -4093,7 +4314,8 @@ class PopUpProperties(QDialog):
 
         # Columns updated
         self.databrowser.table_data.update_visualized_columns(
-            self.old_tags, self.project.session.get_shown_tags())
+            self.old_tags, self.project.session.get_shown_tags()
+        )
         self.accept()
         self.close()
 
@@ -4130,8 +4352,11 @@ class PopUpQuit(QDialog):
         self.setWindowTitle("Confirm exit")
 
         label = QLabel(self)
-        label.setText('Do you want to exit without saving ' +
-                      self.database.getName() + '?')
+        label.setText(
+            "Do you want to exit without saving "
+            + self.database.getName()
+            + "?"
+        )
 
         push_button_save_as = QPushButton("Save", self)
         push_button_do_not_save = QPushButton("Do not save", self)
@@ -4204,16 +4429,17 @@ class PopUpRemoveScan(QDialog):
         self.stop = False
         self.repeat = False
         label = QLabel(self)
-        label.setText('The document ' + scan + '\nwas previously sent to the '
-                                               'pipeline manager, do you '
-                                               'really want to delete it ?')
+        label.setText(
+            "The document " + scan + "\nwas previously sent to the "
+            "pipeline manager, do you "
+            "really want to delete it ?"
+        )
 
         push_button_yes = QPushButton("Ok", self)
         push_button_cancel = QPushButton("No", self)
         if size > 1:
             push_button_yes_all = QPushButton("Ok to all", self)
             push_button_no_all = QPushButton("No to all", self)
-
 
         hbox = QHBoxLayout()
         hbox.addStretch(1)
@@ -4259,21 +4485,21 @@ class PopUpRemoveScan(QDialog):
 
 class PopUpRemoveTag(QDialog):
     """Is called when the user wants to remove a user tag from
-       populse_mia project.
+      populse_mia project.
 
-     .. Methods:
-         - ok_action: verifies the selected tags and send the information to
-            the data browser
-         - search_str: matches the searched pattern with the tags of the project
+    .. Methods:
+        - ok_action: verifies the selected tags and send the information to
+           the data browser
+        - search_str: matches the searched pattern with the tags of the project
 
-     """
+    """
 
     # Signal that will be emitted at the end to tell that
     # the project has been created
     signal_remove_tag = pyqtSignal()
 
     def __init__(self, databrowser, project):
-        """ Initialization
+        """Initialization
 
         :param databrowser: current project in the software
         :param project: data browser instance of the software
@@ -4300,8 +4526,9 @@ class PopUpRemoveTag(QDialog):
         self.label_tag_list = QtWidgets.QLabel(self)
         self.label_tag_list.setTextFormat(QtCore.Qt.AutoText)
         self.label_tag_list.setObjectName("label_tag_list")
-        self.label_tag_list.setText(_translate("Remove a tag",
-                                               "Available tags:"))
+        self.label_tag_list.setText(
+            _translate("Remove a tag", "Available tags:")
+        )
 
         self.search_bar = QtWidgets.QLineEdit(self)
         self.search_bar.setObjectName("lineEdit_search_bar")
@@ -4317,7 +4544,8 @@ class PopUpRemoveTag(QDialog):
         self.list_widget_tags = QtWidgets.QListWidget(self)
         self.list_widget_tags.setObjectName("listWidget_tags")
         self.list_widget_tags.setSelectionMode(
-            QtWidgets.QAbstractItemView.MultiSelection)
+            QtWidgets.QAbstractItemView.MultiSelection
+        )
 
         vbox = QVBoxLayout()
         vbox.addLayout(hbox_top)
@@ -4339,7 +4567,7 @@ class PopUpRemoveTag(QDialog):
 
     def ok_action(self):
         """Verifies the selected tags and send the information to the data
-           browser.
+        browser.
 
         """
 
@@ -4412,7 +4640,9 @@ class PopUpSaveProjectAs(QDialog):
         for i in range(0, len(project_list)):
             if os.path.isdir(os.path.join(self.project_path, project_list[i])):
                 label = QLabel_clickable(project_list[i])
-                label.clicked.connect(partial(self.fill_input, project_list[i]))
+                label.clicked.connect(
+                    partial(self.fill_input, project_list[i])
+                )
                 self.v_box.addWidget(label)
 
         # The text input
@@ -4470,15 +4700,15 @@ class PopUpSaveProjectAs(QDialog):
             projects_folder = self.project_path
 
             if file_name:
-                entire_path = os.path.abspath(os.path.join(projects_folder,
-                                                           file_name))
+                entire_path = os.path.abspath(
+                    os.path.join(projects_folder, file_name)
+                )
                 self.path, self.name = os.path.split(entire_path)
                 self.total_path = entire_path
                 self.relative_path = os.path.relpath(entire_path)
                 self.relative_subpath = os.path.relpath(self.path)
 
-                if (not os.path.exists(self.relative_path) and
-                                                            self.name != ''):
+                if not os.path.exists(self.relative_path) and self.name != "":
                     self.signal_saved_project.emit()
                     self.validate = True
                     self.close()
@@ -4491,15 +4721,21 @@ class PopUpSaveProjectAs(QDialog):
                         utils.message_already_exists()
                         return
                     else:
-                        msgtext = ("Do you really want to overwrite the "
-                                   + file_name + " project ?\nThis action "
-                                   "delete all contents inside this folder!")
+                        msgtext = (
+                            "Do you really want to overwrite the "
+                            + file_name
+                            + " project ?\nThis action "
+                            "delete all contents inside this folder!"
+                        )
                         msg = QMessageBox()
                         msg.setIcon(QMessageBox.Warning)
                         title = "populse_mia - Warning: Overwriting project"
-                        reply = msg.question(self, title, msgtext,
-                                             QMessageBox.Yes |
-                                             QMessageBox.No)
+                        reply = msg.question(
+                            self,
+                            title,
+                            msgtext,
+                            QMessageBox.Yes | QMessageBox.No,
+                        )
                         if reply == QMessageBox.Yes:
                             self.validate = True
                             self.close()
@@ -4532,17 +4768,17 @@ class PopUpSeeAllProjects(QDialog):
 
         self.mainWindow = main_window
 
-        self.setWindowTitle('See all saved projects')
+        self.setWindowTitle("See all saved projects")
         self.setMinimumWidth(500)
 
         # Tree widget
 
         self.label = QLabel()
-        self.label.setText('List of saved projects')
+        self.label.setText("List of saved projects")
 
         self.treeWidget = QTreeWidget()
         self.treeWidget.setColumnCount(3)
-        self.treeWidget.setHeaderLabels(['Name', 'Path', 'State'])
+        self.treeWidget.setHeaderLabels(["Name", "Path", "State"])
 
         i = -1
         for path in saved_projects.pathsList:
@@ -4595,9 +4831,9 @@ class PopUpSeeAllProjects(QDialog):
 
         sources_images_dir = Config().getSourceImageDir()
         if os.path.exists(os.path.join(path)):
-            icon = QIcon(os.path.join(sources_images_dir, 'green_v.png'))
+            icon = QIcon(os.path.join(sources_images_dir, "green_v.png"))
         else:
-            icon = QIcon(os.path.join(sources_images_dir, 'red_cross.png'))
+            icon = QIcon(os.path.join(sources_images_dir, "red_cross.png"))
         return icon
 
     def item_to_path(self):
@@ -4631,7 +4867,8 @@ class PopUpSeeAllProjects(QDialog):
             self.path, self.name = os.path.split(entire_path)
             self.relative_path = os.path.relpath(file_name)
             project_switched = self.mainWindow.switch_project(
-                                                  self.relative_path, self.name)
+                self.relative_path, self.name
+            )
 
             if project_switched:
                 self.accept()
@@ -4705,8 +4942,9 @@ class PopUpSelectIteration(QDialog):
         self.iterated_tag = iterated_tag
         self.tag_values = tag_values
         self.final_values = []
-        self.setWindowTitle("Iterate pipeline run over tag {0}".format(
-            self.iterated_tag))
+        self.setWindowTitle(
+            "Iterate pipeline run over tag {0}".format(self.iterated_tag)
+        )
 
         self.v_box = QVBoxLayout()
 
@@ -4793,8 +5031,9 @@ class PopUpTagSelection(QDialog):
         self.label_tag_list = QtWidgets.QLabel(self)
         self.label_tag_list.setTextFormat(QtCore.Qt.AutoText)
         self.label_tag_list.setObjectName("label_tag_list")
-        self.label_tag_list.setText(_translate("main_window",
-                                               "Available tags:"))
+        self.label_tag_list.setText(
+            _translate("main_window", "Available tags:")
+        )
 
         # The search bar to search in the list of tags
         self.search_bar = QtWidgets.QLineEdit(self)
@@ -4806,7 +5045,8 @@ class PopUpTagSelection(QDialog):
         self.list_widget_tags = QtWidgets.QListWidget(self)
         self.list_widget_tags.setObjectName("listWidget_tags")
         self.list_widget_tags.setSelectionMode(
-            QtWidgets.QAbstractItemView.SingleSelection)
+            QtWidgets.QAbstractItemView.SingleSelection
+        )
         self.list_widget_tags.itemClicked.connect(self.item_clicked)
 
         self.push_button_ok = QtWidgets.QPushButton(self)
@@ -4873,13 +5113,15 @@ class PopUpTagSelection(QDialog):
         return_list = []
         if str_search != "":
             for tag in self.project.session.get_fields_names(
-                    COLLECTION_CURRENT):
+                COLLECTION_CURRENT
+            ):
                 if tag != TAG_CHECKSUM and tag != TAG_HISTORY:
                     if str_search.upper() in tag.upper():
                         return_list.append(tag)
         else:
             for tag in self.project.session.get_fields_names(
-                    COLLECTION_CURRENT):
+                COLLECTION_CURRENT
+            ):
                 if tag != TAG_CHECKSUM and tag != TAG_HISTORY:
                     return_list.append(tag)
 
@@ -5007,8 +5249,9 @@ class PopUpShowHistory(QDialog):
         super().__init__()
 
         self.setModal(False)
-        self.setWindowFlags(self.windowFlags()
-                            & QtCore.Qt.WindowStaysOnBottomHint)
+        self.setWindowFlags(
+            self.windowFlags() & QtCore.Qt.WindowStaysOnBottomHint
+        )
 
         self.databrowser = databrowser
         self.main_window = main_window
@@ -5016,9 +5259,9 @@ class PopUpShowHistory(QDialog):
         self.setWindowTitle("History of " + scan)
 
         brick_row = project.session.get_document(COLLECTION_BRICK, brick_uuid)
-        full_brick_name = project.session.get_value(COLLECTION_BRICK,
-                                               brick_uuid,
-                                               BRICK_NAME).split('.')
+        full_brick_name = project.session.get_value(
+            COLLECTION_BRICK, brick_uuid, BRICK_NAME
+        ).split(".")
 
         layout = QVBoxLayout()
         self.splitter = QSplitter(Qt.Qt.Vertical)
@@ -5027,16 +5270,19 @@ class PopUpShowHistory(QDialog):
         self.table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
 
         history_uuid = self.project.session.get_value(
-            COLLECTION_CURRENT, scan, TAG_HISTORY)
+            COLLECTION_CURRENT, scan, TAG_HISTORY
+        )
 
         self.unitary_pipeline = False
         self.uuid_idx = 0
         if history_uuid is not None:
             self.pipeline_xml = self.project.session.get_value(
-                COLLECTION_HISTORY, history_uuid, HISTORY_PIPELINE)
+                COLLECTION_HISTORY, history_uuid, HISTORY_PIPELINE
+            )
             if self.pipeline_xml is not None:
                 self.brick_list = self.project.session.get_value(
-                    COLLECTION_HISTORY, history_uuid, HISTORY_BRICKS)
+                    COLLECTION_HISTORY, history_uuid, HISTORY_BRICKS
+                )
 
                 engine = Config.get_capsul_engine()
                 try:
@@ -5049,26 +5295,34 @@ class PopUpShowHistory(QDialog):
                     # (e.g. a pipeline alone and plug exported)
                     if len(pipeline.nodes) == 2:
                         for key in pipeline.nodes.keys():
-                            if key != '':
-                                if isinstance(pipeline.nodes[key], PipelineNode):
+                            if key != "":
+                                if isinstance(
+                                    pipeline.nodes[key], PipelineNode
+                                ):
                                     pipeline = pipeline.nodes[key].process
                                     full_brick_name.pop(0)
                                     self.unitary_pipeline = True
                     # handle cases of named pipeline/brick without being a single Pipeline node
                     # (e.g. a pipeline alone without exporting plugs)
-                    if (not self.unitary_pipeline and pipeline.name != 'CustomPipeline') or \
-                        (len(full_brick_name) == 2 and full_brick_name[1] == 'main'):
+                    if (
+                        not self.unitary_pipeline
+                        and pipeline.name != "CustomPipeline"
+                    ) or (
+                        len(full_brick_name) == 2
+                        and full_brick_name[1] == "main"
+                    ):
                         full_brick_name.pop(0)
                         self.unitary_pipeline = True
 
                     self.pipeline_view = PipelineDeveloperView(
-                                                     pipeline,
-                                                     allow_open_controller=False)
+                        pipeline, allow_open_controller=False
+                    )
                     self.pipeline_view.auto_dot_node_positions()
                     self.splitter.addWidget(self.pipeline_view)
                     self.pipeline_view.node_clicked.connect(self.node_selected)
-                    (self.pipeline_view.process_clicked.
-                                                    connect)(self.node_selected)
+                    (self.pipeline_view.process_clicked.connect)(
+                        self.node_selected
+                    )
 
                     bricks = self.find_associated_bricks(full_brick_name[0])
                     for bricks_uuids in bricks.values():
@@ -5082,9 +5336,13 @@ class PopUpShowHistory(QDialog):
 
                     selected_name = full_brick_name[0]
                     try:
-                        self.node_selected(selected_name, pipeline.nodes[selected_name])
+                        self.node_selected(
+                            selected_name, pipeline.nodes[selected_name]
+                        )
                     except:
-                        print('\nerror in naming association brick\\pipeline, cannot select node')
+                        print(
+                            "\nerror in naming association brick\\pipeline, cannot select node"
+                        )
                         pass
 
         inputs = getattr(brick_row, BRICK_INPUTS)
@@ -5094,7 +5352,9 @@ class PopUpShowHistory(QDialog):
         init_time = getattr(brick_row, BRICK_INIT_TIME)
         exec = getattr(brick_row, BRICK_INIT)
         exec_time = getattr(brick_row, BRICK_INIT_TIME)
-        self.update_table(inputs, outputs, brick_name, init, init_time, exec, exec_time)
+        self.update_table(
+            inputs, outputs, brick_name, init, init_time, exec, exec_time
+        )
 
         self.splitter.addWidget(self.table)
 
@@ -5116,8 +5376,9 @@ class PopUpShowHistory(QDialog):
 
         value_scan = None
 
-        for scan in (self.project.session.
-                     get_documents_names(COLLECTION_CURRENT)):
+        for scan in self.project.session.get_documents_names(
+            COLLECTION_CURRENT
+        ):
 
             if scan in str(value):
                 value_scan = scan
@@ -5139,10 +5400,9 @@ class PopUpShowHistory(QDialog):
         bricks = {}
         for uuid in self.brick_list:
             full_brick_name = self.project.session.get_value(
-                COLLECTION_BRICK,
-                uuid,
-                BRICK_NAME)
-            list_full_brick_name = full_brick_name.split('.')
+                COLLECTION_BRICK, uuid, BRICK_NAME
+            )
+            list_full_brick_name = full_brick_name.split(".")
 
             if self.unitary_pipeline:
                 list_full_brick_name.pop(0)
@@ -5155,29 +5415,33 @@ class PopUpShowHistory(QDialog):
         return bricks
 
     def find_process_from_plug(self, plug):
-        process_name = ''
-        plug_name = ''
+        process_name = ""
+        plug_name = ""
         if plug.output:
             link_done = False
             for link in plug.links_from:
                 if not link_done:
                     link_done = True
-                    process_name += '.' + link[2].name
+                    process_name += "." + link[2].name
                     plug_name = link[1]
                     if isinstance(link[2], PipelineNode):
-                        sub_process_name, plug_name = \
-                            self.find_process_from_plug(link[2].plugs[link[1]])
+                        (
+                            sub_process_name,
+                            plug_name,
+                        ) = self.find_process_from_plug(link[2].plugs[link[1]])
                         process_name += sub_process_name
         else:
             link_done = False
             for link in plug.links_to:
                 if not link_done:
                     link_done = True
-                    process_name += '.' + link[2].name
+                    process_name += "." + link[2].name
                     plug_name = link[1]
                     if isinstance(link[2], PipelineNode):
-                        sub_process_name, plug_name = \
-                            self.find_process_from_plug(link[2].plugs[link[1]])
+                        (
+                            sub_process_name,
+                            plug_name,
+                        ) = self.find_process_from_plug(link[2].plugs[link[1]])
                         process_name += sub_process_name
         return process_name, plug_name
 
@@ -5188,15 +5452,17 @@ class PopUpShowHistory(QDialog):
         :param process: process of the corresponding node
         """
 
-        if hasattr(process, 'pipeline_node'):
+        if hasattr(process, "pipeline_node"):
             process = process.pipeline_node
 
         bricks = self.find_associated_bricks(node_name)
 
         if bricks:
             if len(bricks) == 1:
-                brick_row = self.project.session.get_document(COLLECTION_BRICK,
-                                                              next(iter(bricks.values()))[self.uuid_idx])
+                brick_row = self.project.session.get_document(
+                    COLLECTION_BRICK,
+                    next(iter(bricks.values()))[self.uuid_idx],
+                )
                 inputs = getattr(brick_row, BRICK_INPUTS)
                 outputs = getattr(brick_row, BRICK_OUTPUTS)
                 brick_name = getattr(brick_row, BRICK_NAME)
@@ -5204,7 +5470,15 @@ class PopUpShowHistory(QDialog):
                 init_time = getattr(brick_row, BRICK_INIT_TIME)
                 exec = getattr(brick_row, BRICK_INIT)
                 exec_time = getattr(brick_row, BRICK_INIT_TIME)
-                self.update_table(inputs, outputs, brick_name, init, init_time, exec, exec_time)
+                self.update_table(
+                    inputs,
+                    outputs,
+                    brick_name,
+                    init,
+                    init_time,
+                    exec,
+                    exec_time,
+                )
             else:
                 # subpipeline case
                 inputs_dict = {}
@@ -5212,25 +5486,35 @@ class PopUpShowHistory(QDialog):
                 if isinstance(process, PipelineNode):
                     for plug_name, plug in process.plugs.items():
                         if plug.activated:
-                            process_name, inner_plug_name = self.find_process_from_plug(plug)
+                            (
+                                process_name,
+                                inner_plug_name,
+                            ) = self.find_process_from_plug(plug)
                             for uuid in bricks.values():
-                                full_brick_name = self.project.session.get_value(
-                                    COLLECTION_BRICK,
-                                    uuid[0],
-                                    BRICK_NAME)
+                                full_brick_name = (
+                                    self.project.session.get_value(
+                                        COLLECTION_BRICK, uuid[0], BRICK_NAME
+                                    )
+                                )
                                 if full_brick_name == node_name + process_name:
                                     if plug.output:
                                         plugs = self.project.session.get_value(
                                             COLLECTION_BRICK,
                                             uuid[self.uuid_idx],
-                                            BRICK_OUTPUTS)
-                                        outputs_dict[plug_name] = plugs[inner_plug_name]
+                                            BRICK_OUTPUTS,
+                                        )
+                                        outputs_dict[plug_name] = plugs[
+                                            inner_plug_name
+                                        ]
                                     else:
                                         plugs = self.project.session.get_value(
                                             COLLECTION_BRICK,
                                             uuid[self.uuid_idx],
-                                            BRICK_INPUTS)
-                                        inputs_dict[plug_name] = plugs[inner_plug_name]
+                                            BRICK_INPUTS,
+                                        )
+                                        inputs_dict[plug_name] = plugs[
+                                            inner_plug_name
+                                        ]
 
                 self.update_table(inputs_dict, outputs_dict, node_name)
 
@@ -5240,14 +5524,23 @@ class PopUpShowHistory(QDialog):
                 else:
                     gnode.fonced_viewer(True)
 
-    def update_table(self, inputs, outputs, brick_name, init='', init_time=None, exec='', exec_time=None):
+    def update_table(
+        self,
+        inputs,
+        outputs,
+        brick_name,
+        init="",
+        init_time=None,
+        exec="",
+        exec_time=None,
+    ):
         # Filling the table
         self.table.removeRow(0)
         self.table.setRowCount(1)
         nbColumn = 1
-        if init != '':
+        if init != "":
             nbColumn += 2
-        if exec != '':
+        if exec != "":
             nbColumn += 2
 
         self.table.setColumnCount(nbColumn + len(inputs) + len(outputs))
@@ -5264,7 +5557,7 @@ class PopUpShowHistory(QDialog):
         item_idx += 1
 
         # Brick init
-        if init != '':
+        if init != "":
             item = QTableWidgetItem()
             item.setText(BRICK_INIT)
             self.table.setHorizontalHeaderItem(item_idx, item)
@@ -5286,7 +5579,7 @@ class PopUpShowHistory(QDialog):
             item_idx += 1
 
         # Brick execution
-        if init != '':
+        if init != "":
             item = QTableWidgetItem()
             item.setText(BRICK_EXEC)
             self.table.setHorizontalHeaderItem(item_idx, item)
@@ -5313,7 +5606,7 @@ class PopUpShowHistory(QDialog):
             item.setText(key)
             self.table.setHorizontalHeaderItem(item_idx, item)
             if isinstance(value, list):
-                #value = str(value).strip('[]')
+                # value = str(value).strip('[]')
                 value = str(value)
 
             value_scan = self.io_value_is_scan(value)
@@ -5427,8 +5720,9 @@ class PopUpVisualizedTags(QWidget):
         self.label_tag_list = QtWidgets.QLabel(self)
         self.label_tag_list.setTextFormat(QtCore.Qt.AutoText)
         self.label_tag_list.setObjectName("label_tag_list")
-        self.label_tag_list.setText(_translate("main_window",
-                                               "Available tags:"))
+        self.label_tag_list.setText(
+            _translate("main_window", "Available tags:")
+        )
 
         # The search bar to search in the list of tags
         self.search_bar = QtWidgets.QLineEdit(self)
@@ -5439,8 +5733,11 @@ class PopUpVisualizedTags(QWidget):
         # The list of tags
         self.list_widget_tags = QtWidgets.QListWidget(self)
         self.list_widget_tags.setObjectName("listWidget_tags")
-        (self.list_widget_tags.
-                   setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection))
+        (
+            self.list_widget_tags.setSelectionMode(
+                QtWidgets.QAbstractItemView.MultiSelection
+            )
+        )
 
         hbox_top_left = QHBoxLayout()
         hbox_top_left.addWidget(self.label_tag_list)
@@ -5457,10 +5754,16 @@ class PopUpVisualizedTags(QWidget):
         self.label_visualized_tags.setText("Visualized tags:")
 
         self.list_widget_selected_tags = QtWidgets.QListWidget(self)
-        (self.list_widget_selected_tags.
-                                    setObjectName("listWidget_visualized_tags"))
-        (self.list_widget_selected_tags.
-                   setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection))
+        (
+            self.list_widget_selected_tags.setObjectName(
+                "listWidget_visualized_tags"
+            )
+        )
+        (
+            self.list_widget_selected_tags.setSelectionMode(
+                QtWidgets.QAbstractItemView.MultiSelection
+            )
+        )
 
         v_box_top_right = QVBoxLayout()
         v_box_top_right.addWidget(self.label_visualized_tags)
@@ -5474,10 +5777,14 @@ class PopUpVisualizedTags(QWidget):
         self.setLayout(hbox_tags)
 
         self.left_tags = []  # List that will keep track on
-                             # the tags on the left (invisible tags)
+        # the tags on the left (invisible tags)
 
         for tag in project.session.get_fields_names(COLLECTION_CURRENT):
-            if tag != TAG_CHECKSUM and tag != TAG_FILENAME and tag != TAG_HISTORY:
+            if (
+                tag != TAG_CHECKSUM
+                and tag != TAG_FILENAME
+                and tag != TAG_HISTORY
+            ):
                 item = QtWidgets.QListWidgetItem()
                 if tag not in self.visualized_tags:
                     # Tag not visible: left side
@@ -5514,34 +5821,44 @@ class PopUpVisualizedTags(QWidget):
         self.list_widget_tags.sortItems()
 
     def click_select_tag(self):
-        """Puts the selected tags in the "selected tag" table.
+        """Puts the selected tags in the "selected tag" table."""
 
-        """
-
-        rows = sorted([index.row() for index in
-                       self.list_widget_tags.selectedIndexes()],
-                      reverse=True)
+        rows = sorted(
+            [index.row() for index in self.list_widget_tags.selectedIndexes()],
+            reverse=True,
+        )
 
         for row in rows:
             # assuming the other listWidget is called listWidget_2
             self.left_tags.remove(self.list_widget_tags.item(row).text())
-            (self.list_widget_selected_tags.
-                                   addItem(self.list_widget_tags.takeItem(row)))
+            (
+                self.list_widget_selected_tags.addItem(
+                    self.list_widget_tags.takeItem(row)
+                )
+            )
 
     def click_unselect_tag(self):
-        """Removes the unselected tags from populse_mia.e "selected tag" table.
+        """Removes the unselected tags from populse_mia.e "selected tag" table."""
 
-        """
-
-        rows = sorted([index.row() for index in
-                       self.list_widget_selected_tags.selectedIndexes()],
-                      reverse=True)
+        rows = sorted(
+            [
+                index.row()
+                for index in self.list_widget_selected_tags.selectedIndexes()
+            ],
+            reverse=True,
+        )
 
         for row in rows:
-            (self.left_tags.
-                        append(self.list_widget_selected_tags.item(row).text()))
-            (self.list_widget_tags.
-                          addItem(self.list_widget_selected_tags.takeItem(row)))
+            (
+                self.left_tags.append(
+                    self.list_widget_selected_tags.item(row).text()
+                )
+            )
+            (
+                self.list_widget_tags.addItem(
+                    self.list_widget_selected_tags.takeItem(row)
+                )
+            )
 
         self.list_widget_tags.sortItems()
 
@@ -5549,7 +5866,7 @@ class PopUpVisualizedTags(QWidget):
 class QLabel_clickable(QLabel):
     """Custom class to click on a QLabel"""
 
-    clicked=pyqtSignal()
+    clicked = pyqtSignal()
 
     def __init__(self, parent=None):
         QLabel.__init__(self, parent)

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- #
+# -*- coding: utf-8 -*-
 """
 Module to define the advanced search.
 
@@ -18,21 +18,19 @@ Contains:
 
 import os
 
+# Populse_db imports
+from populse_db.database import (ALL_TYPES, FIELD_TYPE_BOOLEAN,
+                                 FIELD_TYPE_STRING)
 # PyQt5 imports
 from PyQt5.QtCore import QObjectCleanupHandler
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import (
-    QWidget, QGridLayout, QComboBox, QLineEdit, QPushButton, QHBoxLayout,
-    QVBoxLayout, QMessageBox)
+from PyQt5.QtWidgets import (QComboBox, QGridLayout, QHBoxLayout, QLineEdit,
+                             QMessageBox, QPushButton, QVBoxLayout, QWidget)
 
 # Populse_MIA imports
-from populse_mia.data_manager.project import TAG_FILENAME, COLLECTION_CURRENT
+from populse_mia.data_manager.project import COLLECTION_CURRENT, TAG_FILENAME
 from populse_mia.software_properties import Config
 from populse_mia.user_interface.pop_ups import ClickableLabel
-
-# Populse_db imports
-from populse_db.database import (
-    ALL_TYPES, FIELD_TYPE_STRING, FIELD_TYPE_BOOLEAN)
 
 
 class AdvancedSearch(QWidget):
@@ -70,8 +68,14 @@ class AdvancedSearch(QWidget):
 
     """
 
-    def __init__(self, project, data_browser, scans_list=None,
-                 tags_list=None, from_pipeline=False):
+    def __init__(
+        self,
+        project,
+        data_browser,
+        scans_list=None,
+        tags_list=None,
+        from_pipeline=False,
+    ):
         """Initialization of the AdvancedSearch class
 
         :param project: current project in the software
@@ -106,13 +110,13 @@ class AdvancedSearch(QWidget):
 
         # NOT choice
         not_choice = QComboBox()
-        not_choice.setObjectName('not')
+        not_choice.setObjectName("not")
         not_choice.addItem("")
         not_choice.addItem("NOT")
 
         # Field choice
         field_choice = QComboBox()
-        field_choice.setObjectName('field')
+        field_choice.setObjectName("field")
         if len(self.tags_list) > 0:
             for tag in self.tags_list:
                 field_choice.addItem(tag)
@@ -124,11 +128,11 @@ class AdvancedSearch(QWidget):
 
         # Value choice
         condition_value = QLineEdit()
-        condition_value.setObjectName('value')
+        condition_value.setObjectName("value")
 
         # Condition choice
         condition_choice = QComboBox()
-        condition_choice.setObjectName('condition')
+        condition_choice.setObjectName("condition")
         condition_choice.addItem("==")
         condition_choice.addItem("!=")
         condition_choice.addItem(">=")
@@ -144,17 +148,20 @@ class AdvancedSearch(QWidget):
 
         # Signal to update the placeholder text of the value
         condition_choice.currentTextChanged.connect(
-            lambda: self.displayValueRules(condition_choice, condition_value))
+            lambda: self.displayValueRules(condition_choice, condition_value)
+        )
 
         # Signal to update the list of conditions, depending on the tag type
         field_choice.currentTextChanged.connect(
-            lambda: self.displayConditionRules(field_choice, condition_choice))
+            lambda: self.displayConditionRules(field_choice, condition_choice)
+        )
 
         # Minus to remove the row
         sources_images_dir = Config().getSourceImageDir()
         remove_row_label = ClickableLabel()
-        remove_row_picture = QPixmap(os.path.relpath(
-            os.path.join(sources_images_dir, "red_minus.png")))
+        remove_row_picture = QPixmap(
+            os.path.relpath(os.path.join(sources_images_dir, "red_minus.png"))
+        )
         remove_row_picture = remove_row_picture.scaledToHeight(30)
         remove_row_label.setPixmap(remove_row_picture)
 
@@ -212,13 +219,16 @@ class AdvancedSearch(QWidget):
             try:
 
                 filter_query = self.prepare_filters(
-                    links, fields, conditions, values, nots, self.scans_list)
+                    links, fields, conditions, values, nots, self.scans_list
+                )
                 result = self.project.session.filter_documents(
-                    COLLECTION_CURRENT, filter_query)
+                    COLLECTION_CURRENT, filter_query
+                )
 
                 # data_browser updated with the new selection
-                result_names = [getattr(
-                    document, TAG_FILENAME) for document in result]
+                result_names = [
+                    getattr(document, TAG_FILENAME) for document in result
+                ]
 
             except Exception as e:
                 print(e)
@@ -227,11 +237,11 @@ class AdvancedSearch(QWidget):
                 # and visualization of all scans in the data_browser
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Warning)
-                msg.setText(
-                    "Error in the search")
+                msg.setText("Error in the search")
                 msg.setInformativeText(
                     "The search has encountered a problem, you can correct it "
-                    "and launch it again.")
+                    "and launch it again."
+                )
                 msg.setWindowTitle("Warning")
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.buttonClicked.connect(msg.close)
@@ -245,12 +255,15 @@ class AdvancedSearch(QWidget):
         else:
             # data_browser updated with every scan
             if self.scans_list:
-                self.dataBrowser.table_data.scans_to_visualize = \
+                self.dataBrowser.table_data.scans_to_visualize = (
                     self.scans_list
+                )
             else:
-                self.dataBrowser.table_data.scans_to_visualize = \
+                self.dataBrowser.table_data.scans_to_visualize = (
                     self.project.session.get_documents_names(
-                        COLLECTION_CURRENT)
+                        COLLECTION_CURRENT
+                    )
+                )
 
         self.dataBrowser.table_data.update_visualized_rows(old_rows)
 
@@ -281,13 +294,14 @@ class AdvancedSearch(QWidget):
 
         tag_name = field.currentText()
         tag_row = self.project.session.get_field(COLLECTION_CURRENT, tag_name)
-        no_operators_tags = [i for i in ALL_TYPES if i.startswith('list_')]
+        no_operators_tags = [i for i in ALL_TYPES if i.startswith("list_")]
         no_operators_tags.append(FIELD_TYPE_STRING)
         no_operators_tags.append(FIELD_TYPE_BOOLEAN)
         no_operators_tags.append(None)
 
-        if (tag_row is not None and tag_row.field_type in no_operators_tags) or \
-                tag_name == "All visualized tags":
+        if (
+            tag_row is not None and tag_row.field_type in no_operators_tags
+        ) or tag_name == "All visualized tags":
             condition.removeItem(condition.findText("<"))
             condition.removeItem(condition.findText(">"))
             condition.removeItem(condition.findText("<="))
@@ -300,9 +314,9 @@ class AdvancedSearch(QWidget):
                 if not is_op_existing:
                     condition.addItem(operator)
 
-        if tag_row is not None and tag_row.field_type.startswith('list_'):
+        if tag_row is not None and tag_row.field_type.startswith("list_"):
             condition.removeItem(condition.findText("IN"))
-        elif tag_row is None or not tag_row.field_type.startswith('list_'):
+        elif tag_row is None or not tag_row.field_type.startswith("list_"):
             operators_to_reput = ["IN"]
             for operator in operators_to_reput:
                 is_op_existing = condition.findText(operator) != -1
@@ -322,13 +336,17 @@ class AdvancedSearch(QWidget):
             value.setDisabled(False)
             value.setPlaceholderText(
                 "Please separate the two inclusive borders of the range by a "
-                "semicolon and a space")
+                "semicolon and a space"
+            )
         elif choice.currentText() == "IN":
             value.setDisabled(False)
-            value.setPlaceholderText("Please separate each list item by a "
-                                     "semicolon and a space")
-        elif choice.currentText() == "HAS VALUE" \
-                or choice.currentText() == "HAS NO VALUE":
+            value.setPlaceholderText(
+                "Please separate each list item by a " "semicolon and a space"
+            )
+        elif (
+            choice.currentText() == "HAS VALUE"
+            or choice.currentText() == "HAS NO VALUE"
+        ):
             value.setDisabled(True)
             value.setPlaceholderText("")
             value.setText("")
@@ -355,26 +373,27 @@ class AdvancedSearch(QWidget):
                 if widget is not None:
                     child = widget
                     child_name = child.objectName()
-                    if child_name == 'link':
+                    if child_name == "link":
                         links.append(child.currentText())
-                    elif child_name == 'condition':
+                    elif child_name == "condition":
                         conditions.append(child.currentText())
-                    elif child_name == 'field':
+                    elif child_name == "field":
                         if child.currentText() != "All visualized tags":
                             fields.append([child.currentText()])
                         else:
                             if replace_all_by_fields:
                                 fields.append(
-                                    self.project.session.get_shown_tags())
+                                    self.project.session.get_shown_tags()
+                                )
                             else:
                                 fields.append([child.currentText()])
-                    elif child_name == 'value':
+                    elif child_name == "value":
                         values.append(child.displayText())
-                    elif child_name == 'not':
+                    elif child_name == "not":
                         nots.append(child.currentText())
 
         operators = ["<", ">", "<=", ">=", "BETWEEN"]
-        no_operators_tags = [i for i in ALL_TYPES if i.startswith('list_')]
+        no_operators_tags = [i for i in ALL_TYPES if i.startswith("list_")]
         no_operators_tags.append(FIELD_TYPE_STRING)
         no_operators_tags.append(FIELD_TYPE_BOOLEAN)
 
@@ -385,13 +404,15 @@ class AdvancedSearch(QWidget):
             if conditions[i] == "IN":
                 for tag in fields[i].copy():
                     tag_row = self.project.session.get_field(
-                        COLLECTION_CURRENT, tag)
-                    if tag_row.type.startswith('list_'):
+                        COLLECTION_CURRENT, tag
+                    )
+                    if tag_row.type.startswith("list_"):
                         fields[i].remove(tag)
             elif conditions[i] in operators:
                 for tag in fields[i].copy():
                     tag_row = self.project.session.get_field(
-                        COLLECTION_CURRENT, tag)
+                        COLLECTION_CURRENT, tag
+                    )
                     if tag_row.type in no_operators_tags:
                         fields[i].remove(tag)
 
@@ -408,13 +429,16 @@ class AdvancedSearch(QWidget):
         try:
             # Result gotten
             filter_query = self.prepare_filters(
-                links, fields, conditions, values, nots, self.scans_list)
+                links, fields, conditions, values, nots, self.scans_list
+            )
             result = self.project.session.filter_documents(
-                COLLECTION_CURRENT, filter_query)
+                COLLECTION_CURRENT, filter_query
+            )
 
             # data_browser updated with the new selection
-            result_names = [getattr(
-                document, TAG_FILENAME) for document in result]
+            result_names = [
+                getattr(document, TAG_FILENAME) for document in result
+            ]
 
             if not self.from_pipeline:
                 self.project.currentFilter.nots = nots
@@ -430,11 +454,11 @@ class AdvancedSearch(QWidget):
             # of all scans in the databrowser
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
-            msg.setText(
-                "Error in the search")
+            msg.setText("Error in the search")
             msg.setInformativeText(
                 "The search has encountered a problem, you can correct it "
-                "and launch it again.")
+                "and launch it again."
+            )
             msg.setWindowTitle("Warning")
             msg.setStandardButtons(QMessageBox.Ok)
             msg.buttonClicked.connect(msg.close)
@@ -474,23 +498,45 @@ class AdvancedSearch(QWidget):
             or_to_write = False
             for row_field in row_fields:
                 if row_condition == "IN":
-                    row_field_query = "({" + row_field + "} " + \
-                                      row_condition + " " + \
-                                      str(row_value).replace("'", "\"") + ")"
+                    row_field_query = (
+                        "({"
+                        + row_field
+                        + "} "
+                        + row_condition
+                        + " "
+                        + str(row_value).replace("'", '"')
+                        + ")"
+                    )
                 elif row_condition == "BETWEEN":
-                    row_field_query = "(({" + row_field + "} >= \"" + \
-                                      row_value[0] + "\") AND (" + row_field\
-                                      + " <= \"" + row_value[1] + "\"))"
+                    row_field_query = (
+                        "(({"
+                        + row_field
+                        + '} >= "'
+                        + row_value[0]
+                        + '") AND ('
+                        + row_field
+                        + ' <= "'
+                        + row_value[1]
+                        + '"))'
+                    )
                 elif row_condition == "HAS VALUE":
                     row_field_query = "({" + row_field + "} != null)"
                 elif row_condition == "HAS NO VALUE":
                     row_field_query = "({" + row_field + "} == null)"
                 elif row_condition == "CONTAINS":
-                    row_field_query = "({" + row_field + "} LIKE \"%" + \
-                                      row_value + "%\")"
+                    row_field_query = (
+                        "({" + row_field + '} LIKE "%' + row_value + '%")'
+                    )
                 else:
-                    row_field_query = "({" + row_field + "} " + \
-                                      row_condition + " \"" + row_value + "\")"
+                    row_field_query = (
+                        "({"
+                        + row_field
+                        + "} "
+                        + row_condition
+                        + ' "'
+                        + row_value
+                        + '")'
+                    )
 
                 # Putting OR between conditions if several tags to search in
                 if or_to_write:
@@ -515,8 +561,13 @@ class AdvancedSearch(QWidget):
             final_query += " " + link + " " + row_queries[row + 1]
 
         # Taking into account the list of scans
-        final_query += " AND ({" + TAG_FILENAME + "} IN " + str(
-            scans).replace("'", "\"") + ")"
+        final_query += (
+            " AND ({"
+            + TAG_FILENAME
+            + "} IN "
+            + str(scans).replace("'", '"')
+            + ")"
+        )
 
         final_query = "(" + final_query + ")"
 
@@ -580,7 +631,6 @@ class AdvancedSearch(QWidget):
                     self.rows[index][i] = None
             del self.rows[index]
 
-
         # We refresh the view
         self.refresh_search()
 
@@ -593,10 +643,10 @@ class AdvancedSearch(QWidget):
         # Plus added to the last row
         sources_images_dir = Config().getSourceImageDir()
         add_search_bar_label = ClickableLabel()
-        add_search_bar_label.setObjectName('plus')
+        add_search_bar_label.setObjectName("plus")
         add_search_bar_picture = QPixmap(
-            os.path.relpath(
-                os.path.join(sources_images_dir, "green_plus.png")))
+            os.path.relpath(os.path.join(sources_images_dir, "green_plus.png"))
+        )
         add_search_bar_picture = add_search_bar_picture.scaledToHeight(20)
         add_search_bar_label.setPixmap(add_search_bar_picture)
         add_search_bar_label.clicked.connect(self.add_search_bar)
@@ -606,7 +656,7 @@ class AdvancedSearch(QWidget):
         for i in range(1, len(self.rows)):
             row = self.rows[i]
             link_choice = QComboBox()
-            link_choice.setObjectName('link')
+            link_choice.setObjectName("link")
             link_choice.addItem("AND")
             link_choice.addItem("OR")
             if len(links) >= i:
@@ -645,6 +695,3 @@ class AdvancedSearch(QWidget):
         if len(self.rows) < 1:
             self.rows = []
             self.add_search_bar()
-
-
-

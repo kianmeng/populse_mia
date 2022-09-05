@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- #
+# -*- coding: utf-8 -*-
 """Module that contains class to override the default behaviour of
 populse_db and some of its methods
 
@@ -19,14 +19,16 @@ populse_db and some of its methods
 ##########################################################################
 
 # Populse_db imports
-from populse_db.database import (
-    Database, FIELD_TYPE_STRING,
-    FIELD_TYPE_DATE, FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_FLOAT,
-    FIELD_TYPE_LIST_DATETIME, FIELD_TYPE_LIST_TIME, FIELD_TYPE_LIST_DATE,
-    FIELD_TYPE_LIST_INTEGER, FIELD_TYPE_DATETIME, FIELD_TYPE_INTEGER,
-    FIELD_TYPE_FLOAT, FIELD_TYPE_TIME, FIELD_TYPE_BOOLEAN,
-    FIELD_TYPE_LIST_BOOLEAN, FIELD_TYPE_JSON, FIELD_TYPE_LIST_JSON,
-    DatabaseSession)
+from populse_db.database import (FIELD_TYPE_BOOLEAN, FIELD_TYPE_DATE,
+                                 FIELD_TYPE_DATETIME, FIELD_TYPE_FLOAT,
+                                 FIELD_TYPE_INTEGER, FIELD_TYPE_JSON,
+                                 FIELD_TYPE_LIST_BOOLEAN, FIELD_TYPE_LIST_DATE,
+                                 FIELD_TYPE_LIST_DATETIME,
+                                 FIELD_TYPE_LIST_FLOAT,
+                                 FIELD_TYPE_LIST_INTEGER, FIELD_TYPE_LIST_JSON,
+                                 FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
+                                 FIELD_TYPE_STRING, FIELD_TYPE_TIME, Database,
+                                 DatabaseSession)
 
 TAG_ORIGIN_BUILTIN = "builtin"
 TAG_ORIGIN_USER = "user"
@@ -38,10 +40,15 @@ TAG_UNIT_DEGREE = "degree"
 TAG_UNIT_HZPIXEL = "Hz/pixel"
 TAG_UNIT_MHZ = "MHz"
 
-ALL_UNITS = [TAG_UNIT_MS, TAG_UNIT_MM,
-             TAG_UNIT_DEGREE, TAG_UNIT_HZPIXEL, TAG_UNIT_MHZ]
-    
-FIELD_ATTRIBUTES_COLLECTION = 'mia_field_attributes'
+ALL_UNITS = [
+    TAG_UNIT_MS,
+    TAG_UNIT_MM,
+    TAG_UNIT_DEGREE,
+    TAG_UNIT_HZPIXEL,
+    TAG_UNIT_MHZ,
+]
+
+FIELD_ATTRIBUTES_COLLECTION = "mia_field_attributes"
 
 
 class DatabaseSessionMIA(DatabaseSession):
@@ -55,8 +62,9 @@ class DatabaseSessionMIA(DatabaseSession):
         - set_shown_tags: sets the list of visible tags
     """
 
-    def add_collection(self, name, primary_key, visibility, origin, unit,
-                       default_value):
+    def add_collection(
+        self, name, primary_key, visibility, origin, unit, default_value
+    ):
         """Override the method adding a collection of populse_db.
 
         :param name: New collection name
@@ -69,40 +77,49 @@ class DatabaseSessionMIA(DatabaseSession):
 
         self.add_field_attributes_collection()
         super(DatabaseSessionMIA, self).add_collection(name, primary_key)
-        self.add_document(FIELD_ATTRIBUTES_COLLECTION,
-                          {
-                              'index': '%s|%s' % (name, primary_key),
-                              'field': primary_key,
-                              'visibility': visibility,
-                              'origin': origin,
-                              'unit': unit,
-                              'default_value': default_value,
-                          })
+        self.add_document(
+            FIELD_ATTRIBUTES_COLLECTION,
+            {
+                "index": "%s|%s" % (name, primary_key),
+                "field": primary_key,
+                "visibility": visibility,
+                "origin": origin,
+                "unit": unit,
+                "default_value": default_value,
+            },
+        )
 
     def add_field_attributes_collection(self):
         if not self.engine.has_collection(FIELD_ATTRIBUTES_COLLECTION):
             super(DatabaseSessionMIA, self).add_collection(
-                FIELD_ATTRIBUTES_COLLECTION)
+                FIELD_ATTRIBUTES_COLLECTION
+            )
             super(DatabaseSessionMIA, self).add_field(
-                FIELD_ATTRIBUTES_COLLECTION,
-                'visibility',
-                FIELD_TYPE_BOOLEAN)
+                FIELD_ATTRIBUTES_COLLECTION, "visibility", FIELD_TYPE_BOOLEAN
+            )
             super(DatabaseSessionMIA, self).add_field(
-                FIELD_ATTRIBUTES_COLLECTION,
-                'origin',
-                FIELD_TYPE_STRING)
+                FIELD_ATTRIBUTES_COLLECTION, "origin", FIELD_TYPE_STRING
+            )
             super(DatabaseSessionMIA, self).add_field(
-                FIELD_ATTRIBUTES_COLLECTION,
-                'unit',
-                FIELD_TYPE_STRING)
+                FIELD_ATTRIBUTES_COLLECTION, "unit", FIELD_TYPE_STRING
+            )
             super(DatabaseSessionMIA, self).add_field(
-                FIELD_ATTRIBUTES_COLLECTION,
-                'default_value',
-                FIELD_TYPE_STRING)
+                FIELD_ATTRIBUTES_COLLECTION, "default_value", FIELD_TYPE_STRING
+            )
 
-    def add_field(self, collection, name, field_type, description,
-                  visibility, origin, unit, default_value,
-                  index=False, flush=True):
+    def add_field(
+        self,
+        collection,
+        name,
+        field_type,
+        description,
+        visibility,
+        origin,
+        unit,
+        default_value,
+        index=False,
+        flush=True,
+    ):
         """Add a field to the database, if it does not already exist.
 
         :param collection: field collection (str)
@@ -122,16 +139,20 @@ class DatabaseSessionMIA(DatabaseSession):
                       False if in the middle of filling fields) => True by
                       default
         """
-        super(DatabaseSessionMIA, self).add_field(collection, name, field_type, description)
-        self.add_document(FIELD_ATTRIBUTES_COLLECTION,
-                          {
-                              'index': '%s|%s' % (collection, name),
-                              'field': name,
-                              'visibility': visibility,
-                              'origin': origin,
-                              'unit': unit,
-                              'default_value': default_value,
-                          })
+        super(DatabaseSessionMIA, self).add_field(
+            collection, name, field_type, description
+        )
+        self.add_document(
+            FIELD_ATTRIBUTES_COLLECTION,
+            {
+                "index": "%s|%s" % (collection, name),
+                "field": name,
+                "visibility": visibility,
+                "origin": origin,
+                "unit": unit,
+                "default_value": default_value,
+            },
+        )
 
     def add_fields(self, fields):
         """Add the list of fields.
@@ -142,8 +163,17 @@ class DatabaseSessionMIA(DatabaseSession):
 
         for field in fields:
             # Adding each field
-            self.add_field(field[0], field[1], field[2], field[3], field[4],
-                           field[5], field[6], field[7], False)
+            self.add_field(
+                field[0],
+                field[1],
+                field[2],
+                field[3],
+                field[4],
+                field[5],
+                field[6],
+                field[7],
+                False,
+            )
 
     def remove_field(self, collection, fields):
         """
@@ -161,26 +191,27 @@ class DatabaseSessionMIA(DatabaseSession):
         if isinstance(fields, str):
             fields = [fields]
         for field in fields:
-            self.remove_document(FIELD_ATTRIBUTES_COLLECTION,
-                                 '%s|%s' % (collection, field))
+            self.remove_document(
+                FIELD_ATTRIBUTES_COLLECTION, "%s|%s" % (collection, field)
+            )
 
     def get_field(self, collection, name):
         field = super(DatabaseSessionMIA, self).get_field(collection, name)
         if field is not None:
-            index = '%s|%s' % (collection, name)
+            index = "%s|%s" % (collection, name)
             attrs = self.get_document(FIELD_ATTRIBUTES_COLLECTION, index)
-            for i in ('visibility', 'origin', 'unit', 'default_value'):
-                setattr(field, i, getattr(attrs,i, None))
+            for i in ("visibility", "origin", "unit", "default_value"):
+                setattr(field, i, getattr(attrs, i, None))
         return field
-    
+
     def get_fields(self, collection):
         fields = super(DatabaseSessionMIA, self).get_fields(collection)
         for field in fields:
             name = field.field_name
-            index = '%s|%s' % (collection, name)
+            index = "%s|%s" % (collection, name)
             attrs = self.get_document(FIELD_ATTRIBUTES_COLLECTION, index)
-            for i in ('visibility', 'origin', 'unit', 'default_value'):
-                setattr(field, i, getattr(attrs,i, None))
+            for i in ("visibility", "origin", "unit", "default_value"):
+                setattr(field, i, getattr(attrs, i, None))
         return fields
 
     def get_shown_tags(self):
@@ -190,8 +221,9 @@ class DatabaseSessionMIA(DatabaseSession):
         """
         visible_names = []
         names_set = set()
-        for i in self.filter_documents(FIELD_ATTRIBUTES_COLLECTION,
-                                       '{visibility} == true'):
+        for i in self.filter_documents(
+            FIELD_ATTRIBUTES_COLLECTION, "{visibility} == true"
+        ):
             if i.field not in names_set:
                 names_set.add(i.field)
                 visible_names.append(i.field)  # respect list order
@@ -204,11 +236,17 @@ class DatabaseSessionMIA(DatabaseSession):
         """
 
         for field in self.get_documents(FIELD_ATTRIBUTES_COLLECTION):
-            self.set_value(FIELD_ATTRIBUTES_COLLECTION, field.index,
-                           'visibility', field.field in fields_shown)
+            self.set_value(
+                FIELD_ATTRIBUTES_COLLECTION,
+                field.index,
+                "visibility",
+                field.field in fields_shown,
+            )
+
 
 class DatabaseMIA(Database):
     """
     Class overriding the default behavior of populse_db
     """
+
     database_session_class = DatabaseSessionMIA

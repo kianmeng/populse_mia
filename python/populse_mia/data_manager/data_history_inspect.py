@@ -1,27 +1,30 @@
-# -*- coding: utf-8 -*- #
+# -*- coding: utf-8 -*-
 """
 """
 
+import os.path as osp
+
+import traits.api as traits
+from capsul.api import Pipeline, Process, capsul_engine
+
 from populse_mia.data_manager.project import (BRICK_EXEC, BRICK_EXEC_TIME,
-                                              BRICK_INIT, BRICK_INIT_TIME,
-                                              BRICK_INPUTS, BRICK_NAME,
-                                              BRICK_ID,
-                                              BRICK_OUTPUTS, COLLECTION_BRICK,
+                                              BRICK_ID, BRICK_INIT,
+                                              BRICK_INIT_TIME, BRICK_INPUTS,
+                                              BRICK_NAME, BRICK_OUTPUTS,
+                                              COLLECTION_BRICK,
                                               COLLECTION_CURRENT,
                                               COLLECTION_INITIAL, TAG_BRICKS,
                                               TAG_CHECKSUM, TAG_EXP_TYPE,
                                               TAG_FILENAME, TAG_TYPE, TYPE_MAT,
                                               TYPE_NII, TYPE_TXT, TYPE_UNKNOWN)
-from capsul.api import capsul_engine, Process, Pipeline
-import traits.api as traits
-import os.path as osp
 
 
 class ProtoProcess(object):
-    '''
+    """
     Lightweight convenience class, stores a brick database entry, plus
     additional info (used)
-    '''
+    """
+
     def __init__(self, brick=None):
         self.brick = brick
         self.used = False
@@ -54,8 +57,7 @@ def data_history_pipeline(filename, project):
                 proc.process = pproc
                 name = pproc.name
                 if name in pipeline.nodes:
-                    name = '%s_%s' % (name,
-                                      pproc.uuid.replace('-', '_'))
+                    name = "%s_%s" % (name, pproc.uuid.replace("-", "_"))
                 pproc.node_name = name
                 pipeline.add_process(name, pproc)
 
@@ -63,18 +65,20 @@ def data_history_pipeline(filename, project):
             if link[0] is None:
                 src = link[1]
                 if src not in pipeline.traits():
-                    pipeline.export_parameter(link[2].process.node_name,
-                                              link[3], src)
+                    pipeline.export_parameter(
+                        link[2].process.node_name, link[3], src
+                    )
                     src = None
                 elif pipeline.trait(src).output:
                     # already taken as an output: export under another name
                     done = False
                     n = 0
                     while not done:
-                        src2 = '%s_%d' % (src, n)
+                        src2 = "%s_%d" % (src, n)
                         if src2 not in pipeline.traits():
                             pipeline.export_parameter(
-                                link[2].process.node_name, link[3], src2)
+                                link[2].process.node_name, link[3], src2
+                            )
                             src = None
                             done = True
                         elif not pipeline.trait(src2).output:
@@ -82,22 +86,24 @@ def data_history_pipeline(filename, project):
                             done = True
                         n += 1
             else:
-                src = '%s.%s' % (link[0].process.node_name, link[1])
+                src = "%s.%s" % (link[0].process.node_name, link[1])
             if link[2] is None:
                 dst = link[3]
                 if dst not in pipeline.traits():
-                    pipeline.export_parameter(link[0].process.node_name,
-                                              link[1], dst)
+                    pipeline.export_parameter(
+                        link[0].process.node_name, link[1], dst
+                    )
                     dst = None
                 elif not pipeline.trait(dst).output:
                     # already taken as an input: export under another name
                     done = False
                     n = 0
                     while not done:
-                        dst2 = '%s_%d' % (dst, n)
+                        dst2 = "%s_%d" % (dst, n)
                         if dst2 not in pipeline.traits():
                             pipeline.export_parameter(
-                                link[0].process.node_name, link[1], dst2)
+                                link[0].process.node_name, link[1], dst2
+                            )
                             dst = None
                             done = True
                         elif pipeline.trait(dst2).output:
@@ -105,10 +111,10 @@ def data_history_pipeline(filename, project):
                             done = True
                         n += 1
             else:
-                dst = '%s.%s' % (link[2].process.node_name, link[3])
+                dst = "%s.%s" % (link[2].process.node_name, link[3])
             if src is not None and dst is not None:
                 try:
-                    pipeline.add_link('%s->%s' % (src, dst))
+                    pipeline.add_link("%s->%s" % (src, dst))
                 except ValueError as e:
                     print(e)
 
@@ -119,14 +125,14 @@ def data_history_pipeline(filename, project):
 
 
 def get_data_history_bricks(filename, project):
-    '''
+    """
     Get the complete "useful" history of a file in the database, as a set of
     bricks.
 
     This is just a fileterd version of :func:`get_data_history_processes` (like
     :func:`data_history_pipeline` in another shape), which only returns the set
     of brick elements actually used in the "useful" history of the data.
-    '''
+    """
 
     procs, links = get_data_history_processes(filename, project)
     bricks = {proc.brick for proc in procs.values() if proc.used}
@@ -158,20 +164,19 @@ def get_data_history(filename, project):
         if not proc.used:
             continue
         for value in proc.brick[BRICK_INPUTS].values():
-            filenames = get_filenames_in_value(value, project,
-                                               allow_temp=False)
+            filenames = get_filenames_in_value(
+                value, project, allow_temp=False
+            )
             parent_files.update(filenames)
 
-
     bricks = {proc.brick[BRICK_ID] for proc in procs.values() if proc.used}
-    history = {'processes': bricks,
-               'parent_files': parent_files}
+    history = {"processes": bricks, "parent_files": parent_files}
 
     return history
 
 
 def get_data_history_processes(filename, project):
-    '''
+    """
     Get the complete "useful" history of a file in the database.
 
     The function outputs a dict of processes (:class:`ProtoProcess` instances)
@@ -197,7 +202,7 @@ def get_data_history_processes(filename, project):
         {(src_protoprocess, src_plug_name, dst_protoprocess, dst_plug_name)}.
         Links from/to the 'exterior" are also given: in this
         case src_protoprocess or dst_protoprocess is None.
-    '''
+    """
 
     session = project.session
 
@@ -221,7 +226,7 @@ def get_data_history_processes(filename, project):
             # ambiguity: keep all equivalent
             keep_procs[uuid] = proc
         else:
-            print('drop earlier run:', proc.brick[BRICK_NAME], uuid)
+            print("drop earlier run:", proc.brick[BRICK_NAME], uuid)
 
     todo = list(keep_procs.values())
 
@@ -232,48 +237,64 @@ def get_data_history_processes(filename, project):
         done_procs.add(proc)
         proc.used = True
 
-        print('-- ancestors for:', proc.brick[BRICK_ID],
-              proc.brick[BRICK_NAME], proc.brick[BRICK_EXEC_TIME])
+        print(
+            "-- ancestors for:",
+            proc.brick[BRICK_ID],
+            proc.brick[BRICK_NAME],
+            proc.brick[BRICK_EXEC_TIME],
+        )
         values_w_files = {}
         for name, value in proc.brick[BRICK_INPUTS].items():
             filenames = get_filenames_in_value(value, project)
             # record inputs referencing files in the DB
             if filenames:
-                print(name, 'will be parsed.')
+                print(name, "will be parsed.")
                 values_w_files[name] = (value, filenames)
 
         for name, (value, filenames) in values_w_files.items():
             for nfilename in filenames:
-                if nfilename == '<temp>':
-                    print('temp file used -- history is broken')
+                if nfilename == "<temp>":
+                    print("temp file used -- history is broken")
                     prev_procs, prev_links = get_proc_ancestors_via_tmp(
-                        proc, project, procs)
+                        proc, project, procs
+                    )
                     links.update(prev_links)
 
-                    n_procs = [pproc for pproc in prev_procs.values()
-                              if pproc not in done_procs]
+                    n_procs = [
+                        pproc
+                        for pproc in prev_procs.values()
+                        if pproc not in done_procs
+                    ]
                     todo += n_procs
                 else:
                     prev_procs = get_direct_proc_ancestors(
-                        nfilename, project, procs,
+                        nfilename,
+                        project,
+                        procs,
                         before_exec_time=proc.brick[BRICK_EXEC_TIME],
-                        org_proc=proc)
+                        org_proc=proc,
+                    )
 
-                    n_procs = [pproc for pproc in prev_procs.values()
-                              if pproc not in done_procs]
+                    n_procs = [
+                        pproc
+                        for pproc in prev_procs.values()
+                        if pproc not in done_procs
+                    ]
                     todo += n_procs
 
                     # connect outputs of prev_procs which are identical to
-                    print('look for value', value, 'in', prev_procs.keys())
+                    print("look for value", value, "in", prev_procs.keys())
                     for pproc in prev_procs.values():
-                        print('- in', pproc.brick[BRICK_NAME])
+                        print("- in", pproc.brick[BRICK_NAME])
                         for pname, pval in pproc.brick[BRICK_OUTPUTS].items():
-                            if pval == value \
-                                    or data_in_value(pval, nfilename, project):
+                            if pval == value or data_in_value(
+                                pval, nfilename, project
+                            ):
                                 links.add((pproc, pname, proc, name))
 
-                if len(prev_procs) == 0 \
-                        or prev_procs == {proc.brick[BRICK_ID]: proc}:
+                if len(prev_procs) == 0 or prev_procs == {
+                    proc.brick[BRICK_ID]: proc
+                }:
                     # the param has no previous processing or just the current
                     # self-modifing process: connect it to main inputs
                     links.add((None, name, proc, name))
@@ -283,13 +304,27 @@ def get_data_history_processes(filename, project):
             if data_in_value(value, filename, project):
                 links.add((proc, name, None, name))
 
-    print('history of:', filename, ':', len([p for p in procs.values() if p.used]), 'processes, ', len(links), 'links')
+    print(
+        "history of:",
+        filename,
+        ":",
+        len([p for p in procs.values() if p.used]),
+        "processes, ",
+        len(links),
+        "links",
+    )
     return procs, links
 
 
-def get_direct_proc_ancestors(filename, project, procs, before_exec_time=None,
-                              only_latest=True, org_proc=None):
-    '''
+def get_direct_proc_ancestors(
+    filename,
+    project,
+    procs,
+    before_exec_time=None,
+    only_latest=True,
+    org_proc=None,
+):
+    """
     Retrieve processing bricks which are referenced in the direct filename
     history. It can get the latest before a given execution time. As exec time
     is ambiguous (several processes may have finished at exactly the same
@@ -327,11 +362,11 @@ def get_direct_proc_ancestors(filename, project, procs, before_exec_time=None,
     -------
     procs: dict
         {brick uuid: ProtoProcess instance}
-    '''
+    """
 
     session = project.session
     bricks = session.get_value(COLLECTION_CURRENT, filename, TAG_BRICKS)
-    print('bricks for:', filename, ':', bricks)
+    print("bricks for:", filename, ":", bricks)
 
     new_procs = {}
     new_links = set()
@@ -340,7 +375,8 @@ def get_direct_proc_ancestors(filename, project, procs, before_exec_time=None,
         for brick in bricks:
             if brick not in procs:
                 proc = get_history_brick_process(
-                    brick, project, before_exec_time=before_exec_time)
+                    brick, project, before_exec_time=before_exec_time
+                )
                 if proc is None:
                     continue
 
@@ -348,8 +384,10 @@ def get_direct_proc_ancestors(filename, project, procs, before_exec_time=None,
                 new_procs[brick] = proc
             else:
                 proc = procs[brick]
-                if before_exec_time \
-                        and proc.brick[BRICK_EXEC_TIME] > before_exec_time:
+                if (
+                    before_exec_time
+                    and proc.brick[BRICK_EXEC_TIME] > before_exec_time
+                ):
                     continue
                 new_procs[brick] = procs[brick]
 
@@ -372,7 +410,7 @@ def get_direct_proc_ancestors(filename, project, procs, before_exec_time=None,
                 # ambiguity: keep all equivalent
                 keep_procs[uuid] = proc
             else:
-                print('drop earlier run:', proc.brick[BRICK_NAME])
+                print("drop earlier run:", proc.brick[BRICK_NAME])
         if org_proc and org_proc.brick[BRICK_ID] in new_procs:
             # set back origin process, if it's in the list
             keep_procs[org_proc.brick[BRICK_ID]] = org_proc
@@ -383,7 +421,7 @@ def get_direct_proc_ancestors(filename, project, procs, before_exec_time=None,
 
 
 def get_proc_ancestors_via_tmp(proc, project, procs):
-    '''
+    """
     Normally an internal function used in :func:`get_data_history_processes`
     and :func:`data_history_pipeline`: it is not meant to be part of a public
     API.
@@ -410,12 +448,12 @@ def get_proc_ancestors_via_tmp(proc, project, procs):
         {(src_protoprocess, src_plug_name, dst_protoprocess, dst_plug_name)}.
         Pipeline link from/to the pipeline main plugs are also given: in this
         case src_protoprocess or dst_protoprocess is None.
-    '''
+    """
 
     new_procs = {}
     links = set()
     dlink = None
-    tmp_filename = '<temp>'
+    tmp_filename = "<temp>"
 
     def _get_tmp_param(proc):
         for param, value in proc.brick[BRICK_INPUTS].items():
@@ -426,18 +464,21 @@ def get_proc_ancestors_via_tmp(proc, project, procs):
     # look first from proc outputs history (which is more direct, less error-
     # prone, and a more limited search)
     for name, value in proc.brick[BRICK_OUTPUTS].items():
-        filenames = get_filenames_in_value(value, project,
-                                           allow_temp=False)
+        filenames = get_filenames_in_value(value, project, allow_temp=False)
         for filename in filenames:
             hprocs = get_direct_proc_ancestors(
-                filename, project, procs,
+                filename,
+                project,
+                procs,
                 before_exec_time=proc.brick[BRICK_EXEC_TIME],
-                only_latest=False)
+                only_latest=False,
+            )
             if proc.brick[BRICK_ID] in hprocs:
                 # exclude the current proc
                 del hprocs[proc.brick[BRICK_ID]]
-            sprocs = find_procs_with_output(hprocs.values(), tmp_filename,
-                                            project)
+            sprocs = find_procs_with_output(
+                hprocs.values(), tmp_filename, project
+            )
             for exec_time in sorted(sprocs, reverse=True):
                 for hproc, param in sprocs[exec_time]:
                     new_procs[hproc.brick[BRICK_ID]] = hproc
@@ -453,27 +494,28 @@ def get_proc_ancestors_via_tmp(proc, project, procs):
     if len(new_procs) == 0:
         # not found in data history: search the entire bricks histories
         session = project.session
-        print('temp history not found from output filenames...')
+        print("temp history not found from output filenames...")
 
-        #print('test bricks older than:', proc.exec_time)
+        # print('test bricks older than:', proc.exec_time)
         # filtering for date <= doesn't seem to work as I expect...
-        #bricks = session.filter_documents(
-            #COLLECTION_BRICK, '{%s} <= "%s"' % (BRICK_EXEC_TIME, proc.exec_time))
+        # bricks = session.filter_documents(
+        # COLLECTION_BRICK, '{%s} <= "%s"' % (BRICK_EXEC_TIME, proc.exec_time))
         candidates = {}
         bricks = session.get_documents(COLLECTION_BRICK)
         for brick in bricks:
-            #if brick
-            if brick[BRICK_EXEC] != 'Done':
+            # if brick
+            if brick[BRICK_EXEC] != "Done":
                 continue
             if brick[BRICK_EXEC_TIME] > proc.brick[BRICK_EXEC_TIME]:
                 continue
-            #print('try brick:', brick[BRICK_NAME])
+            # print('try brick:', brick[BRICK_NAME])
             outputs = brick[BRICK_OUTPUTS]
             for name, value in outputs.items():
                 if data_in_value(value, tmp_filename, project):
                     candidates.setdefault(brick[BRICK_EXEC_TIME], []).append(
-                        (brick, name))
-                    #print('CANDIDATE.')
+                        (brick, name)
+                    )
+                    # print('CANDIDATE.')
                     break
         for exec_time in sorted(candidates, reverse=True):
             for brick, name in candidates[exec_time]:
@@ -486,7 +528,7 @@ def get_proc_ancestors_via_tmp(proc, project, procs):
                 if dlink is None:
                     dlink = _get_tmp_param(proc)
                 links.add((hproc, name, dlink[0], dlink[1]))
-                print('found:', hproc.brick[BRICK_NAME], name)
+                print("found:", hproc.brick[BRICK_NAME], name)
                 break
             break
 
@@ -494,7 +536,7 @@ def get_proc_ancestors_via_tmp(proc, project, procs):
 
 
 def find_procs_with_output(procs, filename, project):
-    '''
+    """
     Find in the given process list if the given filename is part of its outputs
 
     Parameters
@@ -509,29 +551,30 @@ def find_procs_with_output(procs, filename, project):
     -------
     sprocs: dict
         exec_time: [(process, param_name), ...]
-    '''
+    """
 
     sprocs = {}
     for proc in procs:
         for name, value in proc.brick[BRICK_OUTPUTS].items():
             if data_in_value(value, filename, project):
-                sprocs.setdefault(
-                    proc.brick[BRICK_EXEC_TIME], []).append((proc, name))
+                sprocs.setdefault(proc.brick[BRICK_EXEC_TIME], []).append(
+                    (proc, name)
+                )
     return sprocs
 
 
 def data_in_value(value, filename, project):
-    '''
+    """
     Looks if the given filename is part of the given value. The value may ba a
     list, a tuple, or a dict, and may include several layers, which are parsed.
 
     The input filename may be the temp value "<temp>", or a filename in its
     "short" version (relative path to the project database data directory).
-    '''
+    """
 
     if isinstance(value, str):
-        if filename != '<temp>':
-            proj_dir = osp.join(osp.abspath(osp.normpath(project.folder)), '')
+        if filename != "<temp>":
+            proj_dir = osp.join(osp.abspath(osp.normpath(project.folder)), "")
             filename = osp.join(proj_dir, filename)
         return value == filename
     if isinstance(value, (list, tuple)):
@@ -539,7 +582,7 @@ def data_in_value(value, filename, project):
             if data_in_value(val, filename, project):
                 return True
         return False
-    if hasattr(value, 'values'):
+    if hasattr(value, "values"):
         for val in value.values():
             if data_in_value(val, filename, project):
                 return True
@@ -547,33 +590,33 @@ def data_in_value(value, filename, project):
 
 
 def is_data_entry(filename, project, allow_temp=True):
-    '''
+    """
     Checks if the input filename is a database entry. The return value is
     either the relative path to the database data directory, or "<temp>" if
     filename is this value and allow_temp is True (which is the default), or
     None if it is not in the database.
-    '''
+    """
 
-    if allow_temp and filename == '<temp>':
+    if allow_temp and filename == "<temp>":
         return filename
-    proj_dir = osp.join(osp.abspath(osp.normpath(project.folder)), '')
+    proj_dir = osp.join(osp.abspath(osp.normpath(project.folder)), "")
     if not filename.startswith(proj_dir):
         return None
-    filename = filename[len(proj_dir):]
+    filename = filename[len(proj_dir) :]
     if project.session.has_document(COLLECTION_CURRENT, filename):
         return filename
     return None
 
 
 def get_filenames_in_value(value, project, allow_temp=True):
-    '''
+    """
     Parses ``value``, which may be an imbrication of lists, tuples and dicts,
     and gets all filenames referenced in it. Only filenames which are database
     entries are kept, and the "<temp>" value if ``allow_temp`` is True (which
     is the default). Other non-indexed filenames are considered to be read-only
     static data (such as templates, atlases or other software-related data),
     and are not retained.
-    '''
+    """
 
     values = [value]
     filenames = set()
@@ -585,14 +628,14 @@ def get_filenames_in_value(value, project, allow_temp=True):
                 filenames.add(nvalue)
         elif isinstance(value, (list, tuple)):
             values.extend(value)
-        elif hasattr(value, 'values'):
+        elif hasattr(value, "values"):
             values.extend(value.values())
 
     return filenames
 
 
 def get_history_brick_process(brick_id, project, before_exec_time=None):
-    '''
+    """
     Get a brick from its uuid in the database, and return it as a
     :class:`ProtoProcess` instance.
 
@@ -601,21 +644,21 @@ def get_history_brick_process(brick_id, project, before_exec_time=None):
     discarded.
 
     If discarded (or nor found in the database), the return value is None.
-    '''
+    """
 
     session = project.session
     binfo = session.get_document(COLLECTION_BRICK, brick_id)
     if binfo is None:
         return None
     exec_status = binfo[BRICK_EXEC]
-    if exec_status != 'Done':
+    if exec_status != "Done":
         return None
     exec_time = binfo[BRICK_EXEC_TIME]
-    print(brick_id, 'exec_time:', exec_time, ', before:', before_exec_time)
+    print(brick_id, "exec_time:", exec_time, ", before:", before_exec_time)
     if before_exec_time and exec_time > before_exec_time:
         # ignore later runs
         return None
-    print(brick_id, ':', binfo[BRICK_NAME])
+    print(brick_id, ":", binfo[BRICK_NAME])
 
     proc = ProtoProcess(binfo)
 
@@ -623,13 +666,13 @@ def get_history_brick_process(brick_id, project, before_exec_time=None):
 
 
 def brick_to_process(brick, project):
-    '''
+    """
     Converts a brick database entry (document) into a "fake process": a
     :class:`̀~capsul.process.process.Process` direct instance (not subclassed)
     which cannot do any actual processing, but which represents its parameters
     with values (traits and values). The process gets a ``name`` and an
     ``uuid`` from the brick, and also an ``exec_time``.
-    '''
+    """
 
     if isinstance(brick, str):
         # brick is an id
@@ -642,7 +685,7 @@ def brick_to_process(brick, project):
     outputs = brick[BRICK_OUTPUTS]
 
     proc = Process()
-    proc.name = brick[BRICK_NAME].split('.')[-1]
+    proc.name = brick[BRICK_NAME].split(".")[-1]
     proc.uuid = brick[BRICK_ID]
     proc.exec_time = brick[BRICK_EXEC_TIME]
 
@@ -655,5 +698,3 @@ def brick_to_process(brick, project):
         setattr(proc, name, value)
 
     return proc
-
-

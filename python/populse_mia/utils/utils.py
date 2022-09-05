@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Module that contains multiple functions used across Mia.
 
@@ -21,25 +22,24 @@ Module that contains multiple functions used across Mia.
 ##########################################################################
 
 import ast
-import dateutil.parser
 import os
 import sys
-from datetime import datetime, date, time
+from datetime import date, datetime, time
 
-# PyQt5 imports
-from PyQt5.QtCore import Qt, QDate, QDateTime, QTime, QVariant
-from PyQt5.QtWidgets import QMessageBox
-
+import dateutil.parser
 # Populse_db imports
 from populse_db.database import (FIELD_TYPE_BOOLEAN, FIELD_TYPE_DATE,
                                  FIELD_TYPE_DATETIME, FIELD_TYPE_FLOAT,
-                                 FIELD_TYPE_INTEGER, FIELD_TYPE_STRING,
-                                 FIELD_TYPE_TIME, FIELD_TYPE_LIST_BOOLEAN,
+                                 FIELD_TYPE_INTEGER, FIELD_TYPE_LIST_BOOLEAN,
                                  FIELD_TYPE_LIST_DATE,
                                  FIELD_TYPE_LIST_DATETIME,
                                  FIELD_TYPE_LIST_FLOAT,
                                  FIELD_TYPE_LIST_INTEGER,
-                                 FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME)
+                                 FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
+                                 FIELD_TYPE_STRING, FIELD_TYPE_TIME)
+# PyQt5 imports
+from PyQt5.QtCore import QDate, QDateTime, Qt, QTime, QVariant
+from PyQt5.QtWidgets import QMessageBox
 
 # Populse_mia imports
 from populse_mia.software_properties import Config
@@ -52,11 +52,11 @@ def check_python_version():
     """
 
     if sys.version_info[:2] < (3, 5):
-        raise AssertionError("Mia is ensured to work only with Python "
-                             ">= 3.5 (the version of Python used is "
-                             "{}).".format('.'.join((str(x)
-                                                     for x in
-                                                     sys.version_info[:2]))))
+        raise AssertionError(
+            "Mia is ensured to work only with Python "
+            ">= 3.5 (the version of Python used is "
+            "{}).".format(".".join((str(x) for x in sys.version_info[:2])))
+        )
 
 
 def check_value_type(value, value_type, is_subvalue=False):
@@ -69,8 +69,9 @@ def check_value_type(value, value_type, is_subvalue=False):
     :returns: True if the value is valid to replace the old one, False otherwise
     """
 
-    if ((value_type == FIELD_TYPE_INTEGER) or
-            (value_type == FIELD_TYPE_LIST_INTEGER and is_subvalue)):
+    if (value_type == FIELD_TYPE_INTEGER) or (
+        value_type == FIELD_TYPE_LIST_INTEGER and is_subvalue
+    ):
 
         try:
             int(value)
@@ -79,8 +80,9 @@ def check_value_type(value, value_type, is_subvalue=False):
         except Exception:
             return False
 
-    elif ((value_type == FIELD_TYPE_FLOAT) or
-          (value_type == FIELD_TYPE_LIST_FLOAT and is_subvalue)):
+    elif (value_type == FIELD_TYPE_FLOAT) or (
+        value_type == FIELD_TYPE_LIST_FLOAT and is_subvalue
+    ):
 
         try:
             float(value)
@@ -89,14 +91,20 @@ def check_value_type(value, value_type, is_subvalue=False):
         except Exception:
             return False
 
-    elif ((value_type == FIELD_TYPE_BOOLEAN) or
-          (value_type == FIELD_TYPE_LIST_BOOLEAN and is_subvalue)):
+    elif (value_type == FIELD_TYPE_BOOLEAN) or (
+        value_type == FIELD_TYPE_LIST_BOOLEAN and is_subvalue
+    ):
 
-        return (value == "True" or value == True or value == "False" or
-                value == False)
+        return (
+            value == "True"
+            or value == True
+            or value == "False"
+            or value == False
+        )
 
-    elif ((value_type == FIELD_TYPE_STRING) or
-          (value_type == FIELD_TYPE_LIST_STRING and is_subvalue)):
+    elif (value_type == FIELD_TYPE_STRING) or (
+        value_type == FIELD_TYPE_LIST_STRING and is_subvalue
+    ):
 
         try:
             str(value)
@@ -105,9 +113,11 @@ def check_value_type(value, value_type, is_subvalue=False):
         except Exception:
             return False
 
-    elif (isinstance(value_type, str) and
-          value_type.startswith('list_') and not
-          is_subvalue):
+    elif (
+        isinstance(value_type, str)
+        and value_type.startswith("list_")
+        and not is_subvalue
+    ):
 
         if isinstance(value, str):
             value = ast.literal_eval(value)
@@ -122,8 +132,9 @@ def check_value_type(value, value_type, is_subvalue=False):
 
         return is_valid_value
 
-    elif ((value_type == FIELD_TYPE_DATE) or
-          (value_type == FIELD_TYPE_LIST_DATE and is_subvalue)):
+    elif (value_type == FIELD_TYPE_DATE) or (
+        value_type == FIELD_TYPE_LIST_DATE and is_subvalue
+    ):
 
         if isinstance(value, QDate):
             return True
@@ -138,8 +149,9 @@ def check_value_type(value, value_type, is_subvalue=False):
             except Exception:
                 return False
 
-    elif ((value_type == FIELD_TYPE_DATETIME) or
-          (value_type == FIELD_TYPE_LIST_DATETIME and is_subvalue)):
+    elif (value_type == FIELD_TYPE_DATETIME) or (
+        value_type == FIELD_TYPE_LIST_DATETIME and is_subvalue
+    ):
 
         if isinstance(value, QDateTime):
             return True
@@ -154,8 +166,9 @@ def check_value_type(value, value_type, is_subvalue=False):
             except Exception:
                 return False
 
-    elif ((value_type == FIELD_TYPE_TIME) or
-          (value_type == FIELD_TYPE_LIST_TIME and is_subvalue)):
+    elif (value_type == FIELD_TYPE_TIME) or (
+        value_type == FIELD_TYPE_LIST_TIME and is_subvalue
+    ):
 
         if isinstance(value, QTime):
             return True
@@ -192,17 +205,25 @@ def set_filters_directory_as_default(dialog):
     :param dialog: current file dialog
     """
 
-    if not (os.path.exists(
-                os.path.join(
-                    os.path.join(os.path.relpath(os.curdir),'..', '..'),
-                    'filters'))):
-        os.makedirs(os.path.join(
-                        os.path.join(os.path.relpath(os.curdir), '..', '..'),
-                        'filters'))
-    dialog.setDirectory(os.path.expanduser(
-                        os.path.join(
-                           os.path.join(os.path.relpath(os.curdir), '..', '..'),
-                           'filters')))
+    if not (
+        os.path.exists(
+            os.path.join(
+                os.path.join(os.path.relpath(os.curdir), "..", ".."), "filters"
+            )
+        )
+    ):
+        os.makedirs(
+            os.path.join(
+                os.path.join(os.path.relpath(os.curdir), "..", ".."), "filters"
+            )
+        )
+    dialog.setDirectory(
+        os.path.expanduser(
+            os.path.join(
+                os.path.join(os.path.relpath(os.curdir), "..", ".."), "filters"
+            )
+        )
+    )
 
 
 def set_item_data(item, value, value_type):
@@ -214,7 +235,7 @@ def set_item_data(item, value, value_type):
     :param value_type: new value type
     """
 
-    if value_type.startswith('list_'):
+    if value_type.startswith("list_"):
 
         if isinstance(value, str):
             value = ast.literal_eval(value)
@@ -223,7 +244,7 @@ def set_item_data(item, value, value_type):
             new_list = []
 
             for subvalue in value:
-                new_list.append(subvalue.strftime('%d/%m/%Y'))
+                new_list.append(subvalue.strftime("%d/%m/%Y"))
 
             value = new_list
 
@@ -231,7 +252,7 @@ def set_item_data(item, value, value_type):
             new_list = []
 
             for subvalue in value:
-                new_list.append(subvalue.strftime('%d/%m/%Y %H:%M:%S.%f'))
+                new_list.append(subvalue.strftime("%d/%m/%Y %H:%M:%S.%f"))
 
             value = new_list
 
@@ -239,7 +260,7 @@ def set_item_data(item, value, value_type):
             new_list = []
 
             for subvalue in value:
-                new_list.append(subvalue.strftime('%H:%M:%S.%f'))
+                new_list.append(subvalue.strftime("%H:%M:%S.%f"))
 
             value = new_list
 
@@ -381,13 +402,13 @@ def table_to_database(value, value_type):
             format = "%H:%M:%S.%f"
             return datetime.strptime(value, format).time()
 
-    elif value_type.startswith('list_'):
+    elif value_type.startswith("list_"):
         old_list = ast.literal_eval(value)
         list_to_return = []
 
         for old_element in old_list:
-            list_to_return.append(table_to_database(
-                                               old_element,
-                                               value_type.replace("list_", "")))
+            list_to_return.append(
+                table_to_database(old_element, value_type.replace("list_", ""))
+            )
 
         return list_to_return

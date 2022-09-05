@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- #
+# -*- coding: utf-8 -*-
 """Module that handle the projects and their database.
 
 :Contains:
@@ -15,30 +15,28 @@
 # for details.
 ##########################################################################
 
+import glob
+import json
 import os
 import tempfile
 from datetime import datetime, timedelta
+
 import yaml
-import json
-import glob
-
-# Populse_MIA imports
-from populse_mia.software_properties import verCmp
-from populse_mia.data_manager.filter import Filter
-from populse_mia.software_properties import Config
-from populse_mia.utils.utils import set_item_data
-from populse_mia.data_manager.database_mia import (
-    DatabaseMIA, TAG_ORIGIN_BUILTIN, TAG_ORIGIN_USER)
-
-# Populse_db imports
-from populse_db.database import (
-    FIELD_TYPE_STRING, FIELD_TYPE_LIST_STRING,
-    FIELD_TYPE_JSON, FIELD_TYPE_DATETIME,
-    FIELD_TYPE_INTEGER)
-
 from capsul.api import Pipeline
 from capsul.pipeline import pipeline_tools
 from capsul.pipeline.pipeline_nodes import PipelineNode, ProcessNode
+# Populse_db imports
+from populse_db.database import (FIELD_TYPE_DATETIME, FIELD_TYPE_INTEGER,
+                                 FIELD_TYPE_JSON, FIELD_TYPE_LIST_STRING,
+                                 FIELD_TYPE_STRING)
+
+from populse_mia.data_manager.database_mia import (TAG_ORIGIN_BUILTIN,
+                                                   TAG_ORIGIN_USER,
+                                                   DatabaseMIA)
+from populse_mia.data_manager.filter import Filter
+# Populse_MIA imports
+from populse_mia.software_properties import Config, verCmp
+from populse_mia.utils.utils import set_item_data
 
 COLLECTION_CURRENT = "current"
 COLLECTION_INITIAL = "initial"
@@ -52,8 +50,16 @@ TAG_EXP_TYPE = "Exp Type"
 TAG_FILENAME = "FileName"
 TAG_BRICKS = "History"
 TAG_HISTORY = "Full history"
-CLINICAL_TAGS = ["Site", "Spectro", "MR", "PatientRef", "Pathology", "Age",
-                 "Sex", "Message"]
+CLINICAL_TAGS = [
+    "Site",
+    "Spectro",
+    "MR",
+    "PatientRef",
+    "Pathology",
+    "Age",
+    "Sex",
+    "Message",
+]
 BRICK_ID = "ID"
 BRICK_NAME = "Name"
 BRICK_INPUTS = "Input(s)"
@@ -74,7 +80,7 @@ TYPE_TXT = "Text"
 TYPE_UNKNOWN = "Unknown"
 
 
-class Project():
+class Project:
     """Class that handles projects and their associated database.
 
     :param project_root_folder: project's path
@@ -120,8 +126,8 @@ class Project():
 
         if project_root_folder is None:
             self.isTempProject = True
-            #self.folder = os.path.relpath(tempfile.mkdtemp())
-            self.folder = tempfile.mkdtemp(prefix='temp_mia_project')
+            # self.folder = os.path.relpath(tempfile.mkdtemp())
+            self.folder = tempfile.mkdtemp(prefix="temp_mia_project")
 
         else:
             self.isTempProject = False
@@ -138,15 +144,16 @@ class Project():
         else:
             raise IOError(
                 "The project at " + str(self.folder) + " is already opened "
-                                                       "in another instance "
-                                                       "of the software.")
-        
-        db_folder = os.path.join(self.folder, 'database')
-        
+                "in another instance "
+                "of the software."
+            )
+
+        db_folder = os.path.join(self.folder, "database")
+
         if not os.path.exists(db_folder):
             os.makedirs(db_folder)
 
-        db = 'sqlite:///' + os.path.join(db_folder, 'mia.db')
+        db = "sqlite:///" + os.path.join(db_folder, "mia.db")
         self.database = DatabaseMIA(db)
         self.session = self.database.__enter__()
         self.session.add_field_attributes_collection()
@@ -165,114 +172,275 @@ class Project():
             if not os.path.exists(os.path.join(self.folder, "data")):
                 os.makedirs(os.path.join(self.folder, "data"))
 
-            if not os.path.exists(os.path.join(
-                                              self.folder, "data", "raw_data")):
+            if not os.path.exists(
+                os.path.join(self.folder, "data", "raw_data")
+            ):
                 os.makedirs(os.path.join(self.folder, "data", "raw_data"))
 
-            if not os.path.exists(os.path.join(
-                                          self.folder, "data", "derived_data")):
+            if not os.path.exists(
+                os.path.join(self.folder, "data", "derived_data")
+            ):
                 os.makedirs(os.path.join(self.folder, "data", "derived_data"))
 
-            if not os.path.exists(os.path.join(
-                                       self.folder, "data", "downloaded_data")):
-                os.makedirs(os.path.join(
-                                        self.folder, "data", "downloaded_data"))
+            if not os.path.exists(
+                os.path.join(self.folder, "data", "downloaded_data")
+            ):
+                os.makedirs(
+                    os.path.join(self.folder, "data", "downloaded_data")
+                )
 
             # Properties file created
-            os.mkdir(os.path.join(self.folder, 'properties'))
+            os.mkdir(os.path.join(self.folder, "properties"))
             if self.isTempProject:
                 name = "Unnamed project"
             else:
                 name = os.path.basename(self.folder)
             properties = dict(
                 name=name,
-                date=datetime.now().strftime('%d/%m/%Y %H:%M:%S'),
+                date=datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
                 sorted_tag=TAG_FILENAME,
-                sort_order=0
+                sort_order=0,
             )
-            with open(os.path.join(self.folder, 'properties',
-                                   'properties.yml'), 'w', encoding='utf8') \
-                    as propertyfile:
-                yaml.dump(properties, propertyfile,
-                          default_flow_style=False,
-                          allow_unicode=True)
+            with open(
+                os.path.join(self.folder, "properties", "properties.yml"),
+                "w",
+                encoding="utf8",
+            ) as propertyfile:
+                yaml.dump(
+                    properties,
+                    propertyfile,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                )
 
             # Adding current and initial collections
             self.session.add_collection(
-                COLLECTION_CURRENT, TAG_FILENAME, True,
-                TAG_ORIGIN_BUILTIN, None, None)
+                COLLECTION_CURRENT,
+                TAG_FILENAME,
+                True,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
             self.session.add_collection(
-                COLLECTION_INITIAL, TAG_FILENAME, True,
-                TAG_ORIGIN_BUILTIN, None, None)
+                COLLECTION_INITIAL,
+                TAG_FILENAME,
+                True,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
             self.session.add_collection(
-                COLLECTION_BRICK, BRICK_ID, False,
-                TAG_ORIGIN_BUILTIN, None, None)
+                COLLECTION_BRICK,
+                BRICK_ID,
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
             self.session.add_collection(
-                COLLECTION_HISTORY, HISTORY_ID, False,
-                TAG_ORIGIN_BUILTIN, None, None)
+                COLLECTION_HISTORY,
+                HISTORY_ID,
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
 
             # Tags manually added
             self.session.add_field(
-                COLLECTION_CURRENT, TAG_CHECKSUM,
-                FIELD_TYPE_STRING, "Path checksum", False,
-                TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_INITIAL, TAG_CHECKSUM,
-                                   FIELD_TYPE_STRING, "Path checksum", False,
-                                   TAG_ORIGIN_BUILTIN, None, None)
+                COLLECTION_CURRENT,
+                TAG_CHECKSUM,
+                FIELD_TYPE_STRING,
+                "Path checksum",
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_INITIAL,
+                TAG_CHECKSUM,
+                FIELD_TYPE_STRING,
+                "Path checksum",
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
             # TODO Maybe remove checksum tag from populse_mia.itial table
-            self.session.add_field(COLLECTION_CURRENT, TAG_TYPE,
-                                   FIELD_TYPE_STRING, "Path type", True,
-                                   TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_INITIAL, TAG_TYPE,
-                                   FIELD_TYPE_STRING, "Path type", True,
-                                   TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_CURRENT, TAG_EXP_TYPE,
-                                   FIELD_TYPE_STRING, "Path exp type", True,
-                                   TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_INITIAL, TAG_EXP_TYPE,
-                                   FIELD_TYPE_STRING, "Path exp type", True,
-                                   TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_CURRENT, TAG_BRICKS,
-                                   FIELD_TYPE_LIST_STRING, "Path bricks", True,
-                                   TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_INITIAL, TAG_BRICKS,
-                                   FIELD_TYPE_LIST_STRING, "Path bricks", True,
-                                   TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_CURRENT, TAG_HISTORY,
-                                   FIELD_TYPE_STRING, "History uuid", False,
-                                   TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_INITIAL, TAG_HISTORY,
-                                   FIELD_TYPE_STRING, "History uuid", False,
-                                   TAG_ORIGIN_BUILTIN, None, None)
+            self.session.add_field(
+                COLLECTION_CURRENT,
+                TAG_TYPE,
+                FIELD_TYPE_STRING,
+                "Path type",
+                True,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_INITIAL,
+                TAG_TYPE,
+                FIELD_TYPE_STRING,
+                "Path type",
+                True,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_CURRENT,
+                TAG_EXP_TYPE,
+                FIELD_TYPE_STRING,
+                "Path exp type",
+                True,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_INITIAL,
+                TAG_EXP_TYPE,
+                FIELD_TYPE_STRING,
+                "Path exp type",
+                True,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_CURRENT,
+                TAG_BRICKS,
+                FIELD_TYPE_LIST_STRING,
+                "Path bricks",
+                True,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_INITIAL,
+                TAG_BRICKS,
+                FIELD_TYPE_LIST_STRING,
+                "Path bricks",
+                True,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_CURRENT,
+                TAG_HISTORY,
+                FIELD_TYPE_STRING,
+                "History uuid",
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_INITIAL,
+                TAG_HISTORY,
+                FIELD_TYPE_STRING,
+                "History uuid",
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
 
-            self.session.add_field(COLLECTION_BRICK, BRICK_NAME,
-                                   FIELD_TYPE_STRING, "Brick name", False,
-                                   TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_BRICK, BRICK_INPUTS,
-                                   FIELD_TYPE_JSON, "Brick input(s)", False,
-                                   TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_BRICK, BRICK_OUTPUTS,
-                                   FIELD_TYPE_JSON, "Brick output(s)", False,
-                                   TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_BRICK, BRICK_INIT,
-                                   FIELD_TYPE_STRING, "Brick init status",
-                                   False, TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_BRICK, BRICK_INIT_TIME,
-                                   FIELD_TYPE_DATETIME, "Brick init time",
-                                   False, TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_BRICK, BRICK_EXEC,
-                                   FIELD_TYPE_STRING, "Brick exec status",
-                                   False, TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_BRICK, BRICK_EXEC_TIME,
-                                   FIELD_TYPE_DATETIME, "Brick exec time",
-                                   False, TAG_ORIGIN_BUILTIN, None, None)
+            self.session.add_field(
+                COLLECTION_BRICK,
+                BRICK_NAME,
+                FIELD_TYPE_STRING,
+                "Brick name",
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_BRICK,
+                BRICK_INPUTS,
+                FIELD_TYPE_JSON,
+                "Brick input(s)",
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_BRICK,
+                BRICK_OUTPUTS,
+                FIELD_TYPE_JSON,
+                "Brick output(s)",
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_BRICK,
+                BRICK_INIT,
+                FIELD_TYPE_STRING,
+                "Brick init status",
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_BRICK,
+                BRICK_INIT_TIME,
+                FIELD_TYPE_DATETIME,
+                "Brick init time",
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_BRICK,
+                BRICK_EXEC,
+                FIELD_TYPE_STRING,
+                "Brick exec status",
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_BRICK,
+                BRICK_EXEC_TIME,
+                FIELD_TYPE_DATETIME,
+                "Brick exec time",
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
 
-            self.session.add_field(COLLECTION_HISTORY, HISTORY_PIPELINE,
-                                   FIELD_TYPE_STRING, "Pipeline XML", False,
-                                   TAG_ORIGIN_BUILTIN, None, None)
-            self.session.add_field(COLLECTION_HISTORY, HISTORY_BRICKS,
-                                   FIELD_TYPE_LIST_STRING, "Bricks list", False,
-                                   TAG_ORIGIN_BUILTIN, None, None)
+            self.session.add_field(
+                COLLECTION_HISTORY,
+                HISTORY_PIPELINE,
+                FIELD_TYPE_STRING,
+                "Pipeline XML",
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
+            self.session.add_field(
+                COLLECTION_HISTORY,
+                HISTORY_BRICKS,
+                FIELD_TYPE_LIST_STRING,
+                "Bricks list",
+                False,
+                TAG_ORIGIN_BUILTIN,
+                None,
+                None,
+            )
 
             # Adding default tags for the clinical mode
             if config.get_use_clinical() is True:
@@ -281,15 +449,29 @@ class Project():
                         field_type = FIELD_TYPE_INTEGER
                     else:
                         field_type = FIELD_TYPE_STRING
-                    self.session.add_field(COLLECTION_CURRENT, clinical_tag,
-                                           field_type, clinical_tag, True,
-                                           TAG_ORIGIN_BUILTIN, None, None)
-                    self.session.add_field(COLLECTION_INITIAL, clinical_tag,
-                                           field_type, clinical_tag, True,
-                                           TAG_ORIGIN_BUILTIN, None, None)
+                    self.session.add_field(
+                        COLLECTION_CURRENT,
+                        clinical_tag,
+                        field_type,
+                        clinical_tag,
+                        True,
+                        TAG_ORIGIN_BUILTIN,
+                        None,
+                        None,
+                    )
+                    self.session.add_field(
+                        COLLECTION_INITIAL,
+                        clinical_tag,
+                        field_type,
+                        clinical_tag,
+                        True,
+                        TAG_ORIGIN_BUILTIN,
+                        None,
+                        None,
+                    )
 
         self.session.commit()
-        
+
         self.properties = self.loadProperties()
 
         self._unsavedModifications = False
@@ -307,7 +489,8 @@ class Project():
         for clinical_tag in CLINICAL_TAGS:
 
             if clinical_tag not in self.session.get_fields_names(
-                                                            COLLECTION_CURRENT):
+                COLLECTION_CURRENT
+            ):
 
                 if clinical_tag == "Age":
                     field_type = FIELD_TYPE_INTEGER
@@ -316,19 +499,39 @@ class Project():
                     field_type = FIELD_TYPE_STRING
 
                 self.session.add_field(
-                    COLLECTION_CURRENT, clinical_tag, field_type,
-                    clinical_tag, True, TAG_ORIGIN_BUILTIN, None, None)
+                    COLLECTION_CURRENT,
+                    clinical_tag,
+                    field_type,
+                    clinical_tag,
+                    True,
+                    TAG_ORIGIN_BUILTIN,
+                    None,
+                    None,
+                )
                 self.session.add_field(
-                    COLLECTION_INITIAL, clinical_tag, field_type,
-                    clinical_tag, True, TAG_ORIGIN_BUILTIN, None, None)
+                    COLLECTION_INITIAL,
+                    clinical_tag,
+                    field_type,
+                    clinical_tag,
+                    True,
+                    TAG_ORIGIN_BUILTIN,
+                    None,
+                    None,
+                )
 
                 for scan in self.session.get_documents(COLLECTION_CURRENT):
                     self.session.add_value(
-                        COLLECTION_CURRENT, getattr(scan, TAG_FILENAME),
-                        clinical_tag, None)
+                        COLLECTION_CURRENT,
+                        getattr(scan, TAG_FILENAME),
+                        clinical_tag,
+                        None,
+                    )
                     self.session.add_value(
-                        COLLECTION_INITIAL, getattr(scan, TAG_FILENAME),
-                        clinical_tag, None)
+                        COLLECTION_INITIAL,
+                        getattr(scan, TAG_FILENAME),
+                        clinical_tag,
+                        None,
+                    )
 
                 return_tags.append(clinical_tag)
                 self.session.commit()
@@ -345,11 +548,10 @@ class Project():
         for clinical_tag in CLINICAL_TAGS:
 
             if clinical_tag in self.session.get_fields_names(
-                    COLLECTION_CURRENT):
-                self.session.remove_field(COLLECTION_CURRENT,
-                                          clinical_tag)
-                self.session.remove_field(COLLECTION_INITIAL,
-                                                  clinical_tag)
+                COLLECTION_CURRENT
+            ):
+                self.session.remove_field(COLLECTION_CURRENT, clinical_tag)
+                self.session.remove_field(COLLECTION_INITIAL, clinical_tag)
 
                 return_tags.append(clinical_tag)
                 self.session.commit()
@@ -384,8 +586,9 @@ class Project():
         from PyQt5.QtWidgets import QInputDialog, QLineEdit
 
         text, ok_pressed = QInputDialog.getText(
-            None, "Save a filter", "Filter name: ", QLineEdit.Normal, "")
-        if ok_pressed and text != '':
+            None, "Save a filter", "Filter name: ", QLineEdit.Normal, ""
+        )
+        if ok_pressed and text != "":
             return text
 
     def getName(self):
@@ -422,7 +625,7 @@ class Project():
                   False otherwise
         """
 
-        return self.unsavedModifications;
+        return self.unsavedModifications
 
     def init_filters(self):
         """Initialize the filters at project opening."""
@@ -432,26 +635,33 @@ class Project():
 
         filters_folder = os.path.join(self.folder, "filters")
 
-        for filename in glob.glob(os.path.join(filters_folder, '*')):
+        for filename in glob.glob(os.path.join(filters_folder, "*")):
             filter, extension = os.path.splitext(os.path.basename(filename))
             # make sure this gets closed automatically
             # as soon as we are done reading
-            with open(filename, 'r') as f:
+            with open(filename, "r") as f:
                 data = json.load(f)
-            filter_object = Filter(filter, data["nots"], data["values"],
-                                   data["fields"], data["links"],
-                                   data["conditions"], data["search_bar_text"])
+            filter_object = Filter(
+                filter,
+                data["nots"],
+                data["values"],
+                data["fields"],
+                data["links"],
+                data["conditions"],
+                data["search_bar_text"],
+            )
             self.filters.append(filter_object)
 
     def loadProperties(self):
         """Load the properties file."""
-        with open(os.path.join(
-                self.folder, 'properties', 'properties.yml'), 'r') as stream:
-            
+        with open(
+            os.path.join(self.folder, "properties", "properties.yml"), "r"
+        ) as stream:
+
             try:
-                if verCmp(yaml.__version__, '5.1', 'sup'):
+                if verCmp(yaml.__version__, "5.1", "sup"):
                     return yaml.load(stream, Loader=yaml.FullLoader)
-                else:    
+                else:
                     return yaml.load(stream)
 
             except yaml.YAMLError as exc:
@@ -470,8 +680,8 @@ class Project():
             - modified_visibilities
         """
         # To avoid circular imports
-        from populse_mia.user_interface.data_browser.data_browser import (
-            not_defined_value)
+        from populse_mia.user_interface.data_browser.data_browser import \
+            not_defined_value
 
         # We can redo if we have an action to make again
         if len(self.redos) > 0:
@@ -495,19 +705,33 @@ class Project():
                 values = to_redo[6]  # List of values stored
                 # Adding the tag
                 self.session.add_field(
-                    COLLECTION_CURRENT, tag_to_add, tag_type,
-                    tag_description, True, TAG_ORIGIN_USER, tag_unit,
-                    tag_default_value)
+                    COLLECTION_CURRENT,
+                    tag_to_add,
+                    tag_type,
+                    tag_description,
+                    True,
+                    TAG_ORIGIN_USER,
+                    tag_unit,
+                    tag_default_value,
+                )
                 self.session.add_field(
-                    COLLECTION_INITIAL, tag_to_add, tag_type,
-                    tag_description, True, TAG_ORIGIN_USER, tag_unit,
-                    tag_default_value)
+                    COLLECTION_INITIAL,
+                    tag_to_add,
+                    tag_type,
+                    tag_description,
+                    True,
+                    TAG_ORIGIN_USER,
+                    tag_unit,
+                    tag_default_value,
+                )
                 # Adding all the values associated
                 for value in values:
                     self.session.add_value(
-                        COLLECTION_CURRENT, value[0], value[1], value[2])
+                        COLLECTION_CURRENT, value[0], value[1], value[2]
+                    )
                     self.session.add_value(
-                        COLLECTION_INITIAL, value[0], value[1], value[3])
+                        COLLECTION_INITIAL, value[0], value[1], value[3]
+                    )
                 column = table.get_index_insertion(tag_to_add)
                 table.add_column(column, tag_to_add)
 
@@ -520,9 +744,11 @@ class Project():
                     # all the tags params
                     tag_to_remove = tags_removed[i][0].field_name
                     self.session.remove_field(
-                        COLLECTION_CURRENT, tag_to_remove)
+                        COLLECTION_CURRENT, tag_to_remove
+                    )
                     self.session.remove_field(
-                        COLLECTION_INITIAL, tag_to_remove)
+                        COLLECTION_INITIAL, tag_to_remove
+                    )
                     column_to_remove = table.get_tag_column(tag_to_remove)
                     table.removeColumn(column_to_remove)
 
@@ -544,13 +770,20 @@ class Project():
                 for i in range(0, len(values_added)):
                     value_to_add = values_added[i]
                     self.session.add_value(
-                        COLLECTION_CURRENT, value_to_add[0],
-                        value_to_add[1], value_to_add[2])
+                        COLLECTION_CURRENT,
+                        value_to_add[0],
+                        value_to_add[1],
+                        value_to_add[2],
+                    )
                     self.session.add_value(
-                        COLLECTION_INITIAL, value_to_add[0],
-                        value_to_add[1], value_to_add[3])
-                table.add_rows(self.session.get_documents_names(
-                    COLLECTION_CURRENT))
+                        COLLECTION_INITIAL,
+                        value_to_add[0],
+                        value_to_add[1],
+                        value_to_add[3],
+                    )
+                table.add_rows(
+                    self.session.get_documents_names(COLLECTION_CURRENT)
+                )
 
             # if action == "remove_scans":
             #     # To remove a scan, we only need the FileName of the scan
@@ -588,7 +821,8 @@ class Project():
                     new_value = value_to_restore[3]
 
                     item = table.item(
-                        table.get_scan_row(scan), table.get_tag_column(tag))
+                        table.get_scan_row(scan), table.get_tag_column(tag)
+                    )
                     if old_value is None:
                         # Font reput to normal in case it was a not
                         # defined cell
@@ -597,18 +831,24 @@ class Project():
                         font.setBold(False)
                         item.setFont(font)
                     self.session.set_value(
-                        COLLECTION_CURRENT, scan, tag, new_value)
+                        COLLECTION_CURRENT, scan, tag, new_value
+                    )
                     if new_value is None:
                         font = item.font()
                         font.setItalic(True)
                         font.setBold(True)
                         item.setFont(font)
                         set_item_data(
-                            item, not_defined_value, FIELD_TYPE_STRING)
+                            item, not_defined_value, FIELD_TYPE_STRING
+                        )
                     else:
                         set_item_data(
-                            item, new_value, self.session.get_field(
-                                COLLECTION_CURRENT, tag).field_type)
+                            item,
+                            new_value,
+                            self.session.get_field(
+                                COLLECTION_CURRENT, tag
+                            ).field_type,
+                        )
                 table.update_colors()
                 table.itemChanged.connect(table.change_cell_color)
 
@@ -621,8 +861,9 @@ class Project():
                 self.session.set_shown_tags(showed_tags)
                 # Columns updated
                 table.update_visualized_columns(
-                    old_tags, self.session.get_shown_tags())
-            
+                    old_tags, self.session.get_shown_tags()
+                )
+
     def reput_values(self, values):
         """Re-put the value objects in the database.
 
@@ -633,11 +874,17 @@ class Project():
             # We reput each value, exactly the same as it was before
             valueToReput = values[i]
             self.session.add_value(
-                COLLECTION_CURRENT, valueToReput[0], valueToReput[1],
-                valueToReput[2])
+                COLLECTION_CURRENT,
+                valueToReput[0],
+                valueToReput[1],
+                valueToReput[2],
+            )
             self.session.add_value(
-                COLLECTION_INITIAL, valueToReput[0], valueToReput[1],
-                valueToReput[3])
+                COLLECTION_INITIAL,
+                valueToReput[0],
+                valueToReput[1],
+                valueToReput[3],
+            )
 
     def save_current_filter(self, custom_filters):
         """Save the current filter.
@@ -674,7 +921,8 @@ class Project():
                 msg.setIcon(QMessageBox.Warning)
                 msg.setText("The filter already exists in the project")
                 msg.setInformativeText(
-                    "The project already has a filter named " + filter_name)
+                    "The project already has a filter named " + filter_name
+                )
                 msg.setWindowTitle("Warning")
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.buttonClicked.connect(msg.close)
@@ -682,7 +930,7 @@ class Project():
 
             else:
                 # Json filter file written
-                with open(file_path, 'w') as outfile:
+                with open(file_path, "w") as outfile:
 
                     new_filter = Filter(
                         filter_name,
@@ -691,7 +939,8 @@ class Project():
                         self.currentFilter.fields,
                         self.currentFilter.links,
                         self.currentFilter.conditions,
-                        self.currentFilter.search_bar)
+                        self.currentFilter.search_bar,
+                    )
 
                     json.dump(new_filter.json_format(), outfile)
                     self.filters.append(new_filter)
@@ -699,10 +948,17 @@ class Project():
     def saveConfig(self):
         """Save the changes in the properties file."""
 
-        with open(os.path.join(self.folder, 'properties', 'properties.yml'),
-                  'w', encoding='utf8') as configfile:
-            yaml.dump(self.properties, configfile,
-                      default_flow_style=False, allow_unicode=True)
+        with open(
+            os.path.join(self.folder, "properties", "properties.yml"),
+            "w",
+            encoding="utf8",
+        ) as configfile:
+            yaml.dump(
+                self.properties,
+                configfile,
+                default_flow_style=False,
+                allow_unicode=True,
+            )
 
     def saveModifications(self):
         """Save the pending operations of the project (actions
@@ -773,8 +1029,8 @@ class Project():
         """
 
         # To avoid circular imports
-        from populse_mia.user_interface.data_browser.data_browser import (
-            not_defined_value)
+        from populse_mia.user_interface.data_browser.data_browser import \
+            not_defined_value
 
         # We can undo if we have an action to revert
         if len(self.undos) > 0:
@@ -807,15 +1063,25 @@ class Project():
                     # all the tags params
                     tag_to_reput = tags_removed[i][0]
                     self.session.add_field(
-                        COLLECTION_CURRENT, tag_to_reput.field_name,
-                        tag_to_reput.field_type, tag_to_reput.description,
-                        tag_to_reput.visibility, tag_to_reput.origin,
-                        tag_to_reput.unit, tag_to_reput.default_value)
+                        COLLECTION_CURRENT,
+                        tag_to_reput.field_name,
+                        tag_to_reput.field_type,
+                        tag_to_reput.description,
+                        tag_to_reput.visibility,
+                        tag_to_reput.origin,
+                        tag_to_reput.unit,
+                        tag_to_reput.default_value,
+                    )
                     self.session.add_field(
-                        COLLECTION_INITIAL, tag_to_reput.field_name,
-                        tag_to_reput.field_type, tag_to_reput.description,
-                        tag_to_reput.visibility, tag_to_reput.origin,
-                        tag_to_reput.unit, tag_to_reput.default_value)
+                        COLLECTION_INITIAL,
+                        tag_to_reput.field_name,
+                        tag_to_reput.field_type,
+                        tag_to_reput.description,
+                        tag_to_reput.visibility,
+                        tag_to_reput.origin,
+                        tag_to_reput.unit,
+                        tag_to_reput.default_value,
+                    )
                 # The third element is a list of tags values (Value class)
                 values_removed = to_undo[2]
                 self.reput_values(values_removed)
@@ -833,9 +1099,11 @@ class Project():
                     # We remove each scan added
                     scan_to_remove = scans_added[i]
                     self.session.remove_document(
-                        COLLECTION_CURRENT, scan_to_remove)
+                        COLLECTION_CURRENT, scan_to_remove
+                    )
                     self.session.remove_document(
-                        COLLECTION_INITIAL, scan_to_remove)
+                        COLLECTION_INITIAL, scan_to_remove
+                    )
                     table.removeRow(table.get_scan_row(scan_to_remove))
                     table.scans_to_visualize.remove(scan_to_remove)
                 table.itemChanged.disconnect()
@@ -880,15 +1148,19 @@ class Project():
                     old_value = value_to_restore[2]
                     new_value = value_to_restore[3]
                     item = table.item(
-                        table.get_scan_row(scan), table.get_tag_column(tag))
+                        table.get_scan_row(scan), table.get_tag_column(tag)
+                    )
                     if old_value is None:
                         # If the cell was not defined before, we reput it
                         self.session.remove_value(
-                            COLLECTION_CURRENT, scan, tag)
+                            COLLECTION_CURRENT, scan, tag
+                        )
                         self.session.remove_value(
-                            COLLECTION_INITIAL, scan, tag)
+                            COLLECTION_INITIAL, scan, tag
+                        )
                         set_item_data(
-                            item, not_defined_value, FIELD_TYPE_STRING)
+                            item, not_defined_value, FIELD_TYPE_STRING
+                        )
                         font = item.font()
                         font.setItalic(True)
                         font.setBold(True)
@@ -897,10 +1169,15 @@ class Project():
                         # If the cell was there before,
                         # we just set it to the old value
                         self.session.set_value(
-                            COLLECTION_CURRENT, scan, tag, old_value)
+                            COLLECTION_CURRENT, scan, tag, old_value
+                        )
                         set_item_data(
-                            item, old_value, self.session.get_field(
-                                COLLECTION_CURRENT, tag).field_type)
+                            item,
+                            old_value,
+                            self.session.get_field(
+                                COLLECTION_CURRENT, tag
+                            ).field_type,
+                        )
                         # If the new value is None,
                         # the not defined font must be removed
                         if new_value is None:
@@ -920,8 +1197,8 @@ class Project():
                 self.session.set_shown_tags(visibles)
                 # Columns updated
                 table.update_visualized_columns(
-                    old_tags, self.session.get_shown_tags())
-
+                    old_tags, self.session.get_shown_tags()
+                )
 
     @property
     def unsavedModifications(self):
@@ -930,7 +1207,7 @@ class Project():
 
     @unsavedModifications.setter
     def unsavedModifications(self, value):
-        """ Modify the window title depending of whether the project has
+        """Modify the window title depending of whether the project has
            unsaved modifications or not.
 
         :param value: boolean
@@ -941,9 +1218,9 @@ class Project():
             from PyQt5.QtCore import QCoreApplication
 
             app = QCoreApplication.instance()
-            if self._unsavedModifications :
+            if self._unsavedModifications:
                 if app.title()[-1] != "*":
-                    app.set_title(app.title()+"*")
+                    app.set_title(app.title() + "*")
             else:
                 if app.title()[-1] == "*":
                     app.set_title(app.title()[:-1])
@@ -967,8 +1244,9 @@ class Project():
 
         The returned value is a set of filenames (str).
         """
-        proj_dir = os.path.join(os.path.abspath(
-            os.path.normpath(self.folder)), '')
+        proj_dir = os.path.join(
+            os.path.abspath(os.path.normpath(self.folder)), ""
+        )
         pl = len(proj_dir)
 
         values = set()
@@ -1023,27 +1301,41 @@ class Project():
         they still can be used in other data.
         """
         #
-        scan_bricks = list(self.session.get_documents(
-            COLLECTION_CURRENT, document_ids=list(data),
-            fields=[TAG_FILENAME, TAG_BRICKS], as_list=True))
-        scan_bricks = {brick[0]: brick[1] for brick in scan_bricks
-                       if brick and brick[0] is not None}
+        scan_bricks = list(
+            self.session.get_documents(
+                COLLECTION_CURRENT,
+                document_ids=list(data),
+                fields=[TAG_FILENAME, TAG_BRICKS],
+                as_list=True,
+            )
+        )
+        scan_bricks = {
+            brick[0]: brick[1]
+            for brick in scan_bricks
+            if brick and brick[0] is not None
+        }
 
         obsolete = set()
         used = set()
         for output in data:
             o_hist = self.get_data_history(output)
-            p_hist = o_hist['processes']
+            p_hist = o_hist["processes"]
             used.update(p_hist)
             old_bricks = scan_bricks.get(output)
             if old_bricks:
-                new_bricks = [brid for brid in old_bricks
-                              if brid in p_hist]
+                new_bricks = [brid for brid in old_bricks if brid in p_hist]
                 if len(new_bricks) != len(old_bricks):
-                    print('update file history for:', output, ':', old_bricks,
-                          '->', new_bricks)
+                    print(
+                        "update file history for:",
+                        output,
+                        ":",
+                        old_bricks,
+                        "->",
+                        new_bricks,
+                    )
                     self.session.set_value(
-                        COLLECTION_CURRENT, output, TAG_BRICKS, new_bricks)
+                        COLLECTION_CURRENT, output, TAG_BRICKS, new_bricks
+                    )
 
         for bricks in scan_bricks.values():
             if bricks:
@@ -1051,8 +1343,7 @@ class Project():
         return obsolete
 
     def finished_bricks(self, engine, pipeline=None, include_done=False):
-        """
-        """
+        """ """
         bricks = self.get_finished_bricks_in_workflows(engine)
         if pipeline:
             pbricks = self.get_finished_bricks_in_pipeline(engine, pipeline)
@@ -1061,28 +1352,37 @@ class Project():
 
         # filter jobs actually in MIA database
         docs = self.session.get_documents(
-            COLLECTION_BRICK, document_ids=list(bricks.keys()),
-            fields=[BRICK_ID, BRICK_EXEC, BRICK_OUTPUTS], as_list=True)
-        docs = {brid: {'brick_exec': brick_exec, 'outputs': outputs}
-                for brid, brick_exec, outputs in docs
-                if include_done or brick_exec == 'Not Done'}
+            COLLECTION_BRICK,
+            document_ids=list(bricks.keys()),
+            fields=[BRICK_ID, BRICK_EXEC, BRICK_OUTPUTS],
+            as_list=True,
+        )
+        docs = {
+            brid: {"brick_exec": brick_exec, "outputs": outputs}
+            for brid, brick_exec, outputs in docs
+            if include_done or brick_exec == "Not Done"
+        }
 
         def updated(d1, d2):
             d1.update(d2)
             return d1
 
-        bricks = {brid: updated(value, docs[brid])
-                  for brid, value in bricks.items() if brid in docs}
+        bricks = {
+            brid: updated(value, docs[brid])
+            for brid, value in bricks.items()
+            if brid in docs
+        }
 
         # get complete list of outputs to be updated in the database
         outputs = set()
-        proj_dir = os.path.join(os.path.abspath(os.path.normpath(
-            self.folder)), '')
+        proj_dir = os.path.join(
+            os.path.abspath(os.path.normpath(self.folder)), ""
+        )
         lp = len(proj_dir)
 
         def _update_set(outputs, output):
-            ''' update the outputs set with file/dir names in output, relative
-            to the project directory '''
+            """update the outputs set with file/dir names in output, relative
+            to the project directory"""
             todo = [output]
             while todo:
                 output = todo.pop(0)
@@ -1090,7 +1390,7 @@ class Project():
                     todo += output
                 elif isinstance(output, str):
                     path = os.path.abspath(os.path.normpath(output))
-                    if path.startswith(proj_dir): # and os.path.exists(path):
+                    if path.startswith(proj_dir):  # and os.path.exists(path):
                         # record only existing files
                         output = path[lp:]
                         outputs.add(output)
@@ -1098,20 +1398,19 @@ class Project():
         procs = {}
 
         for brid, brdesc in bricks.items():
-            out_data = brdesc['outputs']
+            out_data = brdesc["outputs"]
             if out_data:
                 for param, output in out_data.items():
                     _update_set(outputs, output)
 
-        return {'bricks': bricks, 'outputs': outputs}
+        return {"bricks": bricks, "outputs": outputs}
 
     def get_finished_bricks_in_workflows(self, engine):
-        """
-        """
+        """ """
         import soma_workflow.client as swclient
         from soma_workflow import constants
 
-        swm = engine.study_config.modules['SomaWorkflowConfig']
+        swm = engine.study_config.modules["SomaWorkflowConfig"]
         swm.connect_resource(engine.connected_to())
         controller = swm.get_workflow_controller()
 
@@ -1123,7 +1422,7 @@ class Project():
             finished_jobs = {}
             for job_st in wf_st[0]:
                 job_id = job_st[0]
-                if job_st[1] != 'done' or job_st[3][0] != 'finished_regularly':
+                if job_st[1] != "done" or job_st[3][0] != "finished_regularly":
                     continue
                 finished_jobs[job_id] = job_st
 
@@ -1132,7 +1431,7 @@ class Project():
 
             wf = controller.workflow(wf_id)
             for job in wf.jobs:
-                brid = getattr(job, 'uuid', None)
+                brid = getattr(job, "uuid", None)
                 if not brid:
                     continue
                 # get engine job
@@ -1142,42 +1441,46 @@ class Project():
                 if not status:
                     continue
 
-                jobs[brid] = {'workflow': wf_id,
-                              'job': job,
-                              'job_id': job_id,
-                              'swf_status': status}
+                jobs[brid] = {
+                    "workflow": wf_id,
+                    "job": job,
+                    "job_id": job_id,
+                    "swf_status": status,
+                }
 
         return jobs
 
     def get_finished_bricks_in_pipeline(self, engine, pipeline):
-        """
-        """
+        """ """
         if not isinstance(pipeline, Pipeline):
             # it's a single process...
             procs = {}
-            brid = getattr(pipeline, 'uuid', None)
+            brid = getattr(pipeline, "uuid", None)
             if brid is not None:
-                procs[brid] = {'process': pipeline}
+                procs[brid] = {"process": pipeline}
 
             return procs
 
-        nodes_list = [n for n in pipeline.nodes.items()
-                      if n[0] != ''
-                          and pipeline_tools.is_node_enabled(
-                              pipeline, n[0], n[1])]
+        nodes_list = [
+            n
+            for n in pipeline.nodes.items()
+            if n[0] != ""
+            and pipeline_tools.is_node_enabled(pipeline, n[0], n[1])
+        ]
 
         all_nodes = list(nodes_list)
         while nodes_list:
             node_name, node = nodes_list.pop(0)
-            if hasattr(node, 'process'):
+            if hasattr(node, "process"):
                 process = node.process
 
                 if isinstance(node, PipelineNode):
                     new_nodes = [
-                        n for n in process.nodes.items()
-                        if n[0] != ''
-                            and pipeline_tools.is_node_enabled(
-                                process, n[0], n[1])]
+                        n
+                        for n in process.nodes.items()
+                        if n[0] != ""
+                        and pipeline_tools.is_node_enabled(process, n[0], n[1])
+                    ]
                     nodes_list += new_nodes
                     all_nodes += new_nodes
 
@@ -1186,15 +1489,14 @@ class Project():
         for node_name, node in all_nodes:
             if isinstance(node, ProcessNode):
                 process = node.process
-                brid = getattr(process, 'uuid', None)
+                brid = getattr(process, "uuid", None)
                 if brid is not None:
-                    procs[brid] = {'process': process}
+                    procs[brid] = {"process": process}
 
         return procs
 
     def get_orphan_bricks(self, bricks=None):
-        """
-        """
+        """ """
         orphan = set()
         orphan_weak_files = set()
         used_bricks = set()
@@ -1202,11 +1504,15 @@ class Project():
             bricks = list(bricks)
 
         brick_docs = self.session.get_document(
-            COLLECTION_BRICK, document_ids=bricks,
-            fields=[BRICK_ID, BRICK_OUTPUTS], as_list=True)
+            COLLECTION_BRICK,
+            document_ids=bricks,
+            fields=[BRICK_ID, BRICK_OUTPUTS],
+            as_list=True,
+        )
 
-        proj_dir = os.path.join(os.path.abspath(os.path.normpath(
-            self.folder)), '')
+        proj_dir = os.path.join(
+            os.path.abspath(os.path.normpath(self.folder)), ""
+        )
         lp = len(proj_dir)
 
         for brick in brick_docs:
@@ -1229,15 +1535,18 @@ class Project():
                         value = path[lp:]
                         values.add(value)
             docs = self.session.get_documents(
-                COLLECTION_CURRENT, document_ids=list(values),
-                fields=[TAG_FILENAME, TAG_BRICKS], as_list=True)
+                COLLECTION_CURRENT,
+                document_ids=list(values),
+                fields=[TAG_FILENAME, TAG_BRICKS],
+                as_list=True,
+            )
             used = False
             orphan_files = set()
             for doc in docs:
                 if doc[1] and brid in doc[1]:
-                    if (doc[0].startswith('scripts/')
-                        or not os.path.exists(os.path.join(self.folder,
-                                                           doc[0]))):
+                    if doc[0].startswith("scripts/") or not os.path.exists(
+                        os.path.join(self.folder, doc[0])
+                    ):
                         # script files are "weak" and should not prevent
                         # brick deletion.
                         # non-existing files can be cleared too.
@@ -1259,15 +1568,15 @@ class Project():
         Remove orphan bricks from the database
         """
         obsolete, orphan_files = self.get_orphan_bricks(bricks)
-        print('really orphan:', obsolete)
+        print("really orphan:", obsolete)
         for brick in obsolete:
-            print('remove obsolete brick:', brick)
+            print("remove obsolete brick:", brick)
             try:
                 self.session.remove_document(COLLECTION_BRICK, brick)
             except ValueError:
                 pass  # malformed database, the brick doesn't exist
         for doc in orphan_files:
-            print('remove orphan file:', doc)
+            print("remove orphan file:", doc)
             try:
                 self.session.remove_document(COLLECTION_CURRENT, doc)
                 self.session.remove_document(COLLECTION_INITIAL, doc)
@@ -1277,19 +1586,21 @@ class Project():
                 os.unlink(os.path.join(self.folder, doc))
 
     def get_orphan_history(self):
-        """
-        """
+        """ """
         orphan_hist = set()
         orphan_bricks = set()
         orphan_weak_files = set()
         used_hist = set()
 
         hist_docs = self.session.get_documents(
-            COLLECTION_HISTORY, fields=[HISTORY_ID, HISTORY_BRICKS],
-            as_list=True)
+            COLLECTION_HISTORY,
+            fields=[HISTORY_ID, HISTORY_BRICKS],
+            as_list=True,
+        )
 
-        proj_dir = os.path.join(os.path.abspath(os.path.normpath(
-            self.folder)), '')
+        proj_dir = os.path.join(
+            os.path.abspath(os.path.normpath(self.folder)), ""
+        )
         lp = len(proj_dir)
 
         for hist in hist_docs:
@@ -1303,7 +1614,8 @@ class Project():
             values = set()
             for brid in hist[1]:
                 brick_doc = self.session.get_value(
-                    COLLECTION_BRICK, brid, BRICK_OUTPUTS)
+                    COLLECTION_BRICK, brid, BRICK_OUTPUTS
+                )
                 if brick_doc is None:
                     todo = []
                 else:
@@ -1320,15 +1632,18 @@ class Project():
                             values.add(value)
 
             docs = self.session.get_documents(
-                COLLECTION_CURRENT, document_ids=list(values),
-                fields=[TAG_FILENAME, TAG_HISTORY], as_list=True)
+                COLLECTION_CURRENT,
+                document_ids=list(values),
+                fields=[TAG_FILENAME, TAG_HISTORY],
+                as_list=True,
+            )
             used = False
             orphan_files = set()
             for doc in docs:
                 if doc[1] and hist_id == doc[1]:
-                    if (doc[0].startswith('scripts/')
-                        or not os.path.exists(os.path.join(self.folder,
-                                                           doc[0]))):
+                    if doc[0].startswith("scripts/") or not os.path.exists(
+                        os.path.join(self.folder, doc[0])
+                    ):
                         # script files are "weak" and should not prevent
                         # brick deletion.
                         # non-existing files can be cleared too.
@@ -1349,22 +1664,22 @@ class Project():
         Remove orphan bricks from the database
         """
         obs_hist, obs_bricks, orphan_files = self.get_orphan_history()
-        print('orphan histories:', obs_hist)
-        print('orphan bricks:', obs_bricks)
+        print("orphan histories:", obs_hist)
+        print("orphan bricks:", obs_bricks)
         for hist in obs_hist:
-            print('remove obsolete history:', hist)
+            print("remove obsolete history:", hist)
             try:
                 self.session.remove_document(COLLECTION_HISTORY, hist)
             except ValueError:
                 pass  # malformed database, the brick doesn't exist
         for brick in obs_bricks:
-            print('remove obsolete brick:', brick)
+            print("remove obsolete brick:", brick)
             try:
                 self.session.remove_document(COLLECTION_BRICK, brick)
             except ValueError:
                 pass  # malformed database, the brick doesn't exist
         for doc in orphan_files:
-            print('remove orphan file:', doc)
+            print("remove orphan file:", doc)
             try:
                 self.session.remove_document(COLLECTION_CURRENT, doc)
                 self.session.remove_document(COLLECTION_INITIAL, doc)
@@ -1377,19 +1692,24 @@ class Project():
         """
         Get orphan files which do not exist from the database
         """
-        #filter_query = '{Bricks} == None'
-        #docs = self.session.filter_documents(
-            #COLLECTION_CURRENT, filter_query, fields=[TAG_FILENAME],
-            #as_list=True)
+        # filter_query = '{Bricks} == None'
+        # docs = self.session.filter_documents(
+        # COLLECTION_CURRENT, filter_query, fields=[TAG_FILENAME],
+        # as_list=True)
         docs = self.session.get_documents(
-            COLLECTION_CURRENT, fields=[TAG_FILENAME, TAG_BRICKS],
-            as_list=True)
+            COLLECTION_CURRENT, fields=[TAG_FILENAME, TAG_BRICKS], as_list=True
+        )
         orphan = set()
         for doc in docs:
             if doc[1]:
-                bricks = list(self.session.get_documents(
-                    COLLECTION_BRICK, document_ids=doc[1],
-                    fields=[BRICK_ID], as_list=True))
+                bricks = list(
+                    self.session.get_documents(
+                        COLLECTION_BRICK,
+                        document_ids=doc[1],
+                        fields=[BRICK_ID],
+                        as_list=True,
+                    )
+                )
                 if bricks:
                     continue
             if not os.path.exists(os.path.join(self.folder, doc[0])):
@@ -1402,7 +1722,7 @@ class Project():
         """
         orphan_files = self.get_orphan_nonexsiting_files()
         for doc in orphan_files:
-            print('remove orphan file:', doc)
+            print("remove orphan file:", doc)
             try:
                 self.session.remove_document(COLLECTION_CURRENT, doc)
                 self.session.remove_document(COLLECTION_INITIAL, doc)
@@ -1410,4 +1730,3 @@ class Project():
                 pass  # malformed database, the file doesn't exist
             if os.path.exists(os.path.join(self.folder, doc)):
                 os.unlink(os.path.join(self.folder, doc))
-
