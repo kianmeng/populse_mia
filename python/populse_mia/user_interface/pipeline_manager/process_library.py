@@ -1660,7 +1660,7 @@ class PackageLibraryDialog(QDialog):
                             print("{0}: {1}\n".format(e.__class__.__name__, e))
 
                         else:
-                            # Updating the tree's dictionnary
+                            # Updating the tree's dictionary
                             path_list = module_name.split(".")
                             path_list.append(k)
                             pkg_iter = self.packages
@@ -1745,7 +1745,7 @@ class PackageLibraryDialog(QDialog):
         if _2add is False:
             _2add = self.line_edit.text()
 
-        if self.is_path:  # Currently the self.is_path = False
+        if self.is_path:  # Currently, the self.is_path = False
             # (Need to pass by the method browse_package to initialise to
             # True and the Browse button is commented.
             # Could be interesting to permit a backdoor to pass
