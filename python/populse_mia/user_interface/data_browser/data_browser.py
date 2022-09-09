@@ -1589,7 +1589,8 @@ class TableDataBrowser(QTableWidget):
         for point in points:
             row = point.row()
             scan_path = self.item(row, 0).text()
-            full_name = os.path.join(self.project.folder, scan_path)
+            full_name = os.path.abspath(os.path.join(self.project.folder,
+                                                     scan_path))
 
             if platform == "linux":
                 subprocess.Popen(["xdg-open", full_name])
