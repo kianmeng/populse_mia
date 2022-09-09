@@ -2445,6 +2445,39 @@ class PipelineManagerTab(QWidget):
 
             # else:
 
+            # soma-workflow remote credentials
+            from soma_workflow.gui.workflowGui import ConnectionDialog
+            from soma_workflow import configuration
+            config_file = configuration.Configuration.search_config_path()
+            resource_list \
+                = configuration.Configuration.get_configured_resources(
+                    config_file)
+            login_list = configuration.Configuration.get_logins(config_file)
+            cd = ConnectionDialog(login_list, resource_list)
+            res = cd.exec_()
+            if res == 0:
+                return
+            engine = self.get_capsul_engine()
+            resource = cd.ui.combo_resources.currentText()
+            login = cd.ui.lineEdit_login.text()
+            passwd = cd.ui.lineEdit_password.text()
+            rsa_key = cd.ui.lineEdit_rsa_password.text()
+            if resource not in (
+                '', 'localhost',
+                configuration.Configuration.get_local_resource_id()):
+                sc = engine.study_config
+                if 'SomaWorkflowConfig' in sc.modules:
+                    # not sure this is needed...
+                    sc.somaworkflow_computing_resource = resource
+                    #setattr(sc.somaworkflow_computing_resources_config,
+                            #resource, {})
+                    swc = sc.modules['SomaWorkflowConfig']
+                    swc.set_computing_resource_password(resource, passwd,
+                                                        rsa_key)
+                print('CONNECT TO:', resource)
+                engine.connect(resource)
+
+
             self.progress = RunProgress(self)
             self.progress.setSizePolicy(
                 QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed
