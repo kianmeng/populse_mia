@@ -2453,29 +2453,35 @@ class PipelineManagerTab(QWidget):
                 = configuration.Configuration.get_configured_resources(
                     config_file)
             login_list = configuration.Configuration.get_logins(config_file)
-            cd = ConnectionDialog(login_list, resource_list)
-            res = cd.exec_()
-            if res == 0:
-                return
             engine = self.get_capsul_engine()
-            resource = cd.ui.combo_resources.currentText()
-            login = cd.ui.lineEdit_login.text()
-            passwd = cd.ui.lineEdit_password.text()
-            rsa_key = cd.ui.lineEdit_rsa_password.text()
-            if resource not in (
-                '', 'localhost',
-                configuration.Configuration.get_local_resource_id()):
-                sc = engine.study_config
-                if 'SomaWorkflowConfig' in sc.modules:
-                    # not sure this is needed...
-                    sc.somaworkflow_computing_resource = resource
-                    #setattr(sc.somaworkflow_computing_resources_config,
-                            #resource, {})
-                    swc = sc.modules['SomaWorkflowConfig']
-                    swc.set_computing_resource_password(resource, passwd,
-                                                        rsa_key)
-                print('CONNECT TO:', resource)
-                engine.connect(resource)
+            swf_config = engine.settings.select_configurations(
+                'global', {'somaworkflow': 'config_id=="somaworkflow"'})
+            if swf_config.get('use', True):
+                cd = ConnectionDialog(login_list, resource_list)
+                sel_resource = swf_config.get('computing_resource', None)
+                if sel_resource and sel_resource in resource_list:
+                    cd.ui.combo_resources.setCurrentText(sel_resource)
+                res = cd.exec_()
+                if res == 0:
+                    return
+                resource = cd.ui.combo_resources.currentText()
+                login = cd.ui.lineEdit_login.text()
+                passwd = cd.ui.lineEdit_password.text()
+                rsa_key = cd.ui.lineEdit_rsa_password.text()
+                if resource not in (
+                    '', 'localhost',
+                    configuration.Configuration.get_local_resource_id()):
+                    sc = engine.study_config
+                    if 'SomaWorkflowConfig' in sc.modules:
+                        # not sure this is needed...
+                        sc.somaworkflow_computing_resource = resource
+                        #setattr(sc.somaworkflow_computing_resources_config,
+                                #resource, {})
+                        swc = sc.modules['SomaWorkflowConfig']
+                        swc.set_computing_resource_password(resource, passwd,
+                                                            rsa_key)
+                    print('CONNECT TO:', resource)
+                    engine.connect(resource)
 
 
             self.progress = RunProgress(self)
@@ -3379,10 +3385,24 @@ class RunWorker(QThread):
 
         print("- Pipeline running ...\n")
 
+        workflow = self.pipeline_manager.workflow
+        # if we are running with file transfers / translations, then we must
+        # rebuild the workflow, because it has not been made with them.
+        resource_id = engine.connected_to()
+        resource_conf = engine.settings.select_configurations(
+            resource_id, {'somaworkflow': 'config_id=="somaworkflow"'}).get(
+                'capsul.engine.module.somaworkflow', {})
+        if resource_conf.get('transfer_paths', None) \
+                or resource_conf.get('path_translations', None):
+            print('rebuilding workflow for file transfers / translations...')
+            workflow = workflow_from_pipeline(
+                pipeline, complete_parameters=True, environment=resource_id)
+            print('running now...')
+
         try:
             exec_id, pipeline = engine.start(
                 pipeline,
-                workflow=self.pipeline_manager.workflow,
+                workflow=workflow,
                 get_pipeline=True,
             )
             self.exec_id = exec_id
