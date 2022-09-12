@@ -2907,6 +2907,7 @@ class PopUpPreferences(QDialog):
             "nipype",
             "afni",
             "ants",
+            "somaworkflow",
         ]:
             engine.load_module(module)
         envs = capsul_config.get("engine", {})

@@ -317,6 +317,7 @@ class Config:
                 "python",
                 "afni",
                 "ants",
+                "somaworkflow",
             ],
         )
         econf = capsul_config.setdefault("engine", {})
@@ -1580,6 +1581,7 @@ class Config:
             "axon",
             "afni",
             "ants",
+            "somaworkflow",
         ]:
             engine.load_module(module)
 
