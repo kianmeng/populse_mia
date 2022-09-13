@@ -3,6 +3,7 @@
 import logging
 from functools import partial
 
+import os
 import six
 import traits.api as traits
 from soma.qt_gui import controller_widget
