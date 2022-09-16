@@ -63,6 +63,19 @@ from traits.api import TraitListObject, Undefined
 # can be replaced by a function call to have an effect, e.g. sys.settrace()
 # sys.settrace
 
+uts_dir = os.path.isdir(
+             os.path.join(os.path.dirname(
+                              os.path.dirname(
+                                  os.path.dirname(__file__))),
+                          "miautdata"))
+
+if not uts_dir:
+    print('\nTo work properly, unit tests need data in the populse_mia(or '
+          'populse-mia)/miautdata directory. Please use:\n'
+          'git clone https://gricad-gitlab.univ-grenoble-alpes.fr/condamie/'
+          'miautdata.git\n'
+          'in populse_mia directory to download it...')
+
 if (
     not os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     in sys.path
@@ -210,7 +223,6 @@ if "NO_ET" not in os.environ:
 
 if "NIPYPE_NO_ET" not in os.environ:
     os.environ["NIPYPE_NO_ET"] = "1"
-
 
 class TestMIACase(unittest.TestCase):
     """Parent class for the test classes of mia.
@@ -456,6 +468,7 @@ class TestMIACase(unittest.TestCase):
 
         test_proj = os.path.join(
             mia_path,
+            "miautdata",
             "resources",
             "mia",
             "light_test_project" if light else "project_8",
@@ -1715,6 +1728,7 @@ class TestMIADataBrowser(TestMIACase):
         folder = os.path.abspath(
             os.path.join(
                 config.get_mia_path(),
+                "miautdata",
                 "resources",
                 "mia",
                 "project_8",
@@ -9147,6 +9161,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         folder = os.path.abspath(
             os.path.join(
                 config.get_mia_path(),
+                "miautdata",
                 "resources",
                 "mia",
                 "project_8",
@@ -9237,6 +9252,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         folder = os.path.abspath(
             os.path.join(
                 config.get_mia_path(),
+                "miautdata",
                 "resources",
                 "mia",
                 "project_8",
@@ -9408,6 +9424,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         folder = os.path.abspath(
             os.path.join(
                 config.get_mia_path(),
+                "miautdata",
                 "resources",
                 "mia",
                 "project_8",
@@ -9900,6 +9917,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         folder = os.path.abspath(
             os.path.join(
                 config.get_mia_path(),
+                "miautdata",
                 "resources",
                 "mia",
                 "project_8",
@@ -10074,6 +10092,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         folder = os.path.abspath(
             os.path.join(
                 config.get_mia_path(),
+                "miautdata",
                 "resources",
                 "mia",
                 "project_8",
