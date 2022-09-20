@@ -3293,6 +3293,7 @@ class PopUpPreferences(QDialog):
                         config.set_use_spm(True)
                         config.set_use_matlab(True)
                         config.set_use_matlab_standalone(False)
+                        config.set_use_spm_standalone(False)
 
                 elif os.path.isdir(spm_input):
 
@@ -3326,6 +3327,7 @@ class PopUpPreferences(QDialog):
                                 config.set_use_matlab(True)
                                 config.set_use_matlab_standalone(False)
                                 config.set_use_spm(True)
+                                config.set_use_spm_standalone(False)
 
                             config.set_spm_path(spm_input)
 
@@ -3354,9 +3356,12 @@ class PopUpPreferences(QDialog):
 
                 if matlab_input == config.get_matlab_path():
 
-                    if self.use_matlab_checkbox.isChecked():
+                    if (self.use_matlab_checkbox.isChecked() and
+                            not self.use_spm_checkbox.isChecked()):
                         config.set_use_matlab(True)
                         config.set_use_matlab_standalone(False)
+                        config.set_use_spm(False)
+                        config.set_use_spm_standalone(False)
 
                 elif os.path.isfile(matlab_input):
 
@@ -3384,6 +3389,8 @@ class PopUpPreferences(QDialog):
                             if self.use_matlab_checkbox.isChecked():
                                 config.set_use_matlab(True)
                                 config.set_use_matlab_standalone(False)
+                                config.set_use_spm(False)
+                                config.set_use_spm_standalone(False)
 
                         else:
                             self.wrong_path(matlab_input, "Matlab")
@@ -3570,9 +3577,13 @@ class PopUpPreferences(QDialog):
 
                 elif os.path.isdir(matlab_input):
 
-                    if self.use_matlab_standalone_checkbox.isChecked():
+                    if (self.use_matlab_standalone_checkbox.isChecked() and
+                            not self.use_spm_standalone_checkbox.isChecked()):
                         config.set_use_matlab_standalone(True)
                         config.set_matlab_standalone_path(matlab_input)
+                        config.set_use_matlab(False)
+                        config.set_use_spm_standalone(False)
+                        config.set_use_spm(False)
 
                 else:
                     self.wrong_path(matlab_input, "Matlab standalone")
