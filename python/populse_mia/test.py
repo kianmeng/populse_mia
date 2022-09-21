@@ -75,6 +75,7 @@ if not uts_dir:
           'git clone https://gricad-gitlab.univ-grenoble-alpes.fr/condamie/'
           'miautdata.git\n'
           'in populse_mia directory to download it...')
+    sys.exit()
 
 if (
     not os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
