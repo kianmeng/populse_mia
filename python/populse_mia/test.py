@@ -74,7 +74,7 @@ if not uts_dir:
           'populse-mia)/miautdata directory. Please use:\n'
           'git clone https://gricad-gitlab.univ-grenoble-alpes.fr/condamie/'
           'miautdata.git\n'
-          'in populse_mia directory to download it...')
+          'in populse_mia directory to download it...\n')
     sys.exit()
 
 if (
