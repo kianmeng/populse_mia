@@ -51,7 +51,7 @@ from matplotlib.backends.qt_compat import QtWidgets
 # MIA processes imports
 from mia_processes.bricks.tools.tools import Input_Filter
 # PyQt5 imports
-from PyQt5 import Qt
+from PyQt5 import Qt, QtCore
 from PyQt5.QtCore import QThread, QTimer, Signal
 from PyQt5.QtGui import QCursor, QIcon, QMovie
 from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QMenu,
@@ -1975,30 +1975,50 @@ class PipelineManagerTab(QWidget):
             )
 
             if not init_result:
-                self.msg = QMessageBox()
-                self.msg.setIcon(QMessageBox.Critical)
-                self.msg.setWindowTitle("MIA configuration warning!")
-                message = "The pipeline could not be initialised properly."
 
                 if init_messages:
+                    message = "The pipeline could not be initialised properly:"
 
                     for mssg in init_messages:
                         message = message + "\n- " + mssg
 
-                self.msg.setText(message)
+                else:
+                    message = ("The pipeline could not be initialised "
+                               "correctly, for an unknown reason!")
+
+                lineCnt = message.count('\n')
+                self.msg = QMessageBox()
+                self.msg.setWindowTitle("MIA configuration warning!")
+
+                if lineCnt > 10:
+                    scroll = QtWidgets.QScrollArea()
+                    scroll.setWidgetResizable(1)
+                    content = QtWidgets.QWidget()
+                    scroll.setWidget(content)
+                    layout = QtWidgets.QVBoxLayout(content)
+                    tmpLabel = QtWidgets.QLabel(message)
+                    tmpLabel.setTextInteractionFlags(
+                                                QtCore.Qt.TextSelectableByMouse)
+                    layout.addWidget(tmpLabel)
+                    self.msg.layout().addWidget(scroll, 0, 0, 1,
+                                                self.msg.layout().columnCount())
+                    self.msg.setStyleSheet("QScrollArea{min-width:550 px; "
+                                           "min-height: 300px}")
+
+                else:
+                    self.msg.setText(message)
+                    self.msg.setIcon(QMessageBox.Critical)
+
                 yes_button = self.msg.addButton(
                     "Open MIA preferences", QMessageBox.YesRole
                 )
-                ok_button = self.msg.addButton(QMessageBox.Ok)
+                self.msg.addButton(QMessageBox.Ok)
                 self.msg.exec()
 
                 if self.msg.clickedButton() == yes_button:
                     self.main_window.software_preferences_pop_up()
-                    (
-                        self.main_window.pop_up_preferences.tab_widget.setCurrentIndex
-                    )(1)
-
-                self.msg.close()
+                    (self.main_window.pop_up_preferences.
+                                                  tab_widget.setCurrentIndex)(1)
 
                 self.main_window.statusBar().showMessage(
                     'Pipeline "{0}" was not initialised successfully.'.format(
