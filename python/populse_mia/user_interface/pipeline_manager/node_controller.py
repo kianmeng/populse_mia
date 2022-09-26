@@ -1178,6 +1178,10 @@ class NodeController(QWidget):
         for name, trait in process.user_traits().items():
             if name == "nodes_activation":
                 continue
+
+            if trait.userlevel is not None and trait.userlevel > 0:
+                continue
+
             if not trait.output:
                 label_input = QLabel()
                 label_input.setText(str(name))
