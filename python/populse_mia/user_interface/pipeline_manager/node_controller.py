@@ -1212,18 +1212,20 @@ class NodeController(QWidget):
                 # inputs except if the input is "database_scans"
                 # which means that the scans will be filtered with InputFilter
                 if self.node_name == "inputs" and name != "database_scans":
-                    parameters = (idx, pipeline, type(value))
-                    push_button = QPushButton("Filter")
-                    push_button.clicked.connect(
-                        partial(
-                            self.display_filter,
-                            self.node_name,
-                            name,
-                            parameters,
-                            process,
+
+                    if "File" in trait_type or "List_File" in trait_type:
+                        parameters = (idx, pipeline, type(value))
+                        push_button = QPushButton("Filter")
+                        push_button.clicked.connect(
+                            partial(
+                                self.display_filter,
+                                self.node_name,
+                                name,
+                                parameters,
+                                process,
+                            )
                         )
-                    )
-                    h_box.addWidget(push_button)
+                        h_box.addWidget(push_button)
 
                 self.v_box_inputs.addLayout(h_box)
 
