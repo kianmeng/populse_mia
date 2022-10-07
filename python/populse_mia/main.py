@@ -52,6 +52,11 @@ if "NO_ET" not in os.environ:
 if "NIPYPE_NO_ET" not in os.environ:
     os.environ["NIPYPE_NO_ET"] = "1"
 
+# General QApplication class instantiation
+QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
+app = QApplication(sys.argv)
+QApplication.setOverrideCursor(Qt.WaitCursor)
+
 # Adding the populse projects path to sys.path, if in developer mode
 if (
     not os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -312,7 +317,6 @@ except (ImportError, AttributeError) as e:
     print("*" * 37 + "\n")
 
 if len(pkg_error) > 0:
-    app = QApplication(sys.argv)
     msg = QMessageBox()
     msg.setIcon(QMessageBox.Warning)
     msg.setWindowTitle("populse_mia -  warning: ImportError!")
@@ -341,7 +345,6 @@ if len(pkg_error) > 0:
     msg.setStandardButtons(QMessageBox.Ok)
     msg.buttonClicked.connect(msg.close)
     msg.exec()
-    del app
     sys.exit(1)
 
 # Now that populse projects paths have been, if necessary, added
@@ -610,11 +613,6 @@ def launch_mia():
     except ImportError:
         pass  # QtWebEngineWidgets is not installed
 
-    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-
-    app = QApplication(sys.argv)
-
-    QApplication.setOverrideCursor(Qt.WaitCursor)
     sys.excepthook = _my_excepthook
 
     # working from the scripts directory
@@ -848,7 +846,6 @@ def main():
             )
 
             # open popup, user choose the path to .populse_mia/populse_mia dir
-            app = QApplication(sys.argv)
             msg = QDialog()
             msg.setWindowTitle("populse_mia - mia path selection")
             vbox_layout = QVBoxLayout()
@@ -873,7 +870,6 @@ def main():
             vbox_layout.addLayout(hbox_layout)
             msg.setLayout(vbox_layout)
             msg.exec()
-            del app
 
         else:
             _verify_miaConfig()
@@ -1115,7 +1111,6 @@ def verify_processes():
                     # package from the pipeline library or reload it
                     except ImportError as e:
                         print("\n{0}".format(e))
-                        app = QApplication(sys.argv)
                         msg = QMessageBox()
                         msg.setIcon(QMessageBox.Warning)
                         msg.setWindowTitle(
@@ -1143,7 +1138,6 @@ def verify_processes():
                         msg.setStandardButtons(QMessageBox.Ok)
                         msg.buttonClicked.connect(msg.close)
                         msg.exec()
-                        del app
                         sys.path.remove(
                             os.path.abspath(
                                 os.path.join(
@@ -1157,7 +1151,6 @@ def verify_processes():
                 # directory
                 else:
                     print("No module named '{0}'".format(pckg))
-                    app = QApplication(sys.argv)
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Warning)
                     msg.setWindowTitle("populse_mia - warning: {0}".format(e))
@@ -1181,7 +1174,6 @@ def verify_processes():
                     msg.setStandardButtons(QMessageBox.Ok)
                     msg.buttonClicked.connect(msg.close)
                     msg.exec()
-                    del app
 
             except SyntaxError as e:
                 print("\nA problem is detected with the '{0}' "
@@ -1189,7 +1181,6 @@ def verify_processes():
                 print("".join(traceback.format_tb(e.__traceback__)), end="")
                 print("{0}: {1}\n".format(e.__class__.__name__, e))
 
-                app = QApplication(sys.argv)
                 txt = ("A problem is detected with the '{0}' package...\n\n"
                        "Traceback:\n{1} {2} \n{3}\n\nThis may lead to a later "
                        "crash of Mia ...\nDo you want Mia tries to fix "
@@ -1238,15 +1229,12 @@ def verify_processes():
                     with open(e.filename, 'w') as file:
                         file.write(filedata)
 
-                del app
-
             except ValueError as e:
                 print("\nA problem is detected with the '{0}' "
                       "package...\nTraceback:".format(pckg))
                 print("".join(traceback.format_tb(e.__traceback__)), end="")
                 print("{0}: {1}\n".format(e.__class__.__name__, e))
 
-                app = QApplication(sys.argv)
                 txt = ("A problem is detected with the '{0}' package...\n\n"
                        "Traceback:\n{1} {2} \n{3}\n\nThis may lead to a later "
                        "crash of Mia ...\nPlease, try to fix it !...".format(
@@ -1261,7 +1249,6 @@ def verify_processes():
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.buttonClicked.connect(msg.close)
                 msg.exec()
-                del app
 
     if (
         (not isinstance(proc_content, dict))
