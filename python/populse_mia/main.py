@@ -29,13 +29,15 @@ import inspect
 import os
 import pkgutil
 import sys
+import traceback
+import yaml
 from functools import partial
+from packaging import version
 from pathlib import Path
 
-import yaml
-from packaging import version
-from PyQt5 import QtCore
+
 # PyQt5 imports
+from PyQt5 import QtCore
 from PyQt5.QtCore import QDir, QLockFile, Qt
 from PyQt5.QtWidgets import (QApplication, QDialog, QFileDialog, QHBoxLayout,
                              QLabel, QLineEdit, QMessageBox, QPushButton,
@@ -1180,6 +1182,14 @@ def verify_processes():
                     msg.buttonClicked.connect(msg.close)
                     msg.exec()
                     del app
+
+            except SyntaxError as e:
+                print("\nA problem is detected with the '{0}' "
+                      "module...\nTraceback:".format(pckg))
+                print(
+                    "".join(traceback.format_tb(e.__traceback__)), end=""
+                )
+                print("{0}: {1}\n".format(e.__class__.__name__, e))
 
     if (
         (not isinstance(proc_content, dict))
