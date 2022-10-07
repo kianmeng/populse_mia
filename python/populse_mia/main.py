@@ -41,7 +41,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QDir, QLockFile, Qt
 from PyQt5.QtWidgets import (QApplication, QDialog, QFileDialog, QHBoxLayout,
                              QLabel, QLineEdit, QMessageBox, QPushButton,
-                             QVBoxLayout)
+                             QScrollArea, QVBoxLayout, QWidget)
 
 pypath = []
 
@@ -1185,11 +1185,83 @@ def verify_processes():
 
             except SyntaxError as e:
                 print("\nA problem is detected with the '{0}' "
-                      "module...\nTraceback:".format(pckg))
-                print(
-                    "".join(traceback.format_tb(e.__traceback__)), end=""
-                )
+                      "package...\nTraceback:".format(pckg))
+                print("".join(traceback.format_tb(e.__traceback__)), end="")
                 print("{0}: {1}\n".format(e.__class__.__name__, e))
+
+                app = QApplication(sys.argv)
+                txt = ("A problem is detected with the '{0}' package...\n\n"
+                       "Traceback:\n{1} {2} \n{3}\n\nThis may lead to a later "
+                       "crash of Mia ...\nDo you want Mia tries to fix "
+                       "this issue automatically?\nBe careful, risk of "
+                       "destruction of the '{4}' module!".format(
+                                  pckg,
+                                  "".join(traceback.format_tb(e.__traceback__)),
+                                  e.__class__.__name__,
+                                  e,
+                                  e.filename))
+
+                lineCnt = txt.count('\n')
+                msg = QMessageBox()
+                msg.setWindowTitle("populse_mia - warning: {}".format(e))
+
+                if lineCnt > 15:
+                    scroll = QScrollArea()
+                    scroll.setWidgetResizable(1)
+                    content = QWidget()
+                    scroll.setWidget(content)
+                    layout = QVBoxLayout(content)
+                    tmpLabel = QLabel(txt)
+                    tmpLabel.setTextInteractionFlags(
+                                                QtCore.Qt.TextSelectableByMouse)
+                    layout.addWidget(tmpLabel)
+                    msg.layout().addWidget(scroll, 0, 0, 1,
+                                           msg.layout().columnCount())
+                    msg.setStyleSheet("QScrollArea{min-width:550 px; "
+                                      "min-height: 300px}")
+
+                else:
+                    msg.setText(txt)
+                    msg.setIcon(QMessageBox.Warning)
+
+                ok_button = msg.addButton(QMessageBox.Ok)
+                msg.addButton(QMessageBox.No)
+                msg.exec()
+
+                if msg.clickedButton() == ok_button:
+
+                    with open(e.filename, 'r') as file:
+                        filedata = file.read()
+                        filedata = filedata.replace('<undefined>',
+                                                    "\'<undefined>\'")
+
+                    with open(e.filename, 'w') as file:
+                        file.write(filedata)
+
+                del app
+
+            except ValueError as e:
+                print("\nA problem is detected with the '{0}' "
+                      "package...\nTraceback:".format(pckg))
+                print("".join(traceback.format_tb(e.__traceback__)), end="")
+                print("{0}: {1}\n".format(e.__class__.__name__, e))
+
+                app = QApplication(sys.argv)
+                txt = ("A problem is detected with the '{0}' package...\n\n"
+                       "Traceback:\n{1} {2} \n{3}\n\nThis may lead to a later "
+                       "crash of Mia ...\nPlease, try to fix it !...".format(
+                                  pckg,
+                                  "".join(traceback.format_tb(e.__traceback__)),
+                                  e.__class__.__name__,
+                                  e,))
+                msg = QMessageBox()
+                msg.setWindowTitle("populse_mia - warning: {0}".format(e))
+                msg.setText(txt)
+                msg.setIcon(QMessageBox.Warning)
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.buttonClicked.connect(msg.close)
+                msg.exec()
+                del app
 
     if (
         (not isinstance(proc_content, dict))
