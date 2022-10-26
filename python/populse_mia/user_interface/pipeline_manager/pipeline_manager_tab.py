@@ -637,8 +637,7 @@ class PipelineManagerTab(QWidget):
         for param, parent_file in parent_files.items():
             database_parent_file = None
             relfile = os.path.abspath(os.path.normpath(parent_file))[
-                len(db_dir) :
-            ]
+                                                                   len(db_dir):]
 
             if relfile == p_value:
                 # output is one of the inputs: OK nothing to be done.
