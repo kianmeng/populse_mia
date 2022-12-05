@@ -348,6 +348,8 @@ class PipelineManagerTab(QWidget):
                 return "<temp>"
             if isinstance(item, datetime.datetime):
                 return item.__str__()
+            if isinstance(item, set):
+                return list(item)
             raise TypeError
 
         if isinstance(node, (PipelineNode, Pipeline)):
