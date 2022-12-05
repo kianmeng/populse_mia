@@ -397,7 +397,7 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
         """
         self.set_parameters(process_inputs)
         verbose = False
-        node = self.process
+        node = get_ref(self.process)
         process = node
 
         if isinstance(node, ProcessNode):
