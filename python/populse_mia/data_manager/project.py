@@ -88,33 +88,48 @@ class Project:
 
     .. Methods:
         - add_clinical_tags: add the clinical tags to the project
+        - cleanup_orphan_bricks: remove orphan bricks from the database
+        - cleanup_orphan_history: remove orphan bricks from the database
+        - cleanup_orphan_nonexisting_files: Remove orphan files which do not
+                                            exist from the database
         - del_clinical_tags: remove clinical tags to the project
+        - files_in_project: return file / directory names within the
+                            project folder
+        - finished_bricks: blabla
+        - get_data_history: get the processing history for the given data file
         - getDate: return the date of creation of the project
+        - get_finished_bricks_in_pipeline: blabla
+        - get_finished_bricks_in_workflows: blabla
         - getFilter: return a Filter object
         - getFilterName: input box to get the name of the filter to save
         - getName: return the name of the project
-        - getSortOrder: return the sort order of the project
+        - get_orphan_bricks: blabla
+        - get_orphan_history: blabla
+        - get_orphan_nonexsiting_files: get orphan files which do not exist
+                                        from the database
         - getSortedTag: return the sorted tag of the project
+        - getSortOrder: return the sort order of the project
         - hasUnsavedModifications: return if the project has unsaved
                                    modifications or not
         - init_filters: initialize the filters at project opening
         - loadProperties: load the properties file
         - redo: redo the last action made by the user on the project
         - reput_values: re-put the value objects in the database
-        - save_current_filter: save the current filter
         - saveConfig: save the changes in the properties file
-        - setCurrentFilter: set the current filter of the project
-        - setDate: set the date of the project
+        - save_current_filter: save the current filter
         - saveModifications: save the pending operations of the project
                              (actions still not saved)
+        - setCurrentFilter: set the current filter of the project
+        - setDate: set the date of the project
         - setName: set the name of the project
-        - setSortOrder: set the sort order of the project
         - setSortedTag: set the sorted tag of the project
+        - setSortOrder: set the sort order of the project
         - undo: undo the last action made by the user on the project
         - unsavedModifications(self, value): Modify the window title depending
                                              of whether the project has unsaved
                                              modifications or not.
         - unsaveModifications: unsaves the pending operations of the project
+        - update_data_history: cleanup earlier history of given data
     """
 
     def __init__(self, project_root_folder, new_project):
@@ -886,6 +901,21 @@ class Project:
                 valueToReput[3],
             )
 
+    def saveConfig(self):
+        """Save the changes in the properties file."""
+
+        with open(
+            os.path.join(self.folder, "properties", "properties.yml"),
+            "w",
+            encoding="utf8",
+        ) as configfile:
+            yaml.dump(
+                self.properties,
+                configfile,
+                default_flow_style=False,
+                allow_unicode=True,
+            )
+
     def save_current_filter(self, custom_filters):
         """Save the current filter.
 
@@ -944,21 +974,6 @@ class Project:
 
                     json.dump(new_filter.json_format(), outfile)
                     self.filters.append(new_filter)
-
-    def saveConfig(self):
-        """Save the changes in the properties file."""
-
-        with open(
-            os.path.join(self.folder, "properties", "properties.yml"),
-            "w",
-            encoding="utf8",
-        ) as configfile:
-            yaml.dump(
-                self.properties,
-                configfile,
-                default_flow_style=False,
-                allow_unicode=True,
-            )
 
     def saveModifications(self):
         """Save the pending operations of the project (actions
@@ -1343,7 +1358,7 @@ class Project:
         return obsolete
 
     def finished_bricks(self, engine, pipeline=None, include_done=False):
-        """ """
+        """blabla"""
         bricks = self.get_finished_bricks_in_workflows(engine)
         if pipeline:
             pbricks = self.get_finished_bricks_in_pipeline(engine, pipeline)
@@ -1406,7 +1421,7 @@ class Project:
         return {"bricks": bricks, "outputs": outputs}
 
     def get_finished_bricks_in_workflows(self, engine):
-        """ """
+        """blabla """
         import soma_workflow.client as swclient
         from soma_workflow import constants
 
@@ -1451,7 +1466,7 @@ class Project:
         return jobs
 
     def get_finished_bricks_in_pipeline(self, engine, pipeline):
-        """ """
+        """blabla """
         if not isinstance(pipeline, Pipeline):
             # it's a single process...
             procs = {}
@@ -1496,7 +1511,7 @@ class Project:
         return procs
 
     def get_orphan_bricks(self, bricks=None):
-        """ """
+        """blabla"""
         orphan = set()
         orphan_weak_files = set()
         used_bricks = set()
@@ -1586,7 +1601,7 @@ class Project:
                 os.unlink(os.path.join(self.folder, doc))
 
     def get_orphan_history(self):
-        """ """
+        """blabla"""
         orphan_hist = set()
         orphan_bricks = set()
         orphan_weak_files = set()

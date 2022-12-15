@@ -872,6 +872,9 @@ class MainWindow(QMainWindow):
                     self.exPopup.get_filename(file_name)
                     file_name = self.exPopup.relative_path
                     self.data_browser.data_sent = False
+
+                    # put here the method to clean history and bricks collections ?
+
                     # We switch the project
                     self.switch_project(file_name, self.exPopup.name)
                     field_names = self.project.session.get_fields_names(
@@ -1289,6 +1292,8 @@ class MainWindow(QMainWindow):
                     msg.setStandardButtons(QMessageBox.Ok)
                     msg.buttonClicked.connect(msg.close)
                     msg.exec()
+
+        # put here the method to clean history and bricks collections.
 
     def saveChoice(self):
         """Check if the project needs to be 'saved as' or just 'saved'."""
