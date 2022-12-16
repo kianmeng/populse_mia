@@ -873,8 +873,6 @@ class MainWindow(QMainWindow):
                     file_name = self.exPopup.relative_path
                     self.data_browser.data_sent = False
 
-                    # put here the method to clean history and bricks collections ?
-
                     # We switch the project
                     self.switch_project(file_name, self.exPopup.name)
                     field_names = self.project.session.get_fields_names(
@@ -886,6 +884,17 @@ class MainWindow(QMainWindow):
 
                     else:
                         Config().set_clinical_mode(False)
+
+                    # Update the history and brick tables in the newly opened
+                    # project, if it comes from outside.
+                    path_name = os.path.join(
+                                   os.path.abspath(os.path.normpath(file_name)),
+                                   "")
+                    projectsPath = os.path.join(
+                         os.path.abspath(self.config.getPathToProjectsFolder()),
+                         "")
+                    if path_name != projectsPath:
+                        self.project.update_db_for_paths(path_name)
 
     def open_recent_project(self):
         """Open a recent project."""
@@ -1293,7 +1302,8 @@ class MainWindow(QMainWindow):
                     msg.buttonClicked.connect(msg.close)
                     msg.exec()
 
-        # put here the method to clean history and bricks collections.
+        # Update of the history and the brick table in the newly created project
+        self.project.update_db_for_paths()
 
     def saveChoice(self):
         """Check if the project needs to be 'saved as' or just 'saved'."""

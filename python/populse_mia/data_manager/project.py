@@ -130,6 +130,8 @@ class Project:
                                              modifications or not.
         - unsaveModifications: unsaves the pending operations of the project
         - update_data_history: cleanup earlier history of given data
+        - update_db_for_paths: update the history and brick tables with a new
+                               project file
     """
 
     def __init__(self, project_root_folder, new_project):
@@ -1745,3 +1747,107 @@ class Project:
             if bricks:
                 obsolete.update(brick for brick in bricks if brick not in used)
         return obsolete
+
+    def update_db_for_paths(self, new_path=None):
+        """Update the history and brick tables with a new project file.
+
+           Necessary when a project is renamed or when a new project is loaded
+           from outside.
+        """
+        hist_brick = self.session.get_documents(COLLECTION_HISTORY,
+                                                fields=[HISTORY_ID,
+                                                        HISTORY_BRICKS],
+                                                as_list=True,
+                                                )
+
+        if hist_brick is not None:
+            old_path = None
+            force_break_loop = False
+
+            for list_hist_brick in hist_brick:
+
+                if list_hist_brick[0] is not None:
+
+                    for brick_id in list_hist_brick[1]:
+
+                        if brick_id is not None:
+                            inputs = self.session.get_value(COLLECTION_BRICK,
+                                                            brick_id,
+                                                            BRICK_INPUTS)
+                            old_path = inputs.get('output_directory')
+
+                            if old_path is not None:
+                                tmp = old_path.partition(
+                                                 os.path.join('data',
+                                                              'derived_data'))
+
+                                if tmp[0] != old_path:
+                                    old_path = tmp[0]
+                                    force_break_loop = True
+                                    break
+
+                if force_break_loop:
+                    break
+
+        if old_path is None:
+            print("update_db_for_paths:\n"
+                  "The path value to update the root folder was not found. "
+                  "Nothing is done ...!\n")
+
+        else:
+            if new_path is None:
+                new_path = os.path.join(os.path.abspath(
+                                             os.path.normpath(self.folder)), "")
+
+            print('update_db_for_paths:\n'
+                  'Changing {0} with {1} ...!\n'.format(old_path, new_path))
+
+            for list_hist_brick in hist_brick:
+
+                if list_hist_brick[0] is not None:
+                    hist_id = list_hist_brick[0]
+                    old_pipeline_xml = self.session.get_value(
+                                                             COLLECTION_HISTORY,
+                                                             hist_id,
+                                                             HISTORY_PIPELINE)
+                    new_pipeline_xml = old_pipeline_xml.replace(old_path,
+                                                                new_path)
+                    self.session.set_value(COLLECTION_HISTORY,
+                                           hist_id,
+                                           HISTORY_PIPELINE,
+                                           new_pipeline_xml)
+
+                    if list_hist_brick[1] is not None:
+
+                        for brick_id in list_hist_brick[1]:
+
+                            if brick_id is not None:
+                                inputs = self.session.get_value(
+                                                               COLLECTION_BRICK,
+                                                               brick_id,
+                                                               BRICK_INPUTS)
+
+                                inputs_string = json.dumps(inputs)
+                                new_inputs_string = inputs_string.replace(
+                                                                       old_path,
+                                                                       new_path)
+                                new_inputs = json.loads(new_inputs_string)
+                                self.session.set_value(COLLECTION_BRICK,
+                                                       brick_id,
+                                                       BRICK_INPUTS,
+                                                       new_inputs)
+                                outputs = self.session.get_value(
+                                                               COLLECTION_BRICK,
+                                                               brick_id,
+                                                               BRICK_OUTPUTS)
+
+                                ouputs_string = json.dumps(outputs)
+                                new_outputs_string = ouputs_string.replace(
+                                                                       old_path,
+                                                                       new_path)
+                                new_ouputs = json.loads(new_outputs_string)
+                                self.session.set_value(COLLECTION_BRICK,
+                                                       brick_id,
+                                                       BRICK_OUTPUTS,
+                                                       new_ouputs)
+
