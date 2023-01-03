@@ -367,7 +367,7 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
             # we must keep a copy of inheritance dict,
             # since it changes at each iteration and is not included in workflow
             # TODO: a better solution would be to save for each node the inheritance between plugs
-            # and not between filenames (that changes over iteration)
+            #       and not between filenames (that changes over iteration)
             project = self.get_project(in_process)
             if project is not None:
                 # record completion order to perform 2nd pass tags recording and
@@ -541,7 +541,7 @@ class ProcessMIA(Process):
          - init_default_traits: Automatically initialise necessary parameters
                                 for nipype or capsul
          - list_outputs: Override the outputs of the process
-         - make_initResult: Make the final dictionnary for outputs,
+         - make_initResult: Make the final dictionary for outputs,
                             inheritance and requirement from the
                             initialisation of a brick
          - relax_nipype_exists_constraints: Relax the exists constraint of
