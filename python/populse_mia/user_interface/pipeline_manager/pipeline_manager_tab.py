@@ -1954,9 +1954,9 @@ class PipelineManagerTab(QWidget):
             node_controller_node_name = self.nodeController.node_name
 
             #### Todo: Fix the problem of the controller that
-            #### keeps the name of the old brick deleted until
-            #### a click on the new one. This can cause a mia
-            #### crash during the initialisation, for example.
+            ####       keeps the name of the old brick deleted until
+            ####       a click on the new one. This can cause a mia
+            ####       crash during the initialisation, for example.
 
             if node_controller_node_name in ["inputs", "outputs"]:
                 node_controller_node_name = ""
