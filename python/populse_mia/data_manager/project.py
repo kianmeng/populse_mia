@@ -1760,7 +1760,7 @@ class Project:
                                                 as_list=True,
                                                 )
 
-        if hist_brick is not None:
+        if hist_brick is not None and hist_brick != []:
             old_path = None
             force_break_loop = False
 
@@ -1789,17 +1789,28 @@ class Project:
                 if force_break_loop:
                     break
 
+        elif hist_brick == []:
+            old_path = False
+
         if old_path is None:
-            print("update_db_for_paths:\n"
-                  "The path value to update the root folder was not found. "
-                  "Nothing is done ...!\n")
+            print("\nUpdating the paths in the database when renaming the "
+                  "project:\n"
+                  "No changes in the HISTORY and BRICK collections are made "
+                  "because the output_directory has not been found. The "
+                  "renamed project may be corrupted ...!\n")
+
+        if old_path is False:
+            # The project has no calculation history: There is nothing to do
+            # and no message to print.
+            pass
 
         else:
             if new_path is None:
                 new_path = os.path.join(os.path.abspath(
                                              os.path.normpath(self.folder)), "")
 
-            print('update_db_for_paths:\n'
+            print('\nUpdating the paths in the database when renaming the '
+                  'project:\n'
                   'Changing {0} with {1} ...!\n'.format(old_path, new_path))
 
             for list_hist_brick in hist_brick:
