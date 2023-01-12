@@ -1907,6 +1907,8 @@ class PopUpPreferences(QDialog):
           button is clicked
         - browse_projects_save_path: called when "Projects folder" browse
           button is clicked
+        - browse_resources_path: called when "resources" browse button is
+          clicked
         - browse_spm: called when spm browse button is clicked
         - browse_spm_standalone: called when spm standalone browse button
           is clicked
@@ -2165,6 +2167,34 @@ class PopUpPreferences(QDialog):
 
         self.groupbox_populse.setLayout(populse_layout)
 
+        #### Groupbox "External resources preferences"
+        self.groupbox_resources = QtWidgets.QGroupBox(
+            "External resources preferences"
+        )
+
+        #### Resources folder label/line edit
+        self.resources_path_label = QLabel(
+            "Absolute path to the external resources data (some processes may "
+            "require external data to function properly):"
+        )
+        self.resources_path_line_edit = QLineEdit(config.get_resources_path())
+        self.resources_path_browse = QPushButton("Browse")
+        self.resources_path_browse.clicked.connect(self.browse_resources_path)
+
+        #### Draws graphic objects
+        h_box_resources = QtWidgets.QHBoxLayout()
+        h_box_resources.addWidget(self.resources_path_line_edit)
+        h_box_resources.addWidget(self.resources_path_browse)
+
+        v_box_resources = QtWidgets.QVBoxLayout()
+        v_box_resources.addWidget(self.resources_path_label)
+        v_box_resources.addLayout(h_box_resources)
+
+        resources_layout = QVBoxLayout()
+        resources_layout.addLayout(v_box_resources)
+
+        self.groupbox_resources.setLayout(resources_layout)
+
         # Final tab layouts
         h_box_top = QtWidgets.QHBoxLayout()
         h_box_top.addWidget(self.groupbox_global)
@@ -2174,6 +2204,7 @@ class PopUpPreferences(QDialog):
         self.tab_tools_layout.addLayout(h_box_top)
         self.tab_tools_layout.addWidget(self.groupbox_projects)
         self.tab_tools_layout.addWidget(self.groupbox_populse)
+        self.tab_tools_layout.addWidget(self.groupbox_resources)
         self.tab_tools_layout.addStretch(1)
         self.tab_tools.setLayout(self.tab_tools_layout)
 
@@ -2670,6 +2701,18 @@ class PopUpPreferences(QDialog):
 
             with open(os.path.join(fname, ".gitignore"), "w") as myFile:
                 myFile.write("/*")
+
+    def browse_resources_path(self):
+        """Called when "resources" browse button is clicked."""
+
+        fname = QFileDialog.getExistingDirectory(
+            self,
+            "Select the location of the " "External resources folder",
+            os.path.expanduser("~"),
+        )
+        if fname:
+            self.resources_path_line_edit.setText(fname)
+
 
     def browse_spm(self):
         """Called when spm browse button is clicked."""
@@ -3666,6 +3709,28 @@ class PopUpPreferences(QDialog):
                     "The MRIFileManager.jar path "
                     "entered {0} "
                     "is invalid.".format(mri_conv_path)
+                )
+                self.msg.setWindowTitle("Error")
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.buttonClicked.connect(self.msg.close)
+                self.msg.show()
+                QApplication.restoreOverrideCursor()
+                return False
+
+            # Resources folder
+            resources_folder = self.resources_path_line_edit.text()
+
+            if os.path.isdir(resources_folder):
+                config.set_resources_path(resources_folder)
+
+            else:
+                self.msg = QMessageBox()
+                self.msg.setIcon(QMessageBox.Critical)
+                self.msg.setText("Invalid resources folder path")
+                self.msg.setInformativeText(
+                    "The resources folder path entered "
+                    "{0} is "
+                    "invalid.".format(resources_folder)
                 )
                 self.msg.setWindowTitle("Error")
                 self.msg.setStandardButtons(QMessageBox.Ok)

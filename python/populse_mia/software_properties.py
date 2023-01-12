@@ -137,6 +137,7 @@ class Config:
               saved
             - get_referential: returns boolean to indicate DataViewer
               referential
+            - get_resources_path: get the resources path
             - getShowAllSlices: returns if the "show all slices" checkbox of the
               mini viewer is activated
             - getSourceImageDir: get the source directory for project images
@@ -205,7 +206,8 @@ class Config:
               saved
             - set_radioView: set the orientation in miniviewer (True for
               radiological, False for neurological orientation)
-            - set_referential: sets the DataViewer referential
+            - set_referential: set the DataViewer referential
+            - set_resources_path: Set the resources path
             - setShowAllSlices: set the "show all slices" checkbox of the mini
               viewer
             - setSourceImageDir: set the source directory for project images
@@ -602,8 +604,8 @@ class Config:
             return 5
 
     def get_mia_path(self):
-        """Get the path to the folder containing the processes, properties
-        and resources folders of mia (mia_path).
+        """Get the path to the folder containing the processes and properties
+        folders of mia (mia_path).
 
         During the mia installation, the mia_path is defined and stored in the
         configuration.yml file, located in the .populse_mia folder (himself
@@ -674,8 +676,8 @@ class Config:
 
                 except (yaml.YAMLError, KeyError) as e:
                     print(
-                        "\nMia path (where is located the processes, "
-                        "the properties and resources folders) has not "
+                        "\nMia path (where is located the processes and "
+                        "the properties folders) has not "
                         "been found ..."
                     )
 
@@ -697,7 +699,7 @@ class Config:
     def get_mri_conv_path(self):
         """Get the MRIManager.jar path.
 
-        :returns: string of the pathto the MRIManager.jar
+        :returns: string of the path to the MRIManager.jar
         """
 
         return self.config.get("mri_conv_path", "")
@@ -751,6 +753,14 @@ class Config:
         """
 
         return self.config.get("ref", "0")
+
+    def get_resources_path(self):
+        """Get the resources path.
+
+        :returns: string of the path to the resources folder
+        """
+
+        return self.config.get("resources_path", "")
 
     def getShowAllSlices(self):
         """Get whether the show_all_slices parameters was enabled
@@ -1381,12 +1391,22 @@ class Config:
 
     def set_referential(self, ref):
         """Set the referential to image ref or world coordinates in anatomist_2
-        data viewer
+        data viewer.
 
         :param ref: str; 0 for World Coordinates, 1 for Image ref
         """
 
         self.config["ref"] = ref
+        # Then save the modification
+        self.saveConfig()
+
+    def set_resources_path(self, path):
+        """Set the resources path.
+
+        :param path: string of the path
+        """
+
+        self.config["resources_path"] = path
         # Then save the modification
         self.saveConfig()
 
