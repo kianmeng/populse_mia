@@ -494,6 +494,15 @@ class InstallProcesses(QDialog):
                         with open(fpath, "w") as f:
                             f.write(s)
 
+        try:
+            self.main_window.statusBar().showMessage("Package installation, "
+                                                     "please wait ...")
+            QApplication.processEvents()
+
+        except AttributeError:
+            self.main_window.status_label.setText("Package installation, "
+                                                  "please wait ...")
+
         self.result_add_package = True
         filename = self.path_edit.text()
         config = Config()
