@@ -5760,7 +5760,8 @@ class TestMIAMainWindow(TestMIACase):
             main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             mock_executable(tmp_path, "afni")
-            main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
+            #main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
+            main_wnd.pop_up_preferences.close()  # Closes the window
 
             # Disables AFNI
             config = Config(config_path=self.config_path)
@@ -5798,7 +5799,9 @@ class TestMIAMainWindow(TestMIACase):
             main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             mock_executable(tmp_path, "SmoothImage")
-            main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
+            #main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
+            main_wnd.pop_up_preferences.close()  # Closes the window
+            
 
             # Disables ANTS
             config = Config(config_path=self.config_path)
@@ -5844,8 +5847,9 @@ class TestMIAMainWindow(TestMIACase):
             main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             mock_executable(fsl_path, "flirt")
-            main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
-
+            #main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
+            main_wnd.pop_up_preferences.close()  # Closes the window
+            
             # Disables FSL
             config = Config(config_path=self.config_path)
             config.set_use_fsl(False)
@@ -5915,9 +5919,8 @@ class TestMIAMainWindow(TestMIACase):
                     os.path.join(tmp_path, "not_existing")
                 )
             )
-            main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
-
-            main_wnd.pop_up_preferences.close()
+            #main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
+            main_wnd.pop_up_preferences.close()  # Closes the window
 
             # Disables MATLAB and SPM
             config = Config(config_path=self.config_path)
@@ -5987,7 +5990,8 @@ class TestMIAMainWindow(TestMIACase):
             # Creates a working MATLAB executable
             mock_executable(tmp_path, "matlab")
             main_wnd.pop_up_preferences.ok_clicked()  # Closes window
-
+            #main_wnd.pop_up_preferences.close()  # Closes the window
+            
             # Asserts that MATLAB was enabled and MATLAB standalone
             # remains disabled
             config = Config(config_path=self.config_path)
@@ -8157,14 +8161,10 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         pipeline_manager = self.main_window.pipeline_manager
 
-        # input('1')
-
         # Initializes the workflow manually
         pipeline_manager.workflow = workflow_from_pipeline(
             pipeline, complete_parameters=True
         )
-
-        # input('2')
 
         # Gets the 'job' and mocks adding a brick to the collection
         job = pipeline_manager.workflow.jobs[0]
