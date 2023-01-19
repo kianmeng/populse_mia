@@ -793,6 +793,7 @@ class InstallProcesses(QDialog):
 
             try:
                 self.main_window.statusBar().showMessage(messg)
+                QApplication.processEvents()
 
             except AttributeError:
                 self.main_window.status_label.setText(messg)
@@ -808,6 +809,7 @@ class InstallProcesses(QDialog):
             msg.setStandardButtons(QMessageBox.Ok)
             msg.buttonClicked.connect(msg.close)
             msg.exec()
+            self.close()
 
             # Resetting process_config.yml
             if process_dic_orig is None:
@@ -868,6 +870,7 @@ class InstallProcesses(QDialog):
 
                 try:
                     self.main_window.statusBar().showMessage(messg)
+                    QApplication.processEvents()
 
                 except AttributeError:
                     self.main_window.status_label.setText(messg)
@@ -881,6 +884,7 @@ class InstallProcesses(QDialog):
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.buttonClicked.connect(msg.close)
                 msg.exec()
+                self.close()
 
             else:
                 messg = (
@@ -889,6 +893,7 @@ class InstallProcesses(QDialog):
 
                 try:
                     self.main_window.statusBar().showMessage(messg)
+                    QApplication.processEvents()
 
                 except AttributeError:
                     self.main_window.status_label.setText(messg)
@@ -902,6 +907,7 @@ class InstallProcesses(QDialog):
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.buttonClicked.connect(msg.close)
                 msg.exec()
+                self.close()
 
 
 class Node(object):
