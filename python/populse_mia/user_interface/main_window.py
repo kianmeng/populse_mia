@@ -1166,7 +1166,7 @@ class MainWindow(QMainWindow):
                 self.update_recent_projects_actions()
 
                 if os.path.exists(as_folder_rel):
-                    # Prevent by a carefull message
+                    # Prevent by a careful message
                     # see PopUpSaveProjectAs/return_value
                     # in admin mode only
                     shutil.rmtree(as_folder_rel)
@@ -1175,7 +1175,7 @@ class MainWindow(QMainWindow):
                     os.makedirs(as_folder_rel)
                     os.mkdir(data_path)
                     os.mkdir(raw_data_path)
-                    os.mkdir(derived_data_path)
+                    #os.mkdir(derived_data_path)
                     os.mkdir(downloaded_data_path)
                     os.mkdir(filters_path)
 
@@ -1189,12 +1189,17 @@ class MainWindow(QMainWindow):
                             filename, os.path.join(data_path, "raw_data")
                         )
 
-                    for filename in glob.glob(
-                        os.path.join(old_folder, "data", "derived_data", "*")
-                    ):
-                        shutil.copy(
-                            filename, os.path.join(data_path, "derived_data")
-                        )
+                    # for filename in glob.glob(
+                    #     os.path.join(old_folder, "data", "derived_data", "*")
+                    # ):
+                    #     shutil.copy(
+                    #         filename, os.path.join(data_path, "derived_data")
+                    #     )
+                    shutil.copytree(os.path.join(old_folder,
+                                                 "data",
+                                                 "derived_data"),
+                                    os.path.join(data_path,
+                                                 "derived_data"))
 
                     for filename in glob.glob(
                         os.path.join(
