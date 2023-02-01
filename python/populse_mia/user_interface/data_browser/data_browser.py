@@ -792,8 +792,8 @@ class TableDataBrowser(QTableWidget):
         - delete_from_brick: delete a document from its brick id
         - display_unreset_values: display an error message when trying to
            reset user tags
-        - display_pdf:  tries to display a pdf file in the user's
-          preferred application
+        - display_file: tries to display a file in the user's preferred
+          application
         - edit_table_data_values: change values in DataBrowser
         - fill_cells_update_table: initialize and fills the cells of the table
         - fill_headers: initialize and fill the headers of the table
@@ -1433,8 +1433,8 @@ class TableDataBrowser(QTableWidget):
         self.action_send_documents_to_pipeline = self.menu.addAction(
             "Send documents to the Pipeline Manager"
         )
-        self.action_display_pdf_file = self.menu.addAction(
-            "Display a pdf file"
+        self.action_display_file = self.menu.addAction(
+            "Tries to read a file"
         )
 
         action = self.menu.exec_(self.mapToGlobal(position))
@@ -1488,8 +1488,8 @@ class TableDataBrowser(QTableWidget):
             self.multiple_sort_pop_up()
         elif action == self.action_send_documents_to_pipeline:
             self.data_browser.send_documents_to_pipeline()
-        elif action == self.action_display_pdf_file:
-            self.display_pdf()
+        elif action == self.action_display_file:
+            self.display_file()
 
         self.update_colors()
 
@@ -1581,8 +1581,8 @@ class TableDataBrowser(QTableWidget):
         self.msg.buttonClicked.connect(self.msg.close)
         self.msg.show()
 
-    def display_pdf(self):
-        """Tries to display a pdf file in the user's preferred application."""
+    def display_file(self):
+        """Tries to display a file in the user's preferred application."""
 
         points = self.selectedIndexes()
 
