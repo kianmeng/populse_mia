@@ -1470,15 +1470,30 @@ class NodeController(QWidget):
 
             if in_or_out == "in":
                 new_value = self.line_edit_input[index].text()
+
             elif in_or_out == "out":
                 new_value = self.line_edit_output[index].text()
+
             else:
                 new_value = None
 
             try:
                 new_value = eval(new_value)
+
+            # We try to handle the undefined value with the eval() function
+            # See FixME below.
+            except SyntaxError:
+                new_value = new_value.replace("<undefined>", "\'<undefined>\'")
+
+                try:
+                    new_value = eval(new_value)
+
+                except Exception as err:
+                    print("{0}: {1}.".format(err.__class__, err))
+
             except NameError:
                 pass
+
             except Exception as err:
                 print("{0}: {1}.".format(err.__class__, err))
 
@@ -1500,6 +1515,14 @@ class NodeController(QWidget):
         old_value = pipeline.nodes[node_name].get_plug_value(plug_name)
 
         try:
+
+            #FIXME:Since we replace, above, "<undefined>" with "<undefined>"
+            # in order to handle syntax error with eval() we should handle
+            # all cases here (big job).
+            # For the moment we manage only the dictionary
+            if isinstance(new_value, dict):
+                new_value = {k: Undefined if v == '<undefined>' else
+                                v for k, v in new_value.items()}
             pipeline.nodes[node_name].set_plug_value(plug_name, new_value)
 
         except TraitError as err:
