@@ -3365,7 +3365,7 @@ class TestMIADataBrowser(TestMIACase):
             "action_select_column",
             "action_multiple_sort",
             "action_send_documents_to_pipeline",
-            "action_display_pdf_file",
+            "action_display_file",
         ]
         # Including 'action_sort_column' will crash the build
 
