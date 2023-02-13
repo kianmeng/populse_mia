@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # Define the logger
 import logging
+import os
 from functools import partial
 
-import os
 import six
 import traits.api as traits
 from soma.qt_gui import controller_widget
@@ -496,7 +496,6 @@ class PopulseUndefinedControlWidget(object):
         *args,
         **kwargs
     ):
-
         """Update one element of the controller.
 
         At the end the controller trait value with the name 'control_name'
@@ -517,7 +516,6 @@ class PopulseUndefinedControlWidget(object):
 
         # Update the controller only if the control is valid
         if PopulseUndefinedControlWidget.is_valid(control_instance):
-
             # Define the control value
             new_trait_value = traits.Undefined
             setattr(

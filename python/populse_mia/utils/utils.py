@@ -37,12 +37,11 @@ from populse_db.database import (FIELD_TYPE_BOOLEAN, FIELD_TYPE_DATE,
                                  FIELD_TYPE_LIST_INTEGER,
                                  FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
                                  FIELD_TYPE_STRING, FIELD_TYPE_TIME)
+# Populse_mia imports
+from populse_mia.software_properties import Config
 # PyQt5 imports
 from PyQt5.QtCore import QDate, QDateTime, Qt, QTime, QVariant
 from PyQt5.QtWidgets import QMessageBox
-
-# Populse_mia imports
-from populse_mia.software_properties import Config
 
 
 def check_python_version():
@@ -72,7 +71,6 @@ def check_value_type(value, value_type, is_subvalue=False):
     if (value_type == FIELD_TYPE_INTEGER) or (
         value_type == FIELD_TYPE_LIST_INTEGER and is_subvalue
     ):
-
         try:
             int(value)
             return True
@@ -83,7 +81,6 @@ def check_value_type(value, value_type, is_subvalue=False):
     elif (value_type == FIELD_TYPE_FLOAT) or (
         value_type == FIELD_TYPE_LIST_FLOAT and is_subvalue
     ):
-
         try:
             float(value)
             return True
@@ -94,7 +91,6 @@ def check_value_type(value, value_type, is_subvalue=False):
     elif (value_type == FIELD_TYPE_BOOLEAN) or (
         value_type == FIELD_TYPE_LIST_BOOLEAN and is_subvalue
     ):
-
         return (
             value == "True"
             or value == True
@@ -105,7 +101,6 @@ def check_value_type(value, value_type, is_subvalue=False):
     elif (value_type == FIELD_TYPE_STRING) or (
         value_type == FIELD_TYPE_LIST_STRING and is_subvalue
     ):
-
         try:
             str(value)
             return True
@@ -118,14 +113,12 @@ def check_value_type(value, value_type, is_subvalue=False):
         and value_type.startswith("list_")
         and not is_subvalue
     ):
-
         if isinstance(value, str):
             value = ast.literal_eval(value)
 
         is_valid_value = True
 
         for subvalue in value:
-
             if not check_value_type(subvalue, value_type, True):
                 is_valid_value = False
                 break
@@ -135,12 +128,10 @@ def check_value_type(value, value_type, is_subvalue=False):
     elif (value_type == FIELD_TYPE_DATE) or (
         value_type == FIELD_TYPE_LIST_DATE and is_subvalue
     ):
-
         if isinstance(value, QDate):
             return True
 
         elif isinstance(value, str):
-
             try:
                 format = "%d/%m/%Y"
                 datetime.strptime(value, format).date()
@@ -152,12 +143,10 @@ def check_value_type(value, value_type, is_subvalue=False):
     elif (value_type == FIELD_TYPE_DATETIME) or (
         value_type == FIELD_TYPE_LIST_DATETIME and is_subvalue
     ):
-
         if isinstance(value, QDateTime):
             return True
 
         elif isinstance(value, str):
-
             try:
                 format = "%d/%m/%Y %H:%M:%S.%f"
                 datetime.strptime(value, format)
@@ -169,12 +158,10 @@ def check_value_type(value, value_type, is_subvalue=False):
     elif (value_type == FIELD_TYPE_TIME) or (
         value_type == FIELD_TYPE_LIST_TIME and is_subvalue
     ):
-
         if isinstance(value, QTime):
             return True
 
         elif isinstance(value, str):
-
             try:
                 format = "%H:%M:%S.%f"
                 datetime.strptime(value, format).time()
@@ -236,7 +223,6 @@ def set_item_data(item, value, value_type):
     """
 
     if value_type.startswith("list_"):
-
         if isinstance(value, str):
             value = ast.literal_eval(value)
 
@@ -268,7 +254,6 @@ def set_item_data(item, value, value_type):
         item.setData(Qt.EditRole, QVariant(value_prepared))
 
     elif value_type == FIELD_TYPE_DATETIME:
-
         if isinstance(value, datetime):
             value_prepared = QDateTime(value)
 
@@ -282,7 +267,6 @@ def set_item_data(item, value, value_type):
         item.setData(Qt.EditRole, QVariant(value_prepared))
 
     elif value_type == FIELD_TYPE_DATE:
-
         if isinstance(value, date):
             value_prepared = QDate(value)
 
@@ -296,7 +280,6 @@ def set_item_data(item, value, value_type):
         item.setData(Qt.EditRole, QVariant(value_prepared))
 
     elif value_type == FIELD_TYPE_TIME:
-
         if isinstance(value, time):
             value_prepared = QTime(value)
 
@@ -361,7 +344,6 @@ def table_to_database(value, value_type):
         return int(value)
 
     elif value_type == FIELD_TYPE_BOOLEAN:
-
         if value == "True" or value is True:
             return True
 
@@ -369,12 +351,10 @@ def table_to_database(value, value_type):
             return False
 
     elif value_type == FIELD_TYPE_DATETIME:
-
         if isinstance(value, QDateTime):
             return value.toPyDateTime()
 
         elif isinstance(value, str):
-
             try:
                 format = "%d/%m/%Y %H:%M:%S.%f"
                 date_typed = datetime.strptime(value, format)
@@ -385,7 +365,6 @@ def table_to_database(value, value_type):
             return date_typed
 
     elif value_type == FIELD_TYPE_DATE:
-
         if isinstance(value, QDate):
             return value.toPyDate()
 
@@ -394,7 +373,6 @@ def table_to_database(value, value_type):
             return datetime.strptime(value, format).date()
 
     elif value_type == FIELD_TYPE_TIME:
-
         if isinstance(value, QTime):
             return value.toPyTime()
 

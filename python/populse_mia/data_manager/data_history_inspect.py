@@ -6,7 +6,6 @@ import os.path as osp
 
 import traits.api as traits
 from capsul.api import Pipeline, Process, capsul_engine
-
 from populse_mia.data_manager.project import (BRICK_EXEC, BRICK_EXEC_TIME,
                                               BRICK_ID, BRICK_INIT,
                                               BRICK_INIT_TIME, BRICK_INPUTS,

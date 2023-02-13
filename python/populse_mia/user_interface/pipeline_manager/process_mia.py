@@ -39,14 +39,13 @@ from capsul.pipeline.process_iteration import ProcessIteration
 from capsul.process.process import NipypeProcess
 # nipype imports
 from nipype.interfaces.base import File, InputMultiObject, traits_extension
+# Populse_MIA imports
+from populse_mia.data_manager.project import COLLECTION_CURRENT
+from populse_mia.software_properties import Config
 # Soma-base import
 from soma.controller.trait_utils import relax_exists_constraint
 from soma.utils.weak_proxy import get_ref
 from traits.trait_base import Undefined
-
-# Populse_MIA imports
-from populse_mia.data_manager.project import COLLECTION_CURRENT
-from populse_mia.software_properties import Config
 
 
 class MIAProcessCompletionEngine(ProcessCompletionEngine):
@@ -79,7 +78,6 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
     """
 
     def __init__(self, process, name, fallback_engine):
-
         super(MIAProcessCompletionEngine, self).__init__(process, name)
 
         self.fallback_engine = fallback_engine
@@ -120,7 +118,6 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
         pl = len(proj_dir)
 
         for param, par_value in process.get_inputs().items():
-
             # update value from given forced input
             par_value = process_inputs.get(param, par_value)
             if isinstance(par_value, list):
@@ -200,7 +197,6 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
         project = getattr(study_config, "project", None)
 
         if project:
-
             if hasattr(process, "use_project") and process.use_project:
                 process.project = project
 
@@ -238,7 +234,6 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
                     tname = "spm_script_file"
 
                 if tname:
-
                     if hasattr(process, "_nipype_interface"):
                         iscript = (
                             process._nipype_interface.mlab.inputs.script_file
@@ -270,7 +265,6 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
                 process.mfile = True
 
     def complete_parameters(self, process_inputs={}, complete_iterations=True):
-
         self.completion_progress = self.fallback_engine.completion_progress
         self.completion_progress_total = (
             self.fallback_engine.completion_progress_total
@@ -290,9 +284,7 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
             self.complete_nipype_common(in_process)
 
         if not isinstance(in_process, ProcessMIA):
-
             if not isinstance(in_process, Pipeline):
-
                 if in_process.context_name.split(".")[0] == "Pipeline":
                     node_name = ".".join(
                         in_process.context_name.split(".")[1:]
@@ -564,7 +556,6 @@ class ProcessMIA(Process):
         if hasattr(self, "process") and isinstance(
             self.process, NipypeProcess
         ):
-
             for mia_output in self.user_traits():
                 wrapped_output = self.trait(mia_output).nipype_process_name
 
@@ -588,7 +579,6 @@ class ProcessMIA(Process):
             )
 
         if self.requirement is not None and "spm" in self.requirement:
-
             if "use_mcr" not in self.user_traits():
                 self.add_trait(
                     "use_mcr", traits.Bool(optional=True, userlevel=1)
@@ -714,7 +704,6 @@ class ProcessMIA(Process):
             self.process.output_directory = self.output_directory
 
         if self.requirement is not None and "spm" in self.requirement:
-
             if self.spm_script_file:
                 self.process._spm_script_file = self.spm_script_file
 

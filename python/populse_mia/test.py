@@ -64,17 +64,20 @@ from traits.api import TraitListObject, Undefined
 # sys.settrace
 
 uts_dir = os.path.isdir(
-             os.path.join(os.path.dirname(
-                              os.path.dirname(
-                                  os.path.dirname(__file__))),
-                          "miautdata"))
+    os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+        "miautdata",
+    )
+)
 
 if not uts_dir:
-    print('\nTo work properly, unit tests need data in the populse_mia(or '
-          'populse-mia)/miautdata directory. Please use:\n'
-          'git clone https://gricad-gitlab.univ-grenoble-alpes.fr/condamie/'
-          'miautdata.git\n'
-          'in populse_mia directory to download it...\n')
+    print(
+        "\nTo work properly, unit tests need data in the populse_mia(or "
+        "populse-mia)/miautdata directory. Please use:\n"
+        "git clone https://gricad-gitlab.univ-grenoble-alpes.fr/condamie/"
+        "miautdata.git\n"
+        "in populse_mia directory to download it...\n"
+    )
     sys.exit()
 
 if (
@@ -176,10 +179,6 @@ from populse_db.database import (FIELD_TYPE_BOOLEAN, FIELD_TYPE_DATE,
                                  FIELD_TYPE_LIST_INTEGER,
                                  FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
                                  FIELD_TYPE_STRING, FIELD_TYPE_TIME)
-# soma import
-from soma.qt_gui.qt_backend.Qt import QItemSelectionModel, QTreeView
-from soma.qt_gui.qt_backend.QtWidgets import QMenu
-
 # populse_mia import
 from populse_mia.data_manager.data_loader import ImportProgress, ImportWorker
 # read_log)
@@ -214,6 +213,9 @@ from populse_mia.user_interface.pop_ups import (DefaultValueListCreation,
                                                 PopUpSelectTag,
                                                 PopUpSelectTagCountTable)
 from populse_mia.utils.utils import check_value_type, table_to_database
+# soma import
+from soma.qt_gui.qt_backend.Qt import QItemSelectionModel, QTreeView
+from soma.qt_gui.qt_backend.QtWidgets import QMenu
 
 # Working from the scripts directory
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
@@ -224,6 +226,7 @@ if "NO_ET" not in os.environ:
 
 if "NIPYPE_NO_ET" not in os.environ:
     os.environ["NIPYPE_NO_ET"] = "1"
+
 
 class TestMIACase(unittest.TestCase):
     """Parent class for the test classes of mia.
@@ -492,11 +495,8 @@ class TestMIACase(unittest.TestCase):
         """
 
         if proc_lib_view.to_dict():
-
             if proc_lib_view.to_dict().get("nipype"):
-
                 if proc_lib_view.to_dict().get("nipype").get("interfaces"):
-
                     if (
                         proc_lib_view.to_dict()
                         .get("nipype")
@@ -3225,7 +3225,7 @@ class TestMIADataBrowser(TestMIACase):
             FIELD_TYPE_DATE,
             FIELD_TYPE_TIME,
         ]
-        for (tag, tag_type) in zip(tags, types):
+        for tag, tag_type in zip(tags, types):
             table_data.project.session.add_field(
                 COLLECTION_CURRENT, tag, tag_type, "", True, "", "", ""
             )
@@ -3676,7 +3676,6 @@ class TestMIADataBrowser(TestMIACase):
         clone_tag = self.main_window.data_browser.pop_up_clone_tag
 
         for fov_column in range(clone_tag.list_widget_tags.count()):
-
             if clone_tag.list_widget_tags.item(fov_column).text() == "FOV":
                 break
 
@@ -3882,7 +3881,7 @@ class TestMIADataBrowser(TestMIACase):
             '["11:11:11.11"]',
         ]
 
-        for (type_, value) in zip(types, values):
+        for type_, value in zip(types, values):
             text_edt.setText(value)
             text_edt.mousePressEvent(None)
             text_edt.list_creation.type = type_
@@ -4551,10 +4550,8 @@ class TestMIAMainWindow(TestMIACase):
                 break
 
             if children:
-
                 # Gets the process pid (process id)
                 for child in children:
-
                     if child.name() == "jupyter-qtconso":
                         qt_console_process = child.pid
 
@@ -5760,7 +5757,7 @@ class TestMIAMainWindow(TestMIACase):
             main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             mock_executable(tmp_path, "afni")
-            #main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
+            # main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
             main_wnd.pop_up_preferences.close()  # Closes the window
 
             # Disables AFNI
@@ -5799,9 +5796,8 @@ class TestMIAMainWindow(TestMIACase):
             main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             mock_executable(tmp_path, "SmoothImage")
-            #main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
+            # main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
             main_wnd.pop_up_preferences.close()  # Closes the window
-            
 
             # Disables ANTS
             config = Config(config_path=self.config_path)
@@ -5847,9 +5843,9 @@ class TestMIAMainWindow(TestMIACase):
             main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
 
             mock_executable(fsl_path, "flirt")
-            #main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
+            # main_wnd.pop_up_preferences.ok_clicked()  # Closes the window
             main_wnd.pop_up_preferences.close()  # Closes the window
-            
+
             # Disables FSL
             config = Config(config_path=self.config_path)
             config.set_use_fsl(False)
@@ -5919,7 +5915,7 @@ class TestMIAMainWindow(TestMIACase):
                     os.path.join(tmp_path, "not_existing")
                 )
             )
-            #main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
+            # main_wnd.pop_up_preferences.ok_clicked()  # Opens error dialog
             main_wnd.pop_up_preferences.close()  # Closes the window
 
             # Disables MATLAB and SPM
@@ -5990,8 +5986,8 @@ class TestMIAMainWindow(TestMIACase):
             # Creates a working MATLAB executable
             mock_executable(tmp_path, "matlab")
             main_wnd.pop_up_preferences.ok_clicked()  # Closes window
-            #main_wnd.pop_up_preferences.close()  # Closes the window
-            
+            # main_wnd.pop_up_preferences.close()  # Closes the window
+
             # Asserts that MATLAB was enabled and MATLAB standalone
             # remains disabled
             config = Config(config_path=self.config_path)
@@ -7962,7 +7958,6 @@ class TestMIAPipelineEditor(TestMIACase):
         pkg = sys.modules[package_name]
 
         for name, cls in sorted(list(pkg.__dict__.items())):
-
             if name == "Test_pipeline_1":
                 process_class = cls
 
@@ -8514,7 +8509,6 @@ class TestMIAPipelineManagerTab(TestMIACase):
         """
 
         def mock_get_document(collection, relfile):
-
             SCAN_1_ = SCAN_1
 
             if relfile == "mock_val_1":

@@ -44,16 +44,15 @@ from populse_db.database import (FIELD_TYPE_BOOLEAN, FIELD_TYPE_DATE,
                                  FIELD_TYPE_LIST_INTEGER,
                                  FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
                                  FIELD_TYPE_STRING, FIELD_TYPE_TIME)
-# PyQt5 imports
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
-from PyQt5.QtWidgets import QProgressDialog
-
 from populse_mia.data_manager.database_mia import (TAG_ORIGIN_BUILTIN,
                                                    TAG_ORIGIN_USER)
 # Populse_MIA imports
 from populse_mia.data_manager.project import (COLLECTION_CURRENT,
                                               COLLECTION_INITIAL, TAG_CHECKSUM,
                                               TAG_FILENAME, TAG_TYPE, TYPE_NII)
+# PyQt5 imports
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtWidgets import QProgressDialog
 
 
 class ImportProgress(QProgressDialog):
@@ -155,7 +154,6 @@ class ImportWorker(QThread):
         tags_to_remove = ["Dataset data file", "Dataset header file"]
 
         for dict_log in list_dict_log:
-
             if dict_log["StatusExport"] == "Export ok":
                 file_name = dict_log["NameFile"]
                 path_name = raw_data_folder
@@ -193,7 +191,6 @@ class ImportWorker(QThread):
 
                 # For each tag in each scan
                 for tag in tags_from_file(file_name, path_name):
-
                     # We do the tag only if it's not in the tags to remove
                     if tag[0] not in tags_to_remove:
                         tag_name = tag[0]
@@ -273,7 +270,6 @@ class ImportWorker(QThread):
                                     len(value) == 1
                                     and isinstance(value[0], list)
                                 ) or (len(value) != 1):
-
                                     if tag_type == FIELD_TYPE_STRING:
                                         tag_type = FIELD_TYPE_LIST_STRING
 
@@ -313,7 +309,6 @@ class ImportWorker(QThread):
                             or tag_type == FIELD_TYPE_DATE
                             or tag_type == FIELD_TYPE_TIME
                         ):
-
                             if value is not None and value != "":
                                 value = datetime.strptime(value, format)
 
@@ -362,7 +357,6 @@ class ImportWorker(QThread):
 
                         # The value is accepted if it's not empty or null
                         if value is not None and value != "":
-
                             if document_not_existing:
                                 values_added.append(
                                     [
@@ -394,11 +388,8 @@ class ImportWorker(QThread):
 
         # Missing values added thanks to default values
         for tag in self.project.session.get_fields(COLLECTION_CURRENT):
-
             if tag.origin == TAG_ORIGIN_USER:
-
                 for scan in self.scans_added:
-
                     if (
                         tag.default_value is not None
                         and self.project.session.get_value(
@@ -516,14 +507,12 @@ def verify_scans(project):
     # Returning the files that are problematic
     return_list = []
     for scan in project.session.get_documents_names(COLLECTION_CURRENT):
-
         file_name = scan
         file_path = os.path.relpath(os.path.join(project.folder, file_name))
 
         if os.path.exists(file_path):
             # If the file exists, we do the checksum
             with open(file_path, "rb") as scan_file:
-
                 try:
                     data = scan_file.read()
 

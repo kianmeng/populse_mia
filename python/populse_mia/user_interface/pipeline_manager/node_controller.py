@@ -32,18 +32,6 @@ from capsul.pipeline.process_iteration import ProcessIteration
 from capsul.qt_gui.widgets.attributed_process_widget import \
     AttributedProcessWidget
 from matplotlib.backends.qt_compat import QtWidgets
-# PyQt5 imports
-from PyQt5 import Qt
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (QApplication, QDialog, QDialogButtonBox,
-                             QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-                             QMessageBox, QPushButton, QToolButton,
-                             QVBoxLayout, QWidget)
-# soma-base imports
-from soma.controller import trait_ids
-from traits.api import TraitError, Undefined
-
 # Populse_MIA imports
 from populse_mia.data_manager.filter import Filter
 from populse_mia.data_manager.project import (COLLECTION_BRICK,
@@ -57,6 +45,17 @@ from populse_mia.user_interface.data_browser.rapid_search import RapidSearch
 from populse_mia.user_interface.pipeline_manager.process_mia import ProcessMIA
 from populse_mia.user_interface.pop_ups import (PopUpSelectTagCountTable,
                                                 PopUpVisualizedTags)
+# PyQt5 imports
+from PyQt5 import Qt
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import (QApplication, QDialog, QDialogButtonBox,
+                             QGroupBox, QHBoxLayout, QLabel, QLineEdit,
+                             QMessageBox, QPushButton, QToolButton,
+                             QVBoxLayout, QWidget)
+# soma-base imports
+from soma.controller import trait_ids
+from traits.api import TraitError, Undefined
 
 from . import type_editors
 
@@ -672,7 +671,6 @@ class CapsulNodeController(QWidget):
             history_maker = ["update_node_name"]
 
             if from_undo:
-
                 # TODO: next line is strange!
                 history_maker.append
 
@@ -734,7 +732,6 @@ class CapsulNodeController(QWidget):
         atts = compl.get_attribute_values()
         num_set = 0
         for name, value in attributes.items():
-
             if atts.trait(name):
                 if isinstance(getattr(atts, name), list):
                     setattr(atts, name, value)
@@ -1212,7 +1209,6 @@ class NodeController(QWidget):
                 # inputs except if the input is "database_scans"
                 # which means that the scans will be filtered with InputFilter
                 if self.node_name == "inputs" and name != "database_scans":
-
                     if "File" in trait_type or "List_File" in trait_type:
                         parameters = (idx, pipeline, type(value))
                         push_button = QPushButton("Filter")
@@ -1467,7 +1463,6 @@ class NodeController(QWidget):
 
         # Reading the value from the plug's line edit
         if not new_value:
-
             if in_or_out == "in":
                 new_value = self.line_edit_input[index].text()
 
@@ -1483,7 +1478,7 @@ class NodeController(QWidget):
             # We try to handle the undefined value with the eval() function
             # See FixME below.
             except SyntaxError:
-                new_value = new_value.replace("<undefined>", "\'<undefined>\'")
+                new_value = new_value.replace("<undefined>", "'<undefined>'")
 
                 try:
                     new_value = eval(new_value)
@@ -1515,14 +1510,15 @@ class NodeController(QWidget):
         old_value = pipeline.nodes[node_name].get_plug_value(plug_name)
 
         try:
-
-            #FIXME:Since we replace, above, "<undefined>" with "<undefined>"
+            # FIXME:Since we replace, above, "<undefined>" with "<undefined>"
             # in order to handle syntax error with eval() we should handle
             # all cases here (big job).
             # For the moment we manage only the dictionary
             if isinstance(new_value, dict):
-                new_value = {k: Undefined if v == '<undefined>' else
-                                v for k, v in new_value.items()}
+                new_value = {
+                    k: Undefined if v == "<undefined>" else v
+                    for k, v in new_value.items()
+                }
             pipeline.nodes[node_name].set_plug_value(plug_name, new_value)
 
         except TraitError as err:

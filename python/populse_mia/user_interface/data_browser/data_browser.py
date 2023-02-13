@@ -37,18 +37,6 @@ from populse_db.database import (FIELD_TYPE_DATE, FIELD_TYPE_DATETIME,
                                  FIELD_TYPE_LIST_INTEGER,
                                  FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
                                  FIELD_TYPE_STRING, FIELD_TYPE_TIME)
-# PyQt5 imports
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor, QIcon, QPixmap
-from PyQt5.QtWidgets import (QAbstractItemView, QAction, QApplication,
-                             QDateEdit, QDateTimeEdit, QDoubleSpinBox, QFrame,
-                             QGridLayout, QHBoxLayout, QItemDelegate, QMenu,
-                             QMessageBox, QProgressDialog, QPushButton,
-                             QSplitter, QTableWidget, QTableWidgetItem,
-                             QTimeEdit, QToolBar, QToolButton, QVBoxLayout,
-                             QWidget)
-
 from populse_mia.data_manager.database_mia import (TAG_ORIGIN_BUILTIN,
                                                    TAG_ORIGIN_USER)
 from populse_mia.data_manager.project import (BRICK_NAME, COLLECTION_BRICK,
@@ -70,6 +58,17 @@ from populse_mia.user_interface.pop_ups import (
     PopUpRemoveScan, PopUpRemoveTag, PopUpSelectFilter, PopUpShowHistory)
 from populse_mia.utils.utils import (check_value_type, set_item_data,
                                      table_to_database)
+# PyQt5 imports
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor, QIcon, QPixmap
+from PyQt5.QtWidgets import (QAbstractItemView, QAction, QApplication,
+                             QDateEdit, QDateTimeEdit, QDoubleSpinBox, QFrame,
+                             QGridLayout, QHBoxLayout, QItemDelegate, QMenu,
+                             QMessageBox, QProgressDialog, QPushButton,
+                             QSplitter, QTableWidget, QTableWidgetItem,
+                             QTimeEdit, QToolBar, QToolButton, QVBoxLayout,
+                             QWidget)
 
 # Variable shown everywhere when no value for the tag
 not_defined_value = "*Not Defined*"
@@ -322,7 +321,6 @@ class DataBrowser(QWidget):
         )
         self.project.unsavedModifications = True
         for scan in self.project.session.get_documents(COLLECTION_CURRENT):
-
             # If the tag to clone has a value, we add this value with the
             # new tag name in the Database
             cloned_cur_value = self.project.session.get_value(
@@ -971,11 +969,9 @@ class TableDataBrowser(QTableWidget):
         # Adding missing columns
 
         for tag in tags:
-
             # Tag added only if it's not already in the table
 
             if self.get_tag_column(tag) is None:
-
                 column_index = self.get_index_insertion(tag)
                 self.insertColumn(column_index)
 
@@ -1115,7 +1111,6 @@ class TableDataBrowser(QTableWidget):
 
                 # Columns filled for the row being added
                 for column in range(0, self.columnCount()):
-
                     idx += 1
                     self.progress.setValue(idx)
                     QApplication.processEvents()
@@ -1300,7 +1295,6 @@ class TableDataBrowser(QTableWidget):
 
         # Otherwise we update the values
         else:
-
             # For history
             history_maker = list()
             history_maker.append("modified_values")
@@ -1320,7 +1314,6 @@ class TableDataBrowser(QTableWidget):
 
                 # We only set the cell if it's not the tag name
                 if tag_name != TAG_FILENAME:
-
                     old_value = self.project.session.get_value(
                         COLLECTION_CURRENT, scan_path, tag_name
                     )
@@ -1433,9 +1426,7 @@ class TableDataBrowser(QTableWidget):
         self.action_send_documents_to_pipeline = self.menu.addAction(
             "Send documents to the Pipeline Manager"
         )
-        self.action_display_file = self.menu.addAction(
-            "Tries to read a file"
-        )
+        self.action_display_file = self.menu.addAction("Tries to read a file")
 
         action = self.menu.exec_(self.mapToGlobal(position))
         msg = QMessageBox()
@@ -1589,8 +1580,9 @@ class TableDataBrowser(QTableWidget):
         for point in points:
             row = point.row()
             scan_path = self.item(row, 0).text()
-            full_name = os.path.abspath(os.path.join(self.project.folder,
-                                                     scan_path))
+            full_name = os.path.abspath(
+                os.path.join(self.project.folder, scan_path)
+            )
 
             if platform == "linux":
                 subprocess.Popen(["xdg-open", full_name])
@@ -1616,7 +1608,6 @@ class TableDataBrowser(QTableWidget):
         self.tags = []  # List of table tags
 
         try:
-
             for item in self.selectedItems():
                 column = item.column()
                 row = item.row()
@@ -1641,7 +1632,6 @@ class TableDataBrowser(QTableWidget):
                     self.types.append(tag_type)
 
                 if tag_type.startswith("list_"):
-
                     database_value = self.project.session.get_value(
                         COLLECTION_CURRENT, scan_name, tag_name
                     )
@@ -1672,7 +1662,6 @@ class TableDataBrowser(QTableWidget):
 
             # Ok
             elif len(self.old_table_values) > 0:
-
                 if len(self.coordinates) > 1:
                     value = []
                     for i in range(0, self.lengths[0]):
@@ -2097,9 +2086,7 @@ class TableDataBrowser(QTableWidget):
             old_row = self.get_scan_row(scan)
 
             if old_row != row:
-
                 for column in range(0, self.columnCount()):
-
                     if self.horizontalHeaderItem(column).text() == TAG_BRICKS:
                         widget_to_move = self.cellWidget(old_row, column)
                         item_to_move = self.takeItem(old_row, column)
@@ -2129,7 +2116,6 @@ class TableDataBrowser(QTableWidget):
                                 bricks_copy = {**self.bricks}
 
                                 for key, value in bricks_copy.items():
-
                                     if (
                                         value == brick_uuid
                                         and key
@@ -2185,7 +2171,6 @@ class TableDataBrowser(QTableWidget):
                                 bricks_copy = {**self.bricks}
 
                                 for key, value in bricks_copy.items():
-
                                     if (
                                         value == brick_uuid
                                         and key
@@ -2261,11 +2246,9 @@ class TableDataBrowser(QTableWidget):
             )
 
             if scan_object is not None:
-
                 if (scan_path in scan_list) and (
                     self.data_browser.data_sent is True
                 ):
-
                     if not repeat_pop_up:
                         self.pop = PopUpRemoveScan(scan_path, len(points))
                         self.pop.exec()
@@ -2281,7 +2264,6 @@ class TableDataBrowser(QTableWidget):
                 for tag in self.project.session.get_fields_names(
                     COLLECTION_CURRENT
                 ):
-
                     if tag != TAG_FILENAME:
                         current_value = self.project.session.get_value(
                             COLLECTION_CURRENT, scan_path, tag
@@ -2313,7 +2295,6 @@ class TableDataBrowser(QTableWidget):
                     full_scan_paths.append(full_scan_paths[0][:-4] + ".json")
 
                 for full_scan_path in full_scan_paths:
-
                     if os.path.isfile(full_scan_path):
                         os.remove(full_scan_path)
 

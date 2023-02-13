@@ -29,7 +29,6 @@ from capsul.pipeline.pipeline_nodes import PipelineNode, ProcessNode
 from populse_db.database import (FIELD_TYPE_DATETIME, FIELD_TYPE_INTEGER,
                                  FIELD_TYPE_JSON, FIELD_TYPE_LIST_STRING,
                                  FIELD_TYPE_STRING)
-
 from populse_mia.data_manager.database_mia import (TAG_ORIGIN_BUILTIN,
                                                    TAG_ORIGIN_USER,
                                                    DatabaseMIA)
@@ -176,7 +175,6 @@ class Project:
         self.session.add_field_attributes_collection()
 
         if new_project:
-
             if not os.path.exists(self.folder):
                 os.makedirs(self.folder)
 
@@ -504,11 +502,9 @@ class Project:
         return_tags = []
 
         for clinical_tag in CLINICAL_TAGS:
-
             if clinical_tag not in self.session.get_fields_names(
                 COLLECTION_CURRENT
             ):
-
                 if clinical_tag == "Age":
                     field_type = FIELD_TYPE_INTEGER
 
@@ -629,7 +625,6 @@ class Project:
         return_tags = []
 
         for clinical_tag in CLINICAL_TAGS:
-
             if clinical_tag in self.session.get_fields_names(
                 COLLECTION_CURRENT
             ):
@@ -768,7 +763,7 @@ class Project:
         return self.properties["date"]
 
     def get_finished_bricks_in_pipeline(self, engine, pipeline):
-        """blabla """
+        """blabla"""
         if not isinstance(pipeline, Pipeline):
             # it's a single process...
             procs = {}
@@ -813,7 +808,7 @@ class Project:
         return procs
 
     def get_finished_bricks_in_workflows(self, engine):
-        """blabla """
+        """blabla"""
         import soma_workflow.client as swclient
         from soma_workflow import constants
 
@@ -1117,7 +1112,6 @@ class Project:
         with open(
             os.path.join(self.folder, "properties", "properties.yml"), "r"
         ) as stream:
-
             try:
                 if verCmp(yaml.__version__, "5.1", "sup"):
                     return yaml.load(stream, Loader=yaml.FullLoader)
@@ -1406,7 +1400,6 @@ class Project:
             else:
                 # Json filter file written
                 with open(file_path, "w") as outfile:
-
                     new_filter = Filter(
                         filter_name,
                         self.currentFilter.nots,
@@ -1751,35 +1744,32 @@ class Project:
     def update_db_for_paths(self, new_path=None):
         """Update the history and brick tables with a new project file.
 
-           Necessary when a project is renamed or when a new project is loaded
-           from outside.
+        Necessary when a project is renamed or when a new project is loaded
+        from outside.
         """
-        hist_brick = self.session.get_documents(COLLECTION_HISTORY,
-                                                fields=[HISTORY_ID,
-                                                        HISTORY_BRICKS],
-                                                as_list=True,
-                                                )
+        hist_brick = self.session.get_documents(
+            COLLECTION_HISTORY,
+            fields=[HISTORY_ID, HISTORY_BRICKS],
+            as_list=True,
+        )
 
         if hist_brick is not None and hist_brick != []:
             old_path = None
             force_break_loop = False
 
             for list_hist_brick in hist_brick:
-
                 if list_hist_brick[0] is not None:
-
                     for brick_id in list_hist_brick[1]:
-
                         if brick_id is not None:
-                            inputs = self.session.get_value(COLLECTION_BRICK,
-                                                            brick_id,
-                                                            BRICK_INPUTS)
-                            old_path = inputs.get('output_directory')
+                            inputs = self.session.get_value(
+                                COLLECTION_BRICK, brick_id, BRICK_INPUTS
+                            )
+                            old_path = inputs.get("output_directory")
 
                             if old_path is not None:
                                 tmp = old_path.partition(
-                                                 os.path.join('data',
-                                                              'derived_data'))
+                                    os.path.join("data", "derived_data")
+                                )
 
                                 if tmp[0] != old_path:
                                     old_path = tmp[0]
@@ -1793,11 +1783,13 @@ class Project:
             old_path = False
 
         if old_path is None:
-            print("\nUpdating the paths in the database when renaming the "
-                  "project:\n"
-                  "No changes in the HISTORY and BRICK collections are made "
-                  "because the output_directory has not been found. The "
-                  "renamed project may be corrupted ...!\n")
+            print(
+                "\nUpdating the paths in the database when renaming the "
+                "project:\n"
+                "No changes in the HISTORY and BRICK collections are made "
+                "because the output_directory has not been found. The "
+                "renamed project may be corrupted ...!\n"
+            )
 
         if old_path is False:
             # The project has no calculation history: There is nothing to do
@@ -1806,59 +1798,62 @@ class Project:
 
         else:
             if new_path is None:
-                new_path = os.path.join(os.path.abspath(
-                                             os.path.normpath(self.folder)), "")
+                new_path = os.path.join(
+                    os.path.abspath(os.path.normpath(self.folder)), ""
+                )
 
-            print('\nUpdating the paths in the database when renaming the '
-                  'project:\n'
-                  'Changing {0} with {1} ...!\n'.format(old_path, new_path))
+            print(
+                "\nUpdating the paths in the database when renaming the "
+                "project:\n"
+                "Changing {0} with {1} ...!\n".format(old_path, new_path)
+            )
 
             for list_hist_brick in hist_brick:
-
                 if list_hist_brick[0] is not None:
                     hist_id = list_hist_brick[0]
                     old_pipeline_xml = self.session.get_value(
-                                                             COLLECTION_HISTORY,
-                                                             hist_id,
-                                                             HISTORY_PIPELINE)
-                    new_pipeline_xml = old_pipeline_xml.replace(old_path,
-                                                                new_path)
-                    self.session.set_value(COLLECTION_HISTORY,
-                                           hist_id,
-                                           HISTORY_PIPELINE,
-                                           new_pipeline_xml)
+                        COLLECTION_HISTORY, hist_id, HISTORY_PIPELINE
+                    )
+                    new_pipeline_xml = old_pipeline_xml.replace(
+                        old_path, new_path
+                    )
+                    self.session.set_value(
+                        COLLECTION_HISTORY,
+                        hist_id,
+                        HISTORY_PIPELINE,
+                        new_pipeline_xml,
+                    )
 
                     if list_hist_brick[1] is not None:
-
                         for brick_id in list_hist_brick[1]:
-
                             if brick_id is not None:
                                 inputs = self.session.get_value(
-                                                               COLLECTION_BRICK,
-                                                               brick_id,
-                                                               BRICK_INPUTS)
+                                    COLLECTION_BRICK, brick_id, BRICK_INPUTS
+                                )
 
                                 inputs_string = json.dumps(inputs)
                                 new_inputs_string = inputs_string.replace(
-                                                                       old_path,
-                                                                       new_path)
+                                    old_path, new_path
+                                )
                                 new_inputs = json.loads(new_inputs_string)
-                                self.session.set_value(COLLECTION_BRICK,
-                                                       brick_id,
-                                                       BRICK_INPUTS,
-                                                       new_inputs)
+                                self.session.set_value(
+                                    COLLECTION_BRICK,
+                                    brick_id,
+                                    BRICK_INPUTS,
+                                    new_inputs,
+                                )
                                 outputs = self.session.get_value(
-                                                               COLLECTION_BRICK,
-                                                               brick_id,
-                                                               BRICK_OUTPUTS)
+                                    COLLECTION_BRICK, brick_id, BRICK_OUTPUTS
+                                )
 
                                 ouputs_string = json.dumps(outputs)
                                 new_outputs_string = ouputs_string.replace(
-                                                                       old_path,
-                                                                       new_path)
+                                    old_path, new_path
+                                )
                                 new_ouputs = json.loads(new_outputs_string)
-                                self.session.set_value(COLLECTION_BRICK,
-                                                       brick_id,
-                                                       BRICK_OUTPUTS,
-                                                       new_ouputs)
-
+                                self.session.set_value(
+                                    COLLECTION_BRICK,
+                                    brick_id,
+                                    BRICK_OUTPUTS,
+                                    new_ouputs,
+                                )

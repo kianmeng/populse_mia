@@ -22,10 +22,6 @@ from __future__ import absolute_import, print_function
 import os
 
 import anatomist.direct.api as ana
-from PyQt5.QtGui import QIcon, QIntValidator, QMessageBox, QPixmap
-from PyQt5.QtWidgets import QHBoxLayout, QToolButton
-from soma.qt_gui.qt_backend import Qt, QtCore
-
 from populse_mia.data_manager.project import COLLECTION_CURRENT, TAG_FILENAME
 from populse_mia.software_properties import Config
 from populse_mia.user_interface.data_browser.advanced_search import \
@@ -36,6 +32,9 @@ from populse_mia.user_interface.data_browser.rapid_search import RapidSearch
 from populse_mia.user_interface.data_viewer.anatomist_2 import resources
 from populse_mia.user_interface.data_viewer.anatomist_2.anasimpleviewer2 import \
     AnaSimpleViewer2
+from PyQt5.QtGui import QIcon, QIntValidator, QMessageBox, QPixmap
+from PyQt5.QtWidgets import QHBoxLayout, QToolButton
+from soma.qt_gui.qt_backend import Qt, QtCore
 
 from ..data_viewer import DataViewer
 
@@ -62,7 +61,6 @@ class MiaViewer(Qt.QWidget, DataViewer):
     """
 
     def __init__(self, init_global_handlers=None):
-
         super(MiaViewer, self).__init__()
 
         self.anaviewer = AnaSimpleViewer2(init_global_handlers)
