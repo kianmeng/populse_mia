@@ -592,6 +592,7 @@ class TestMIACase(unittest.TestCase):
         config.set_opened_projects([])
         config.saveConfig()
         self.app.exit()
+        del self.app
 
         config = Config(config_path=self.config_path)
         config.set_user_mode(False)
@@ -635,6 +636,7 @@ class TestMIACase(unittest.TestCase):
         config.set_opened_projects([])
         config.saveConfig()
         self.app.exit()
+        del self.app
 
     @classmethod
     def tearDownClass(cls):
