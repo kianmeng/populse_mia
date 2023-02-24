@@ -23,26 +23,12 @@
 
 ### General imports:
 
-# Nipype import
-from nipype.interfaces import Rename, Select
-from nipype.interfaces.base.traits_extension import InputMultiObject
-from nipype.interfaces.spm import Smooth, Threshold
-
-# PyQt5 import
-from PyQt5 import QtGui
-from PyQt5.QtCore import (QCoreApplication, QEvent,
-                          QModelIndex, QPoint, Qt, QThread, QT_VERSION_STR)
-from PyQt5.QtTest import QTest
-from PyQt5.QtWidgets import (QApplication, QDialog, QFileDialog, QInputDialog,
-                             QMessageBox, QTableWidgetItem)
-
 # Other import
 import ast
 import copy
 import json
 import os
 import platform
-import psutil
 import shutil
 import subprocess
 import sys
@@ -50,26 +36,41 @@ import tempfile
 import threading
 import unittest
 import uuid
-import yaml
 from datetime import datetime
 from functools import partial
 from hashlib import sha256
-from packaging import version
 from pathlib import Path
 from time import sleep
-from traits.api import TraitListObject, Undefined
 from unittest.mock import MagicMock, Mock
+
+import psutil
+import yaml
+# Nipype import
+from nipype.interfaces import Rename, Select
+from nipype.interfaces.base.traits_extension import InputMultiObject
+from nipype.interfaces.spm import Smooth, Threshold
+from packaging import version
+# PyQt5 import
+from PyQt5 import QtGui
+from PyQt5.QtCore import (QT_VERSION_STR, QCoreApplication, QEvent,
+                          QModelIndex, QPoint, Qt, QThread)
+from PyQt5.QtTest import QTest
+from PyQt5.QtWidgets import (QApplication, QDialog, QFileDialog, QInputDialog,
+                             QMessageBox, QTableWidgetItem)
+from traits.api import TraitListObject, Undefined
 
 # The following statement is currently commented because it has no effect and
 # can be replaced by a function call to have an effect, e.g. sys.settrace()
 # sys.settrace
 
 uts_dir = os.path.isdir(
-              os.path.join(os.path.dirname(
-                               os.path.dirname(
-                                   os.path.dirname(
-                                       os.path.realpath(__file__)))),
-                           "miautdata"))
+    os.path.join(
+        os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        ),
+        "miautdata",
+    )
+)
 
 if not uts_dir:
     print(
@@ -159,8 +160,8 @@ if (
 ### developer configuration:
 
 # Capsul import
-from capsul.api import (capsul_engine, get_process_instance, PipelineNode,
-                        Process, ProcessNode, Switch)
+from capsul.api import (PipelineNode, Process, ProcessNode, Switch,
+                        capsul_engine, get_process_instance)
 from capsul.attributes.completion_engine import ProcessCompletionEngine
 from capsul.engine import CapsulEngine, WorkflowExecutionError
 from capsul.pipeline.pipeline import Pipeline
@@ -168,10 +169,8 @@ from capsul.pipeline.pipeline_workflow import workflow_from_pipeline
 from capsul.pipeline.process_iteration import ProcessIteration
 from capsul.process.process import NipypeProcess
 from capsul.qt_gui.widgets.settings_editor import SettingsEditor
-
 # Mia_processes import
 from mia_processes.bricks.tools import Input_Filter
-
 # Populse_db import
 from populse_db.database import (FIELD_TYPE_BOOLEAN, FIELD_TYPE_DATE,
                                  FIELD_TYPE_DATETIME, FIELD_TYPE_FLOAT,
@@ -182,27 +181,31 @@ from populse_db.database import (FIELD_TYPE_BOOLEAN, FIELD_TYPE_DATE,
                                  FIELD_TYPE_LIST_INTEGER,
                                  FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
                                  FIELD_TYPE_STRING, FIELD_TYPE_TIME)
+# Soma import
+# soma import
+from soma.qt_gui.qt_backend.Qt import QItemSelectionModel, QTreeView
+from soma.qt_gui.qt_backend.QtWidgets import QMenu
 
 # Populse_mia import
 from populse_mia.data_manager.data_loader import ImportProgress, ImportWorker
 from populse_mia.data_manager.project import (COLLECTION_BRICK,
                                               COLLECTION_CURRENT,
                                               COLLECTION_HISTORY,
-                                              COLLECTION_INITIAL, Project,
-                                              TAG_BRICKS, TAG_CHECKSUM,
-                                              TAG_EXP_TYPE, TAG_FILENAME,
-                                              TAG_HISTORY, TAG_ORIGIN_USER,
-                                              TAG_TYPE, TYPE_NII)
+                                              COLLECTION_INITIAL, TAG_BRICKS,
+                                              TAG_CHECKSUM, TAG_EXP_TYPE,
+                                              TAG_FILENAME, TAG_HISTORY,
+                                              TAG_ORIGIN_USER, TAG_TYPE,
+                                              TYPE_NII, Project)
 from populse_mia.data_manager.project_properties import SavedProjects
 from populse_mia.software_properties import Config
 from populse_mia.user_interface.data_browser.modify_table import ModifyTable
 from populse_mia.user_interface.main_window import MainWindow
 from populse_mia.user_interface.pipeline_manager.pipeline_editor import (
-                                                  PipelineEditor, save_pipeline)
-from populse_mia.user_interface.pipeline_manager.\
-                                         pipeline_manager_tab import RunProgress
-from populse_mia.user_interface.pipeline_manager.\
-                                     process_library import PackageLibraryDialog
+    PipelineEditor, save_pipeline)
+from populse_mia.user_interface.pipeline_manager.pipeline_manager_tab import \
+    RunProgress
+from populse_mia.user_interface.pipeline_manager.process_library import \
+    PackageLibraryDialog
 from populse_mia.user_interface.pop_ups import (DefaultValueListCreation,
                                                 PopUpAddPath, PopUpAddTag,
                                                 PopUpClosePipeline,
@@ -216,13 +219,6 @@ from populse_mia.user_interface.pop_ups import (DefaultValueListCreation,
                                                 PopUpSelectTag,
                                                 PopUpSelectTagCountTable)
 from populse_mia.utils.utils import check_value_type, table_to_database
-# soma import
-from soma.qt_gui.qt_backend.Qt import QItemSelectionModel, QTreeView
-from soma.qt_gui.qt_backend.QtWidgets import QMenu
-
-# Soma import
-from soma.qt_gui.qt_backend.Qt import QItemSelectionModel, QTreeView
-from soma.qt_gui.qt_backend.QtWidgets import QMenu
 
 # Working from the scripts directory
 os.chdir(os.path.dirname(os.path.realpath(__file__)))

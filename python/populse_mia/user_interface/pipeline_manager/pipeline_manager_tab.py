@@ -50,6 +50,20 @@ from capsul.pipeline.process_iteration import ProcessIteration
 from matplotlib.backends.qt_compat import QtWidgets
 # MIA processes imports
 from mia_processes.bricks.tools.tools import Input_Filter
+# PyQt5 imports
+from PyQt5 import Qt, QtCore
+from PyQt5.QtCore import QThread, QTimer, Signal
+from PyQt5.QtGui import QCursor, QIcon, QMovie
+from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QMenu,
+                             QMessageBox, QProgressDialog, QPushButton,
+                             QScrollArea, QSplitter, QToolBar, QVBoxLayout,
+                             QWidget)
+# Soma_base import
+from soma.controller.trait_utils import is_file_trait
+from soma.qt_gui.qtThread import QtThreadCall
+from traits.api import TraitListObject, Undefined
+from traits.trait_errors import TraitError
+
 # Populse_MIA imports
 from populse_mia.data_manager.project import (BRICK_EXEC, BRICK_EXEC_TIME,
                                               BRICK_INIT, BRICK_INIT_TIME,
@@ -75,19 +89,6 @@ from populse_mia.user_interface.pipeline_manager.process_library import \
 from populse_mia.user_interface.pipeline_manager.process_mia import ProcessMIA
 from populse_mia.user_interface.pop_ups import (PopUpInheritanceDict,
                                                 PopUpSelectIteration)
-# PyQt5 imports
-from PyQt5 import Qt, QtCore
-from PyQt5.QtCore import QThread, QTimer, Signal
-from PyQt5.QtGui import QCursor, QIcon, QMovie
-from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QMenu,
-                             QMessageBox, QProgressDialog, QPushButton,
-                             QScrollArea, QSplitter, QToolBar, QVBoxLayout,
-                             QWidget)
-# Soma_base import
-from soma.controller.trait_utils import is_file_trait
-from soma.qt_gui.qtThread import QtThreadCall
-from traits.api import TraitListObject, Undefined
-from traits.trait_errors import TraitError
 
 
 class PipelineManagerTab(QWidget):

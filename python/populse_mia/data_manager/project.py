@@ -29,6 +29,7 @@ from capsul.pipeline.pipeline_nodes import PipelineNode, ProcessNode
 from populse_db.database import (FIELD_TYPE_DATETIME, FIELD_TYPE_INTEGER,
                                  FIELD_TYPE_JSON, FIELD_TYPE_LIST_STRING,
                                  FIELD_TYPE_STRING)
+
 from populse_mia.data_manager.database_mia import (TAG_ORIGIN_BUILTIN,
                                                    TAG_ORIGIN_USER,
                                                    DatabaseMIA)

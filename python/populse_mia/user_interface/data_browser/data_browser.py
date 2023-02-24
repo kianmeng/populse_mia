@@ -37,6 +37,18 @@ from populse_db.database import (FIELD_TYPE_DATE, FIELD_TYPE_DATETIME,
                                  FIELD_TYPE_LIST_INTEGER,
                                  FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
                                  FIELD_TYPE_STRING, FIELD_TYPE_TIME)
+# PyQt5 imports
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor, QIcon, QPixmap
+from PyQt5.QtWidgets import (QAbstractItemView, QAction, QApplication,
+                             QDateEdit, QDateTimeEdit, QDoubleSpinBox, QFrame,
+                             QGridLayout, QHBoxLayout, QItemDelegate, QMenu,
+                             QMessageBox, QProgressDialog, QPushButton,
+                             QSplitter, QTableWidget, QTableWidgetItem,
+                             QTimeEdit, QToolBar, QToolButton, QVBoxLayout,
+                             QWidget)
+
 from populse_mia.data_manager.database_mia import (TAG_ORIGIN_BUILTIN,
                                                    TAG_ORIGIN_USER)
 from populse_mia.data_manager.project import (BRICK_NAME, COLLECTION_BRICK,
@@ -58,17 +70,6 @@ from populse_mia.user_interface.pop_ups import (
     PopUpRemoveScan, PopUpRemoveTag, PopUpSelectFilter, PopUpShowHistory)
 from populse_mia.utils.utils import (check_value_type, set_item_data,
                                      table_to_database)
-# PyQt5 imports
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor, QIcon, QPixmap
-from PyQt5.QtWidgets import (QAbstractItemView, QAction, QApplication,
-                             QDateEdit, QDateTimeEdit, QDoubleSpinBox, QFrame,
-                             QGridLayout, QHBoxLayout, QItemDelegate, QMenu,
-                             QMessageBox, QProgressDialog, QPushButton,
-                             QSplitter, QTableWidget, QTableWidgetItem,
-                             QTimeEdit, QToolBar, QToolButton, QVBoxLayout,
-                             QWidget)
 
 # Variable shown everywhere when no value for the tag
 not_defined_value = "*Not Defined*"

@@ -29,9 +29,16 @@ import webbrowser
 from datetime import datetime
 from os.path import expanduser
 
-import populse_mia.data_manager.data_loader as data_loader
 import yaml
 from packaging import version
+from PyQt5.QtCore import QCoreApplication, Qt
+# PyQt5 imports
+from PyQt5.QtGui import QCursor, QIcon
+from PyQt5.QtWidgets import (QAction, QApplication, QLabel, QMainWindow, QMenu,
+                             QMessageBox, QPushButton, QTabWidget, QVBoxLayout,
+                             QWidget)
+
+import populse_mia.data_manager.data_loader as data_loader
 from populse_mia.data_manager.project import (COLLECTION_CURRENT, TAG_HISTORY,
                                               Project)
 # Populse_MIA imports
@@ -52,12 +59,6 @@ from populse_mia.user_interface.pop_ups import (PopUpDeletedProject,
                                                 PopUpProperties, PopUpQuit,
                                                 PopUpSaveProjectAs,
                                                 PopUpSeeAllProjects)
-from PyQt5.QtCore import QCoreApplication, Qt
-# PyQt5 imports
-from PyQt5.QtGui import QCursor, QIcon
-from PyQt5.QtWidgets import (QAction, QApplication, QLabel, QMainWindow, QMenu,
-                             QMessageBox, QPushButton, QTabWidget, QVBoxLayout,
-                             QWidget)
 
 CLINICAL_TAGS = [
     "Site",

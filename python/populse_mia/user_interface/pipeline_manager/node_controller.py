@@ -32,6 +32,18 @@ from capsul.pipeline.process_iteration import ProcessIteration
 from capsul.qt_gui.widgets.attributed_process_widget import \
     AttributedProcessWidget
 from matplotlib.backends.qt_compat import QtWidgets
+# PyQt5 imports
+from PyQt5 import Qt
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import (QApplication, QDialog, QDialogButtonBox,
+                             QGroupBox, QHBoxLayout, QLabel, QLineEdit,
+                             QMessageBox, QPushButton, QToolButton,
+                             QVBoxLayout, QWidget)
+# soma-base imports
+from soma.controller import trait_ids
+from traits.api import TraitError, Undefined
+
 # Populse_MIA imports
 from populse_mia.data_manager.filter import Filter
 from populse_mia.data_manager.project import (COLLECTION_BRICK,
@@ -45,17 +57,6 @@ from populse_mia.user_interface.data_browser.rapid_search import RapidSearch
 from populse_mia.user_interface.pipeline_manager.process_mia import ProcessMIA
 from populse_mia.user_interface.pop_ups import (PopUpSelectTagCountTable,
                                                 PopUpVisualizedTags)
-# PyQt5 imports
-from PyQt5 import Qt
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (QApplication, QDialog, QDialogButtonBox,
-                             QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-                             QMessageBox, QPushButton, QToolButton,
-                             QVBoxLayout, QWidget)
-# soma-base imports
-from soma.controller import trait_ids
-from traits.api import TraitError, Undefined
 
 from . import type_editors
 

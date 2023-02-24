@@ -58,15 +58,16 @@ import six
 from anatomist.cpp.simplecontrols import (ResetFOVAction, Simple2DControl,
                                           Simple3DControl,
                                           registerSimpleControls)
+from PyQt5.QtGui import QColor, QIcon, QLabel, QSlider, QWidget
+from PyQt5.QtWidgets import QMessageBox
+from soma.qt_gui.qt_backend import Qt, QtCore, QtGui, uic
+from soma.qt_gui.qt_backend.uic import loadUi
+
 from populse_mia.software_properties import Config
 from populse_mia.user_interface.data_viewer.anatomist_2 import \
     resources_snd_window
 from populse_mia.user_interface.data_viewer.anatomist_2.snd_window import \
     NewWindowViewer
-from PyQt5.QtGui import QColor, QIcon, QLabel, QSlider, QWidget
-from PyQt5.QtWidgets import QMessageBox
-from soma.qt_gui.qt_backend import Qt, QtCore, QtGui, uic
-from soma.qt_gui.qt_backend.uic import loadUi
 
 
 class LeftSimple3DControl(Simple2DControl):

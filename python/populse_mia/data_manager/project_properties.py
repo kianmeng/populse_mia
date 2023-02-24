@@ -19,6 +19,7 @@ import os
 
 import yaml
 from packaging import version
+
 # Populse_MIA imports
 from populse_mia.software_properties import Config, verCmp
 

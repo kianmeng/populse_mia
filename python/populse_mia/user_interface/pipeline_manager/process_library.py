@@ -47,8 +47,6 @@ from zipfile import ZipFile, is_zipfile
 import yaml
 # capsul import
 from capsul.api import get_process_instance
-# Populse_MIA import
-from populse_mia.software_properties import Config, verCmp
 # PyQt5 import
 from PyQt5 import QtCore
 # QAbstractItemView is not available from soma (see in PackageLibraryDialog)
@@ -64,6 +62,9 @@ from soma.qt_gui.qt_backend.Qt import (QApplication, QDialog, QFileDialog,
 from soma.qt_gui.qt_backend.QtCore import (QAbstractItemModel, QByteArray,
                                            QMimeData, QModelIndex, Qt, Signal)
 from soma.qt_gui.qt_backend.QtWidgets import QGroupBox, QListWidget, QMenu
+
+# Populse_MIA import
+from populse_mia.software_properties import Config, verCmp
 
 
 class DictionaryTreeModel(QAbstractItemModel):

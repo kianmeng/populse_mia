@@ -24,10 +24,6 @@ import skimage as sk
 # Populse_MIA imports
 # from populse_mia.software_properties import verCmp
 from packaging import version
-from populse_mia.data_manager.project import COLLECTION_CURRENT
-from populse_mia.software_properties import Config
-from populse_mia.user_interface.data_browser import data_browser
-from populse_mia.user_interface.pop_ups import ClickableLabel, PopUpSelectTag
 from PyQt5 import QtCore
 # PyQt5 imports
 from PyQt5.QtCore import Qt
@@ -37,6 +33,11 @@ from PyQt5.QtWidgets import (QCheckBox, QFrame, QHBoxLayout, QLabel, QLineEdit,
                              QWidget)
 # from scipy.ndimage import rotate  # to work with NumPy arrays
 from skimage.transform import resize
+
+from populse_mia.data_manager.project import COLLECTION_CURRENT
+from populse_mia.software_properties import Config
+from populse_mia.user_interface.data_browser import data_browser
+from populse_mia.user_interface.pop_ups import ClickableLabel, PopUpSelectTag
 
 
 class MiniViewer(QWidget):

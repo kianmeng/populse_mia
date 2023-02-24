@@ -72,6 +72,18 @@ from populse_db.database import (FIELD_TYPE_BOOLEAN, FIELD_TYPE_DATE,
                                  FIELD_TYPE_LIST_INTEGER,
                                  FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
                                  FIELD_TYPE_STRING, FIELD_TYPE_TIME)
+# PyQt5 imports
+from PyQt5 import Qt, QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QCoreApplication, pyqtSignal
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog,
+                             QDialogButtonBox, QFileDialog, QFormLayout,
+                             QHBoxLayout, QHeaderView, QInputDialog, QLabel,
+                             QLineEdit, QMessageBox, QPlainTextEdit,
+                             QPushButton, QRadioButton, QScrollArea, QSplitter,
+                             QTableWidget, QTableWidgetItem, QTreeWidget,
+                             QTreeWidgetItem, QVBoxLayout, QWidget)
+
 # Populse_mia imports
 from populse_mia.data_manager.database_mia import (TAG_ORIGIN_USER,
                                                    TAG_UNIT_DEGREE,
@@ -94,17 +106,6 @@ from populse_mia.software_properties import Config, verCmp
 from populse_mia.user_interface.data_browser import data_browser
 from populse_mia.utils import utils
 from populse_mia.utils.utils import check_value_type
-# PyQt5 imports
-from PyQt5 import Qt, QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QCoreApplication, pyqtSignal
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog,
-                             QDialogButtonBox, QFileDialog, QFormLayout,
-                             QHBoxLayout, QHeaderView, QInputDialog, QLabel,
-                             QLineEdit, QMessageBox, QPlainTextEdit,
-                             QPushButton, QRadioButton, QScrollArea, QSplitter,
-                             QTableWidget, QTableWidgetItem, QTreeWidget,
-                             QTreeWidgetItem, QVBoxLayout, QWidget)
 
 
 class ClickableLabel(QLabel):

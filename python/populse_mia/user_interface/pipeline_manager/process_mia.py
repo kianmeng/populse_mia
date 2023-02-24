@@ -39,13 +39,14 @@ from capsul.pipeline.process_iteration import ProcessIteration
 from capsul.process.process import NipypeProcess
 # nipype imports
 from nipype.interfaces.base import File, InputMultiObject, traits_extension
-# Populse_MIA imports
-from populse_mia.data_manager.project import COLLECTION_CURRENT
-from populse_mia.software_properties import Config
 # Soma-base import
 from soma.controller.trait_utils import relax_exists_constraint
 from soma.utils.weak_proxy import get_ref
 from traits.trait_base import Undefined
+
+# Populse_MIA imports
+from populse_mia.data_manager.project import COLLECTION_CURRENT
+from populse_mia.software_properties import Config
 
 
 class MIAProcessCompletionEngine(ProcessCompletionEngine):

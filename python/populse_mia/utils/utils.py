@@ -37,11 +37,12 @@ from populse_db.database import (FIELD_TYPE_BOOLEAN, FIELD_TYPE_DATE,
                                  FIELD_TYPE_LIST_INTEGER,
                                  FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
                                  FIELD_TYPE_STRING, FIELD_TYPE_TIME)
-# Populse_mia imports
-from populse_mia.software_properties import Config
 # PyQt5 imports
 from PyQt5.QtCore import QDate, QDateTime, Qt, QTime, QVariant
 from PyQt5.QtWidgets import QMessageBox
+
+# Populse_mia imports
+from populse_mia.software_properties import Config
 
 
 def check_python_version():

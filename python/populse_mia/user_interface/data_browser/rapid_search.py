@@ -15,10 +15,11 @@ Contains:
 # for details.
 ##########################################################################
 
-# Populse_MIA imports
-from populse_mia.data_manager.project import TAG_BRICKS, TAG_FILENAME
 # PyQt5 import
 from PyQt5.QtWidgets import QLineEdit
+
+# Populse_MIA imports
+from populse_mia.data_manager.project import TAG_BRICKS, TAG_FILENAME
 
 
 class RapidSearch(QLineEdit):
