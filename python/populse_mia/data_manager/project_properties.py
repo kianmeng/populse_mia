@@ -19,7 +19,6 @@ import os
 
 import yaml
 from packaging import version
-
 # Populse_MIA imports
 from populse_mia.software_properties import Config, verCmp
 
@@ -74,7 +73,6 @@ class SavedProjects:
 
         """
         if self.pathsList:
-
             if newPath not in self.pathsList:
                 self.pathsList.insert(0, newPath)
 
@@ -101,12 +99,10 @@ class SavedProjects:
         config = Config()
 
         try:
-
             with open(
                 os.path.join(config.get_config_path(), "saved_projects.yml"),
                 "r",
             ) as stream:
-
                 try:
                     if version.parse(yaml.__version__) > version.parse("5.1"):
                         return yaml.load(stream, Loader=yaml.FullLoader)
@@ -117,7 +113,6 @@ class SavedProjects:
                     print(exc)
 
         except FileNotFoundError as exc:
-
             with open(
                 os.path.join(config.get_config_path(), "saved_projects.yml"),
                 "w",
@@ -144,12 +139,10 @@ class SavedProjects:
 
         config = Config()
 
-        with (
-            open(
-                os.path.join(config.get_config_path(), "saved_projects.yml"),
-                "w",
-                encoding="utf8",
-            )
+        with open(
+            os.path.join(config.get_config_path(), "saved_projects.yml"),
+            "w",
+            encoding="utf8",
         ) as configfile:
             yaml.dump(
                 self.savedProjects,

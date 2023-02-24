@@ -15,11 +15,10 @@ Contains:
 # for details.
 ##########################################################################
 
-# PyQt5 import
-from PyQt5.QtWidgets import QLineEdit
-
 # Populse_MIA imports
 from populse_mia.data_manager.project import TAG_BRICKS, TAG_FILENAME
+# PyQt5 import
+from PyQt5.QtWidgets import QLineEdit
 
 
 class RapidSearch(QLineEdit):
@@ -67,9 +66,7 @@ class RapidSearch(QLineEdit):
         or_to_write = False
 
         for tag in tags:
-
             if tag != TAG_BRICKS:
-
                 if or_to_write:
                     query += " OR "
 
@@ -106,9 +103,7 @@ class RapidSearch(QLineEdit):
         or_to_write = False
 
         for tag in tags:
-
             if tag != TAG_BRICKS:
-
                 if or_to_write:
                     query += " OR "
 

@@ -29,16 +29,9 @@ import webbrowser
 from datetime import datetime
 from os.path import expanduser
 
+import populse_mia.data_manager.data_loader as data_loader
 import yaml
 from packaging import version
-from PyQt5.QtCore import QCoreApplication, Qt
-# PyQt5 imports
-from PyQt5.QtGui import QCursor, QIcon
-from PyQt5.QtWidgets import (QAction, QApplication, QLabel, QMainWindow, QMenu,
-                             QMessageBox, QPushButton, QTabWidget, QVBoxLayout,
-                             QWidget)
-
-import populse_mia.data_manager.data_loader as data_loader
 from populse_mia.data_manager.project import (COLLECTION_CURRENT, TAG_HISTORY,
                                               Project)
 # Populse_MIA imports
@@ -59,6 +52,12 @@ from populse_mia.user_interface.pop_ups import (PopUpDeletedProject,
                                                 PopUpProperties, PopUpQuit,
                                                 PopUpSaveProjectAs,
                                                 PopUpSeeAllProjects)
+from PyQt5.QtCore import QCoreApplication, Qt
+# PyQt5 imports
+from PyQt5.QtGui import QCursor, QIcon
+from PyQt5.QtWidgets import (QAction, QApplication, QLabel, QMainWindow, QMenu,
+                             QMessageBox, QPushButton, QTabWidget, QVBoxLayout,
+                             QWidget)
 
 CLINICAL_TAGS = [
     "Site",
@@ -594,9 +593,7 @@ class MainWindow(QMainWindow):
                     self.msg.close()
 
             else:
-
                 if self.exPopup.exec():
-
                     self.exPopup.get_filename(self.exPopup.selectedFiles())
                     file_name = self.exPopup.relative_path
 
@@ -826,7 +823,6 @@ class MainWindow(QMainWindow):
         # Ui_Dialog() is defined in pop_ups.py
         # We check for unsaved modifications
         if self.check_unsaved_modifications():
-
             # If there are unsaved modifications, we ask the user what he
             # wants to do
             self.pop_up_close = PopUpQuit(self.project)
@@ -839,7 +835,6 @@ class MainWindow(QMainWindow):
 
         # We can open a new project
         if can_switch:
-
             try:
                 self.exPopup = PopUpOpenProject()
 
@@ -866,7 +861,6 @@ class MainWindow(QMainWindow):
                     self.msg.close()
 
             else:
-
                 if self.exPopup.exec():
                     file_name = self.exPopup.selectedFiles()
                     self.exPopup.get_filename(file_name)
@@ -888,11 +882,12 @@ class MainWindow(QMainWindow):
                     # Update the history and brick tables in the newly opened
                     # project, if it comes from outside.
                     path_name = os.path.join(
-                                   os.path.abspath(os.path.normpath(file_name)),
-                                   "")
+                        os.path.abspath(os.path.normpath(file_name)), ""
+                    )
                     projectsPath = os.path.join(
-                         os.path.abspath(self.config.getPathToProjectsFolder()),
-                         "")
+                        os.path.abspath(self.config.getPathToProjectsFolder()),
+                        "",
+                    )
                     if path_name != projectsPath:
                         self.project.update_db_for_paths(path_name)
 
@@ -900,7 +895,6 @@ class MainWindow(QMainWindow):
         """Open a recent project."""
         # We check for unsaved modifications
         if self.check_unsaved_modifications():
-
             # If there are unsaved modifications, we ask the user what he
             # wants to do
             self.pop_up_close = PopUpQuit(self.project)
@@ -993,7 +987,6 @@ class MainWindow(QMainWindow):
             shutil.rmtree(folder)
 
         else:
-
             for filename in glob.glob(
                 os.path.join(os.path.abspath(folder), "data", "raw_data", "*")
             ):
@@ -1008,7 +1001,6 @@ class MainWindow(QMainWindow):
                 for database_scan in self.project.session.get_documents_names(
                     COLLECTION_CURRENT
                 ):
-
                     if file_name in database_scan:
                         file_in_database = True
 
@@ -1127,7 +1119,6 @@ class MainWindow(QMainWindow):
                 self.msg.close()
 
         else:
-
             if self.test:
                 self.exPopup.exec = lambda x=0: True
                 self.exPopup.validate = True
@@ -1175,13 +1166,12 @@ class MainWindow(QMainWindow):
                     os.makedirs(as_folder_rel)
                     os.mkdir(data_path)
                     os.mkdir(raw_data_path)
-                    #os.mkdir(derived_data_path)
+                    # os.mkdir(derived_data_path)
                     os.mkdir(downloaded_data_path)
                     os.mkdir(filters_path)
 
                 # Data files copied
                 if os.path.exists(os.path.join(old_folder_rel, "data")):
-
                     for filename in glob.glob(
                         os.path.join(old_folder, "data", "raw_data", "*")
                     ):
@@ -1195,11 +1185,10 @@ class MainWindow(QMainWindow):
                     #     shutil.copy(
                     #         filename, os.path.join(data_path, "derived_data")
                     #     )
-                    shutil.copytree(os.path.join(old_folder,
-                                                 "data",
-                                                 "derived_data"),
-                                    os.path.join(data_path,
-                                                 "derived_data"))
+                    shutil.copytree(
+                        os.path.join(old_folder, "data", "derived_data"),
+                        os.path.join(data_path, "derived_data"),
+                    )
 
                     for filename in glob.glob(
                         os.path.join(
@@ -1212,7 +1201,6 @@ class MainWindow(QMainWindow):
                         )
 
                 if os.path.exists(os.path.join(old_folder_rel, "filters")):
-
                     for filename in glob.glob(
                         os.path.join(old_folder, "filters", "*")
                     ):
@@ -1489,10 +1477,8 @@ class MainWindow(QMainWindow):
 
         # Switching project only if it's a different one
         if file_path != self.project.folder:
-
             # If the file exists
             if os.path.exists(os.path.join(file_path)):
-
                 # If it is a MIA project
                 if (
                     os.path.exists(
@@ -1512,7 +1498,6 @@ class MainWindow(QMainWindow):
                     )
                     and os.path.exists(os.path.join(file_path, "filters"))
                 ):
-
                     # We check if the name of the project directory is the
                     # same in its properties
                     with open(
@@ -1521,7 +1506,6 @@ class MainWindow(QMainWindow):
                         ),
                         "r+",
                     ) as stream:
-
                         if version.parse(yaml.__version__) > version.parse(
                             "5.1"
                         ):

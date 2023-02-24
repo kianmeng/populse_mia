@@ -24,6 +24,10 @@ import skimage as sk
 # Populse_MIA imports
 # from populse_mia.software_properties import verCmp
 from packaging import version
+from populse_mia.data_manager.project import COLLECTION_CURRENT
+from populse_mia.software_properties import Config
+from populse_mia.user_interface.data_browser import data_browser
+from populse_mia.user_interface.pop_ups import ClickableLabel, PopUpSelectTag
 from PyQt5 import QtCore
 # PyQt5 imports
 from PyQt5.QtCore import Qt
@@ -33,11 +37,6 @@ from PyQt5.QtWidgets import (QCheckBox, QFrame, QHBoxLayout, QLabel, QLineEdit,
                              QWidget)
 # from scipy.ndimage import rotate  # to work with NumPy arrays
 from skimage.transform import resize
-
-from populse_mia.data_manager.project import COLLECTION_CURRENT
-from populse_mia.software_properties import Config
-from populse_mia.user_interface.data_browser import data_browser
-from populse_mia.user_interface.pop_ups import ClickableLabel, PopUpSelectTag
 
 
 class MiniViewer(QWidget):
@@ -454,7 +453,6 @@ class MiniViewer(QWidget):
         #      defined in skimage since version 0.14.0
 
         if version.parse(sk.__version__) >= version.Version("0.14.0"):
-
             try:
                 im2D = resize(
                     im2D, display_size, mode="constant", anti_aliasing=False
@@ -468,7 +466,6 @@ class MiniViewer(QWidget):
                     anti_aliasing=False,
                 )
         else:
-
             try:
                 im2D = resize(im2D, display_size, mode="constant")
 
@@ -650,7 +647,6 @@ class MiniViewer(QWidget):
 
             # Reading the images from the file paths
             for idx, file_path in enumerate(self.file_paths.copy()):
-
                 try:
                     chk = nib.as_closest_canonical(
                         nib.load(file_path, mmap=False)
@@ -680,7 +676,6 @@ class MiniViewer(QWidget):
                     chk = False
 
                 if chk is not False:
-
                     try:
                         np.asarray(chk.dataobj)
 
@@ -701,14 +696,12 @@ class MiniViewer(QWidget):
 
             # If we are in the "cursors" display mode
             if self.check_box_slices.checkState() == Qt.Unchecked:
-
                 # Layout to aligne each thumbnail (image + cursors)
                 self.h_box_thumb = QHBoxLayout()
 
                 # idx represents the index of the selected image
                 for idx in range(min(self.max_scans, len(self.file_paths))):
                     if not self.do_nothing[idx]:
-
                         # Creating sliders and labels
                         self.boxSlider(idx)
                         self.enableSliders(idx)
@@ -795,7 +788,6 @@ class MiniViewer(QWidget):
 
             # If we are in the "all slices" display mode
             else:
-
                 self.h_box_images = QHBoxLayout()
                 self.h_box_images.setSpacing(10)
                 self.v_box_scans = QVBoxLayout()

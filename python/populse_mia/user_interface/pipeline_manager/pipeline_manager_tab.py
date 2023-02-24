@@ -50,20 +50,6 @@ from capsul.pipeline.process_iteration import ProcessIteration
 from matplotlib.backends.qt_compat import QtWidgets
 # MIA processes imports
 from mia_processes.bricks.tools.tools import Input_Filter
-# PyQt5 imports
-from PyQt5 import Qt, QtCore
-from PyQt5.QtCore import QThread, QTimer, Signal
-from PyQt5.QtGui import QCursor, QIcon, QMovie
-from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QMenu,
-                             QMessageBox, QProgressDialog, QPushButton,
-                             QScrollArea, QSplitter, QToolBar, QVBoxLayout,
-                             QWidget)
-# Soma_base import
-from soma.controller.trait_utils import is_file_trait
-from soma.qt_gui.qtThread import QtThreadCall
-from traits.api import TraitListObject, Undefined
-from traits.trait_errors import TraitError
-
 # Populse_MIA imports
 from populse_mia.data_manager.project import (BRICK_EXEC, BRICK_EXEC_TIME,
                                               BRICK_INIT, BRICK_INIT_TIME,
@@ -89,6 +75,19 @@ from populse_mia.user_interface.pipeline_manager.process_library import \
 from populse_mia.user_interface.pipeline_manager.process_mia import ProcessMIA
 from populse_mia.user_interface.pop_ups import (PopUpInheritanceDict,
                                                 PopUpSelectIteration)
+# PyQt5 imports
+from PyQt5 import Qt, QtCore
+from PyQt5.QtCore import QThread, QTimer, Signal
+from PyQt5.QtGui import QCursor, QIcon, QMovie
+from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QMenu,
+                             QMessageBox, QProgressDialog, QPushButton,
+                             QScrollArea, QSplitter, QToolBar, QVBoxLayout,
+                             QWidget)
+# Soma_base import
+from soma.controller.trait_utils import is_file_trait
+from soma.qt_gui.qtThread import QtThreadCall
+from traits.api import TraitListObject, Undefined
+from traits.trait_errors import TraitError
 
 
 class PipelineManagerTab(QWidget):
@@ -409,7 +408,6 @@ class PipelineManagerTab(QWidget):
 
         # Adding I/O to database history
         for key in inputs:
-
             # filter Undefined / temp
             # this is an overhead since we convert to/from json, and it will
             # be converted again in the database. But the "default" function
@@ -418,7 +416,6 @@ class PipelineManagerTab(QWidget):
             inputs[key] = json.loads(code)
 
         for key in outputs:
-
             # filter Undefined / temp
             # this is an overhead since we convert to/from json, and it will
             # be converted again in the database.
@@ -434,14 +431,11 @@ class PipelineManagerTab(QWidget):
         notInDb = set(outputs.get("notInDb", []))
 
         for plug_name, plug_value in outputs.items():
-
             if plug_name not in process.traits():
                 continue
 
             if plug_value != "<undefined>":
-
                 if plug_name not in notInDb:
-
                     if pipeline_name != "":
                         full_name = pipeline_name + "." + node_name
 
@@ -639,7 +633,8 @@ class PipelineManagerTab(QWidget):
         for param, parent_file in parent_files.items():
             database_parent_file = None
             relfile = os.path.abspath(os.path.normpath(parent_file))[
-                                                                   len(db_dir):]
+                len(db_dir) :
+            ]
 
             if relfile == p_value:
                 # output is one of the inputs: OK nothing to be done.
@@ -683,7 +678,6 @@ class PipelineManagerTab(QWidget):
             and (node_name not in self.ignore)
             and (node_name + plug_name not in self.ignore)
         ):
-
             # if all inputs have the same tags set: then pick either of them,
             # they are all the same, there is no ambiguity
             eq = True
@@ -712,7 +706,6 @@ class PipelineManagerTab(QWidget):
                 all_ivalues = {k: v}
 
             else:
-
                 # ambiguous inputs -> output
                 # ask the user, or use previously setup answers.
 
@@ -796,10 +789,8 @@ class PipelineManagerTab(QWidget):
         )
 
         if own_tags:
-
             # own_tags may insert new fields in the database
             for tag_to_add in own_tags:
-
                 if tag_to_add["name"] not in field_names:
                     (self.project.session.add_field)(
                         COLLECTION_CURRENT,
@@ -1132,7 +1123,6 @@ class PipelineManagerTab(QWidget):
         return config
 
     def cleanup_older_init(self):
-
         for brick in self.brick_list:
             print("cleanup brick", brick)
             self.main_window.data_browser.table_data.delete_from_brick(brick)
@@ -1187,7 +1177,6 @@ class PipelineManagerTab(QWidget):
             editor.setTransform(trans)
 
         elif case == "plug_value":
-
             if (
                 signal_list[2]
                 in [
@@ -1205,7 +1194,6 @@ class PipelineManagerTab(QWidget):
             history_maker.append("update_plug_value")
 
             for element in signal_list:
-
                 if element in ["inputs", "outputs"]:
                     element = ""
 
@@ -1454,7 +1442,6 @@ class PipelineManagerTab(QWidget):
         QApplication.instance().setOverrideCursor(QCursor(Qt.Qt.WaitCursor))
 
         if self.init_clicked:
-
             self.cleanup_older_init()
 
         self.ignore_node = False
@@ -1539,7 +1526,6 @@ class PipelineManagerTab(QWidget):
 
         # completion / retrieve workflow
         try:
-
             print("Completion / workflow...")
             print("pipeline:", pipeline)
             self.workflow = workflow_from_pipeline(
@@ -1609,7 +1595,6 @@ class PipelineManagerTab(QWidget):
 
             else:
                 if "capsul.engine.module.fsl" in requirements:
-
                     if not requirements["capsul.engine.module." "fsl"].get(
                         "directory", False
                     ):
@@ -1645,7 +1630,6 @@ class PipelineManagerTab(QWidget):
 
             else:
                 if "capsul.engine.module.afni" in requirements:
-
                     if not requirements["capsul.engine.module." "afni"].get(
                         "directory", False
                     ):
@@ -1681,7 +1665,6 @@ class PipelineManagerTab(QWidget):
 
             else:
                 if "capsul.engine.module.ants" in requirements:
-
                     if not requirements["capsul.engine.module." "ants"].get(
                         "directory", False
                     ):
@@ -1703,7 +1686,6 @@ class PipelineManagerTab(QWidget):
 
             # Matlab:
             try:
-
                 if (
                     requirements["capsul_engine"]["uses"].get(
                         "capsul.engine.module." "matlab"
@@ -1718,9 +1700,7 @@ class PipelineManagerTab(QWidget):
                 pass
 
             else:
-
                 if "capsul.engine.module.matlab" in requirements:
-
                     if not requirements["capsul.engine.module." "matlab"].get(
                         "executable", False
                     ):
@@ -1755,9 +1735,7 @@ class PipelineManagerTab(QWidget):
                 pass
 
             else:
-
                 if "capsul.engine.module.spm" in requirements:
-
                     if not requirements["capsul.engine.module.spm"].get(
                         "directory", False
                     ):
@@ -1772,7 +1750,6 @@ class PipelineManagerTab(QWidget):
                     elif requirements["capsul.engine.module.spm"][
                         "standalone"
                     ]:
-
                         if Config().get_matlab_standalone_path() is None:
                             init_result = False
                             init_messages.append(
@@ -1786,7 +1763,6 @@ class PipelineManagerTab(QWidget):
                             )
 
                     else:
-
                         try:
                             requirements["capsul.engine.module.matlab"].get(
                                 "executable"
@@ -1976,7 +1952,6 @@ class PipelineManagerTab(QWidget):
             )
 
             if not init_result:
-
                 if init_messages:
                     message = "The pipeline could not be initialised properly:"
 
@@ -1984,10 +1959,12 @@ class PipelineManagerTab(QWidget):
                         message = message + "\n- " + mssg
 
                 else:
-                    message = ("The pipeline could not be initialised "
-                               "correctly, for an unknown reason!")
+                    message = (
+                        "The pipeline could not be initialised "
+                        "correctly, for an unknown reason!"
+                    )
 
-                lineCnt = message.count('\n')
+                lineCnt = message.count("\n")
                 self.msg = QMessageBox()
                 self.msg.setWindowTitle("MIA configuration warning!")
 
@@ -1999,12 +1976,15 @@ class PipelineManagerTab(QWidget):
                     layout = QtWidgets.QVBoxLayout(content)
                     tmpLabel = QtWidgets.QLabel(message)
                     tmpLabel.setTextInteractionFlags(
-                                                QtCore.Qt.TextSelectableByMouse)
+                        QtCore.Qt.TextSelectableByMouse
+                    )
                     layout.addWidget(tmpLabel)
-                    self.msg.layout().addWidget(scroll, 0, 0, 1,
-                                                self.msg.layout().columnCount())
-                    self.msg.setStyleSheet("QScrollArea{min-width:550 px; "
-                                           "min-height: 300px}")
+                    self.msg.layout().addWidget(
+                        scroll, 0, 0, 1, self.msg.layout().columnCount()
+                    )
+                    self.msg.setStyleSheet(
+                        "QScrollArea{min-width:550 px; " "min-height: 300px}"
+                    )
 
                 else:
                     self.msg.setText(message)
@@ -2018,8 +1998,9 @@ class PipelineManagerTab(QWidget):
 
                 if self.msg.clickedButton() == yes_button:
                     self.main_window.software_preferences_pop_up()
-                    (self.main_window.pop_up_preferences.
-                                                  tab_widget.setCurrentIndex)(1)
+                    (
+                        self.main_window.pop_up_preferences.tab_widget.setCurrentIndex
+                    )(1)
 
                 self.main_window.statusBar().showMessage(
                     'Pipeline "{0}" was not initialised successfully.'.format(
@@ -2467,19 +2448,23 @@ class PipelineManagerTab(QWidget):
             # else:
 
             # soma-workflow remote credentials
-            from soma_workflow.gui.workflowGui import ConnectionDialog
             from soma_workflow import configuration
+            from soma_workflow.gui.workflowGui import ConnectionDialog
+
             config_file = configuration.Configuration.search_config_path()
-            resource_list \
-                = configuration.Configuration.get_configured_resources(
-                    config_file)
+            resource_list = (
+                configuration.Configuration.get_configured_resources(
+                    config_file
+                )
+            )
             login_list = configuration.Configuration.get_logins(config_file)
             engine = self.get_capsul_engine()
             swf_config = engine.settings.select_configurations(
-                'global', {'somaworkflow': 'config_id=="somaworkflow"'})
-            if swf_config.get('use', True):
+                "global", {"somaworkflow": 'config_id=="somaworkflow"'}
+            )
+            if swf_config.get("use", True):
                 cd = ConnectionDialog(login_list, resource_list)
-                sel_resource = swf_config.get('computing_resource', None)
+                sel_resource = swf_config.get("computing_resource", None)
                 if sel_resource and sel_resource in resource_list:
                     cd.ui.combo_resources.setCurrentText(sel_resource)
                 res = cd.exec_()
@@ -2490,20 +2475,22 @@ class PipelineManagerTab(QWidget):
                 passwd = cd.ui.lineEdit_password.text()
                 rsa_key = cd.ui.lineEdit_rsa_password.text()
                 if resource not in (
-                    '', 'localhost',
-                    configuration.Configuration.get_local_resource_id()):
+                    "",
+                    "localhost",
+                    configuration.Configuration.get_local_resource_id(),
+                ):
                     sc = engine.study_config
-                    if 'SomaWorkflowConfig' in sc.modules:
+                    if "SomaWorkflowConfig" in sc.modules:
                         # not sure this is needed...
                         sc.somaworkflow_computing_resource = resource
-                        #setattr(sc.somaworkflow_computing_resources_config,
-                                #resource, {})
-                        swc = sc.modules['SomaWorkflowConfig']
-                        swc.set_computing_resource_password(resource, passwd,
-                                                            rsa_key)
-                    print('CONNECT TO:', resource)
+                        # setattr(sc.somaworkflow_computing_resources_config,
+                        # resource, {})
+                        swc = sc.modules["SomaWorkflowConfig"]
+                        swc.set_computing_resource_password(
+                            resource, passwd, rsa_key
+                        )
+                    print("CONNECT TO:", resource)
                     engine.connect(resource)
-
 
             self.progress = RunProgress(self)
             self.progress.setSizePolicy(
@@ -2695,7 +2682,6 @@ class PipelineManagerTab(QWidget):
                 temp_plug_name = []
 
                 for parameter in parameters:
-
                     if c_e.scene.pipeline.nodes[""].plugs[parameter].links_to:
                         pip_plug_name = ("inputs", parameter)
 
@@ -2877,7 +2863,6 @@ class PipelineManagerTab(QWidget):
 
         # retrieve inputs and outputs keys in process,
         if isinstance(process, Process):
-
             inputs = process.get_inputs()
             outputs = process.get_outputs()
             # ProcessMIA / Process_Mia specific
@@ -2923,7 +2908,6 @@ class PipelineManagerTab(QWidget):
 
         values = {}
         for key, value in inputs.items():
-
             trait = process.trait(key)
             if not is_file_trait(trait):
                 continue
@@ -2964,7 +2948,6 @@ class PipelineManagerTab(QWidget):
         auto_inheritance_dict = {}
 
         for plug_name, plug_value in outputs.items():
-
             if plug_name in notInDb:
                 continue
 
@@ -3267,7 +3250,6 @@ class RunProgress(QWidget):
     """
 
     def __init__(self, pipeline_manager, settings=None):
-
         super(RunProgress, self).__init__()
 
         self.pipeline_manager = pipeline_manager
@@ -3296,7 +3278,6 @@ class RunProgress(QWidget):
         # self.hide()
 
     def end_progress(self):
-
         self.worker.wait()
         QApplication.instance().restoreOverrideCursor()
 
@@ -3330,12 +3311,10 @@ class RunProgress(QWidget):
         mbox.exec()
 
     def start(self):
-
         self.worker.start()
         # self.progressbar.setValue(20)
 
     def stop_execution(self):
-
         print("*** CANCEL ***")
         with self.worker.lock:
             self.worker.interrupt_request = True
@@ -3357,7 +3336,6 @@ class RunWorker(QThread):
 
     def run(self):
         def _check_nipype_processes(pplne):
-
             if isinstance(pplne, Pipeline):
                 for node_name, node in pplne.nodes.items():
                     if not hasattr(node, "process"):
@@ -3411,14 +3389,16 @@ class RunWorker(QThread):
         # rebuild the workflow, because it has not been made with them.
         resource_id = engine.connected_to()
         resource_conf = engine.settings.select_configurations(
-            resource_id, {'somaworkflow': 'config_id=="somaworkflow"'}).get(
-                'capsul.engine.module.somaworkflow', {})
-        if resource_conf.get('transfer_paths', None) \
-                or resource_conf.get('path_translations', None):
-            print('rebuilding workflow for file transfers / translations...')
+            resource_id, {"somaworkflow": 'config_id=="somaworkflow"'}
+        ).get("capsul.engine.module.somaworkflow", {})
+        if resource_conf.get("transfer_paths", None) or resource_conf.get(
+            "path_translations", None
+        ):
+            print("rebuilding workflow for file transfers / translations...")
             workflow = workflow_from_pipeline(
-                pipeline, complete_parameters=True, environment=resource_id)
-            print('running now...')
+                pipeline, complete_parameters=True, environment=resource_id
+            )
+            print("running now...")
 
         try:
             exec_id, pipeline = engine.start(
@@ -3464,7 +3444,6 @@ class StatusWidget(QWidget):
     """
 
     def __init__(self, pipeline_manager):
-
         super().__init__()
         self.pipeline_manager = pipeline_manager
         layout = QVBoxLayout()
@@ -3498,7 +3477,6 @@ class StatusWidget(QWidget):
         self.setWindowTitle("Execution status")
 
     def toggle_soma_workflow(self, checked):
-
         if self.swf_widget is not None:
             self.swf_widget.setVisible(checked)
             if not checked:

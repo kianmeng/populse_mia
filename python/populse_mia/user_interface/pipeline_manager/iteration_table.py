@@ -18,13 +18,6 @@
 
 import os
 
-# PyQt5 imports
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QLabel,
-                             QPushButton, QTableWidget, QTableWidgetItem,
-                             QVBoxLayout, QWidget)
-
 from populse_mia.data_manager.project import COLLECTION_CURRENT, TAG_FILENAME
 from populse_mia.software_properties import Config
 # MIA imports
@@ -32,6 +25,12 @@ from populse_mia.user_interface.pipeline_manager.process_mia import ProcessMIA
 from populse_mia.user_interface.pop_ups import (ClickableLabel,
                                                 PopUpSelectIteration,
                                                 PopUpSelectTagCountTable)
+# PyQt5 imports
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QLabel,
+                             QPushButton, QTableWidget, QTableWidgetItem,
+                             QVBoxLayout, QWidget)
 
 
 class IterationTable(QWidget):
@@ -280,7 +279,6 @@ class IterationTable(QWidget):
         )
 
         if ui_select.exec_():
-
             if (
                 self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().iterated_tag
                 is None

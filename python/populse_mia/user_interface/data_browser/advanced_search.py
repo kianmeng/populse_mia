@@ -21,16 +21,15 @@ import os
 # Populse_db imports
 from populse_db.database import (ALL_TYPES, FIELD_TYPE_BOOLEAN,
                                  FIELD_TYPE_STRING)
+# Populse_MIA imports
+from populse_mia.data_manager.project import COLLECTION_CURRENT, TAG_FILENAME
+from populse_mia.software_properties import Config
+from populse_mia.user_interface.pop_ups import ClickableLabel
 # PyQt5 imports
 from PyQt5.QtCore import QObjectCleanupHandler
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (QComboBox, QGridLayout, QHBoxLayout, QLineEdit,
                              QMessageBox, QPushButton, QVBoxLayout, QWidget)
-
-# Populse_MIA imports
-from populse_mia.data_manager.project import COLLECTION_CURRENT, TAG_FILENAME
-from populse_mia.software_properties import Config
-from populse_mia.user_interface.pop_ups import ClickableLabel
 
 
 class AdvancedSearch(QWidget):
@@ -217,7 +216,6 @@ class AdvancedSearch(QWidget):
         if len(nots) > 0:
             # Result gotten
             try:
-
                 filter_query = self.prepare_filters(
                     links, fields, conditions, values, nots, self.scans_list
                 )

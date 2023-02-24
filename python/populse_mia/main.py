@@ -30,12 +30,11 @@ import os
 import pkgutil
 import sys
 import traceback
-import yaml
 from functools import partial
-from packaging import version
 from pathlib import Path
 
-
+import yaml
+from packaging import version
 # PyQt5 imports
 from PyQt5 import QtCore
 from PyQt5.QtCore import QDir, QLockFile, Qt
@@ -118,7 +117,6 @@ if (
         del capsul_dev_dir
 
     else:
-
         try:
             import capsul
 
@@ -213,7 +211,6 @@ if (
         del mia_processes_dev_dir
 
     else:
-
         try:
             import mia_processes
 
@@ -353,15 +350,14 @@ if len(pkg_error) > 0:
 import capsul.api as capsul_api
 # capsul imports
 from capsul.api import get_process_instance
-# soma-base imports
-from soma.qt_gui.qtThread import QtThreadCall
-
 from populse_mia.data_manager.project import Project
 from populse_mia.data_manager.project_properties import SavedProjects
 from populse_mia.software_properties import Config
 # populse_mia imports
 from populse_mia.user_interface.main_window import MainWindow
 from populse_mia.utils.utils import check_python_version
+# soma-base imports
+from soma.qt_gui.qtThread import QtThreadCall
 
 main_window = None
 
@@ -410,7 +406,6 @@ class PackagesInstall:
             and "test" not in module_name.split(".")
             and "tests" not in module_name.split(".")
         ):
-
             # reloading the package
             if module_name in sys.modules.keys():
                 del sys.modules[module_name]
@@ -420,13 +415,11 @@ class PackagesInstall:
                 pkg = sys.modules[module_name]
 
                 for k, v in sorted(list(pkg.__dict__.items())):
-
                     if class_name and k != class_name:
                         continue
 
                     # checking each class in the package
                     if inspect.isclass(v):
-
                         if v in PackagesInstall._already_loaded:
                             continue
 
@@ -446,14 +439,12 @@ class PackagesInstall:
                         PackagesInstall._already_loaded.add(vname)
 
                         try:
-
                             try:
                                 get_process_instance(
                                     "%s.%s" % (module_name, v.__name__)
                                 )
 
                             except Exception:
-
                                 if v is capsul_api.Node or not issubclass(
                                     v, capsul_api.Node
                                 ):
@@ -465,12 +456,10 @@ class PackagesInstall:
                             pkg_iter = self.packages
 
                             for element in path_list:
-
                                 if element in pkg_iter.keys():
                                     pkg_iter = pkg_iter[element]
 
                                 else:
-
                                     if element is path_list[-1]:
                                         pkg_iter[element] = "process_enabled"
                                         print("Detected brick: ", element)
@@ -493,9 +482,7 @@ class PackagesInstall:
                     path = [os.path.dirname(pkg.__file__)]
 
                 if path:
-
                     for _, modname, ispkg in pkgutil.iter_modules(path):
-
                         if modname == "__main__":
                             continue  # skip main
 
@@ -596,7 +583,6 @@ def launch_mia():
         deleted_projects = []
 
         for saved_project in saved_projects_list:
-
             if not os.path.isdir(saved_project):
                 deleted_projects.append(os.path.abspath(saved_project))
                 saved_projects_object.removeSavedProject(saved_project)
@@ -711,7 +697,6 @@ def main():
         save_flag = False
 
         if DEV_MODE:  # "developer" mode
-
             try:
                 config = Config()
 
@@ -730,7 +715,6 @@ def main():
                 sys.exit(1)
 
         elif dialog is not None:  # "user" mode only if problem
-
             mia_home_config = dict()
             mia_home_config["mia_user_path"] = dialog.file_line_edit.text()
             print("\nNew values in ~/.populse_mia/configuration.yml: ")
@@ -787,9 +771,7 @@ def main():
                 )
 
         if "config" in locals():
-
             for key, value in config.config.items():
-
                 if value == "no":
                     save_flag = True
                     config.config[key] = False
@@ -809,9 +791,7 @@ def main():
         _verify_miaConfig()
 
     else:  # "user" mode
-
         try:
-
             if not os.path.exists(os.path.dirname(dot_mia_config)):
                 os.mkdir(os.path.dirname(dot_mia_config))
                 print(
@@ -821,7 +801,6 @@ def main():
 
             # Just to check if dot_mia_config file is well readable/writeable
             with open(dot_mia_config, "r") as stream:
-
                 if version.parse(yaml.__version__) > version.parse("5.1"):
                     mia_home_config = yaml.load(stream, Loader=yaml.FullLoader)
                 else:
@@ -902,7 +881,6 @@ def main():
             ]
 
             for i in pc["path"]:
-
                 if i not in pypath and not any(x in i for x in matches):
                     pypath.append(i)
 
@@ -968,7 +946,6 @@ def verify_processes():
             return True
 
         for key in old_dic:
-
             if key not in new_dic:
                 pass
 
@@ -996,9 +973,7 @@ def verify_processes():
     )
 
     if os.path.isfile(proc_config):
-
         with open(proc_config, "r") as stream:
-
             if version.parse(yaml.__version__) > version.parse("5.1"):
                 proc_content = yaml.load(stream, Loader=yaml.FullLoader)
             else:
@@ -1014,14 +989,11 @@ def verify_processes():
     # Checking that the packages used during the previous launch
     # of mia are still available
     if othPckg:
-
         for pckg in othPckg:
-
             try:
                 __import__(pckg)
 
             except ImportError as e:
-
                 # Try to update the sys.path for the processes/ directory
                 # currently used
                 if (
@@ -1054,7 +1026,6 @@ def verify_processes():
                         if ("Paths" in proc_content) and (
                             isinstance(proc_content["Paths"], list)
                         ):
-
                             if (
                                 not os.path.relpath(
                                     os.path.join(
@@ -1176,23 +1147,28 @@ def verify_processes():
                     msg.exec()
 
             except SyntaxError as e:
-                print("\nA problem is detected with the '{0}' "
-                      "package...\nTraceback:".format(pckg))
+                print(
+                    "\nA problem is detected with the '{0}' "
+                    "package...\nTraceback:".format(pckg)
+                )
                 print("".join(traceback.format_tb(e.__traceback__)), end="")
                 print("{0}: {1}\n".format(e.__class__.__name__, e))
 
-                txt = ("A problem is detected with the '{0}' package...\n\n"
-                       "Traceback:\n{1} {2} \n{3}\n\nThis may lead to a later "
-                       "crash of Mia ...\nDo you want Mia tries to fix "
-                       "this issue automatically?\nBe careful, risk of "
-                       "destruction of the '{4}' module!".format(
-                                  pckg,
-                                  "".join(traceback.format_tb(e.__traceback__)),
-                                  e.__class__.__name__,
-                                  e,
-                                  e.filename))
+                txt = (
+                    "A problem is detected with the '{0}' package...\n\n"
+                    "Traceback:\n{1} {2} \n{3}\n\nThis may lead to a later "
+                    "crash of Mia ...\nDo you want Mia tries to fix "
+                    "this issue automatically?\nBe careful, risk of "
+                    "destruction of the '{4}' module!".format(
+                        pckg,
+                        "".join(traceback.format_tb(e.__traceback__)),
+                        e.__class__.__name__,
+                        e,
+                        e.filename,
+                    )
+                )
 
-                lineCnt = txt.count('\n')
+                lineCnt = txt.count("\n")
                 msg = QMessageBox()
                 msg.setWindowTitle("populse_mia - warning: {}".format(e))
 
@@ -1204,12 +1180,15 @@ def verify_processes():
                     layout = QVBoxLayout(content)
                     tmpLabel = QLabel(txt)
                     tmpLabel.setTextInteractionFlags(
-                                                QtCore.Qt.TextSelectableByMouse)
+                        QtCore.Qt.TextSelectableByMouse
+                    )
                     layout.addWidget(tmpLabel)
-                    msg.layout().addWidget(scroll, 0, 0, 1,
-                                           msg.layout().columnCount())
-                    msg.setStyleSheet("QScrollArea{min-width:550 px; "
-                                      "min-height: 300px}")
+                    msg.layout().addWidget(
+                        scroll, 0, 0, 1, msg.layout().columnCount()
+                    )
+                    msg.setStyleSheet(
+                        "QScrollArea{min-width:550 px; " "min-height: 300px}"
+                    )
 
                 else:
                     msg.setText(txt)
@@ -1220,28 +1199,33 @@ def verify_processes():
                 msg.exec()
 
                 if msg.clickedButton() == ok_button:
-
-                    with open(e.filename, 'r') as file:
+                    with open(e.filename, "r") as file:
                         filedata = file.read()
-                        filedata = filedata.replace('<undefined>',
-                                                    "\'<undefined>\'")
+                        filedata = filedata.replace(
+                            "<undefined>", "'<undefined>'"
+                        )
 
-                    with open(e.filename, 'w') as file:
+                    with open(e.filename, "w") as file:
                         file.write(filedata)
 
             except ValueError as e:
-                print("\nA problem is detected with the '{0}' "
-                      "package...\nTraceback:".format(pckg))
+                print(
+                    "\nA problem is detected with the '{0}' "
+                    "package...\nTraceback:".format(pckg)
+                )
                 print("".join(traceback.format_tb(e.__traceback__)), end="")
                 print("{0}: {1}\n".format(e.__class__.__name__, e))
 
-                txt = ("A problem is detected with the '{0}' package...\n\n"
-                       "Traceback:\n{1} {2} \n{3}\n\nThis may lead to a later "
-                       "crash of Mia ...\nPlease, try to fix it !...".format(
-                                  pckg,
-                                  "".join(traceback.format_tb(e.__traceback__)),
-                                  e.__class__.__name__,
-                                  e,))
+                txt = (
+                    "A problem is detected with the '{0}' package...\n\n"
+                    "Traceback:\n{1} {2} \n{3}\n\nThis may lead to a later "
+                    "crash of Mia ...\nPlease, try to fix it !...".format(
+                        pckg,
+                        "".join(traceback.format_tb(e.__traceback__)),
+                        e.__class__.__name__,
+                        e,
+                    )
+                )
                 msg = QMessageBox()
                 msg.setWindowTitle("populse_mia - warning: {0}".format(e))
                 msg.setText(txt)
@@ -1297,7 +1281,6 @@ def verify_processes():
                 )
 
         else:
-
             if (
                 (isinstance(proc_content, dict))
                 and ("Versions" in proc_content)
@@ -1348,7 +1331,6 @@ def verify_processes():
                 )
 
         else:
-
             if (
                 (isinstance(proc_content, dict))
                 and ("Versions" in proc_content)
@@ -1399,7 +1381,6 @@ def verify_processes():
                 )
 
         else:
-
             if (
                 (isinstance(proc_content, dict))
                 and ("Versions" in proc_content)
@@ -1495,9 +1476,7 @@ def verify_processes():
             final_pckgs["Packages"][item] = pckg_dic[item]
 
     if pack2install:
-
         if len(pack2install) == 2:
-
             if not any("nipype" in s for s in pack2install):
                 print(
                     "\n** The nipype processes library in mia is "
@@ -1520,7 +1499,6 @@ def verify_processes():
                 )
 
         elif len(pack2install) == 1:
-
             if any("nipype" in s for s in pack2install):
                 print(
                     "\n** The mia_processes and capsul processes "
@@ -1551,7 +1529,6 @@ def verify_processes():
 
         if (isinstance(proc_content, dict)) and ("Versions" in proc_content):
             for item in proc_content["Versions"]:
-
                 if item not in final_pckgs["Versions"]:
                     final_pckgs["Versions"][item] = proc_content["Versions"][
                         item
@@ -1563,7 +1540,6 @@ def verify_processes():
             _deepCompDic(proc_content["Packages"], final_pckgs["Packages"])
 
             for item in proc_content["Packages"]:
-
                 if item not in final_pckgs["Packages"]:
                     final_pckgs["Packages"][item] = proc_content["Packages"][
                         item

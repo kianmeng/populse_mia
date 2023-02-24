@@ -72,18 +72,6 @@ from populse_db.database import (FIELD_TYPE_BOOLEAN, FIELD_TYPE_DATE,
                                  FIELD_TYPE_LIST_INTEGER,
                                  FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
                                  FIELD_TYPE_STRING, FIELD_TYPE_TIME)
-# PyQt5 imports
-from PyQt5 import Qt, QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QCoreApplication, pyqtSignal
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog,
-                             QDialogButtonBox, QFileDialog, QFormLayout,
-                             QHBoxLayout, QHeaderView, QInputDialog, QLabel,
-                             QLineEdit, QMessageBox, QPlainTextEdit,
-                             QPushButton, QRadioButton, QScrollArea, QSplitter,
-                             QTableWidget, QTableWidgetItem, QTreeWidget,
-                             QTreeWidgetItem, QVBoxLayout, QWidget)
-
 # Populse_mia imports
 from populse_mia.data_manager.database_mia import (TAG_ORIGIN_USER,
                                                    TAG_UNIT_DEGREE,
@@ -106,6 +94,17 @@ from populse_mia.software_properties import Config, verCmp
 from populse_mia.user_interface.data_browser import data_browser
 from populse_mia.utils import utils
 from populse_mia.utils.utils import check_value_type
+# PyQt5 imports
+from PyQt5 import Qt, QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QCoreApplication, pyqtSignal
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog,
+                             QDialogButtonBox, QFileDialog, QFormLayout,
+                             QHBoxLayout, QHeaderView, QInputDialog, QLabel,
+                             QLineEdit, QMessageBox, QPlainTextEdit,
+                             QPushButton, QRadioButton, QScrollArea, QSplitter,
+                             QTableWidget, QTableWidgetItem, QTreeWidget,
+                             QTreeWidgetItem, QVBoxLayout, QWidget)
 
 
 class ClickableLabel(QLabel):
@@ -173,7 +172,6 @@ class DefaultValueListCreation(QDialog):
             try:
                 list_value = ast.literal_eval(value)
                 if isinstance(list_value, list):
-
                     # If the previous value was already a list, we fill it
 
                     self.table.setColumnCount(len(list_value))
@@ -482,7 +480,6 @@ class PopUpAddPath(QDialog):
             self.msg.show()
 
         elif path != "" and os.path.exists(path) and path_type != "":
-
             # For history
             history_maker = []
             history_maker.append("add_scans")
@@ -1791,7 +1788,6 @@ class PopUpMultipleSort(QDialog):
         self.order = self.combo_box.itemText(self.combo_box.currentIndex())
 
         for push_button in self.push_buttons:
-
             if push_button.text() in self.project.session.get_fields_names(
                 COLLECTION_CURRENT
             ):
@@ -2713,7 +2709,6 @@ class PopUpPreferences(QDialog):
         if fname:
             self.resources_path_line_edit.setText(fname)
 
-
     def browse_spm(self):
         """Called when spm browse button is clicked."""
 
@@ -3132,7 +3127,6 @@ class PopUpPreferences(QDialog):
 
         # complete backup and testing
         else:
-
             # Auto-save
             if self.save_checkbox.isChecked():
                 config.setAutoSave(True)
@@ -3321,7 +3315,6 @@ class PopUpPreferences(QDialog):
             if (
                 matlab_input != "" and spm_input != ""
             ) or self.use_spm_checkbox.isChecked():
-
                 if not os.path.isfile(matlab_input):
                     self.wrong_path(matlab_input, "Matlab")
                     QApplication.restoreOverrideCursor()
@@ -3331,7 +3324,6 @@ class PopUpPreferences(QDialog):
                     matlab_input == config.get_matlab_path()
                     and spm_input == config.get_spm_path()
                 ):
-
                     if self.use_spm_checkbox.isChecked():
                         config.set_use_spm(True)
                         config.set_use_matlab(True)
@@ -3339,7 +3331,6 @@ class PopUpPreferences(QDialog):
                         config.set_use_spm_standalone(False)
 
                 elif os.path.isdir(spm_input):
-
                     try:
                         matlab_cmd = (
                             "restoredefaultpath; "
@@ -3396,18 +3387,17 @@ class PopUpPreferences(QDialog):
 
             # Matlab alone config test
             if matlab_input != "" or self.use_matlab_checkbox.isChecked():
-
                 if matlab_input == config.get_matlab_path():
-
-                    if (self.use_matlab_checkbox.isChecked() and
-                            not self.use_spm_checkbox.isChecked()):
+                    if (
+                        self.use_matlab_checkbox.isChecked()
+                        and not self.use_spm_checkbox.isChecked()
+                    ):
                         config.set_use_matlab(True)
                         config.set_use_matlab_standalone(False)
                         config.set_use_spm(False)
                         config.set_use_spm_standalone(False)
 
                 elif os.path.isfile(matlab_input):
-
                     try:
                         matlab_cmd = "ver; exit"
                         p = subprocess.Popen(
@@ -3457,7 +3447,6 @@ class PopUpPreferences(QDialog):
             if (
                 matlab_input != "" and spm_input != ""
             ) or self.use_spm_standalone_checkbox.isChecked():
-
                 if (not os.path.isdir(matlab_input)) and (
                     not "Windows" in archi[1]
                 ):
@@ -3468,7 +3457,6 @@ class PopUpPreferences(QDialog):
                 if (matlab_input == config.get_matlab_standalone_path()) and (
                     spm_input == config.get_spm_standalone_path()
                 ):
-
                     if self.use_spm_standalone_checkbox.isChecked():
                         config.set_use_spm_standalone(True)
 
@@ -3480,7 +3468,6 @@ class PopUpPreferences(QDialog):
                             config.set_use_matlab_standalone(True)
 
                 elif os.path.isdir(spm_input):
-
                     if "Windows" in archi[1]:
                         mcr = glob.glob(
                             os.path.join(spm_input, "spm*_win*.exe")
@@ -3503,9 +3490,7 @@ class PopUpPreferences(QDialog):
                         mcr = glob.glob(os.path.join(spm_input, "run_spm*.sh"))
 
                     if mcr:
-
                         try:
-
                             if "Windows" in archi[1]:
                                 p = subprocess.Popen(
                                     [mcr[pos], "--version"],
@@ -3546,7 +3531,6 @@ class PopUpPreferences(QDialog):
                                 and (b"version" in output.split()[2:])
                                 and (b"(standalone)" in output.split()[2:])
                             ):
-
                                 if (
                                     self.use_spm_standalone_checkbox.isChecked()
                                 ):
@@ -3568,7 +3552,6 @@ class PopUpPreferences(QDialog):
                                 )
 
                             elif err != b"":
-
                                 if "shared libraries" in str(err):
                                     self.wrong_path(
                                         matlab_input, "Matlab standalone"
@@ -3608,7 +3591,6 @@ class PopUpPreferences(QDialog):
                 matlab_input != ""
                 or self.use_matlab_standalone_checkbox.isChecked()
             ):
-
                 if "Windows" in archi[1]:
                     print(
                         "WARNING: Matlab Standalone Path enter, this "
@@ -3619,9 +3601,10 @@ class PopUpPreferences(QDialog):
                     config.set_matlab_standalone_path(matlab_input)
 
                 elif os.path.isdir(matlab_input):
-
-                    if (self.use_matlab_standalone_checkbox.isChecked() and
-                            not self.use_spm_standalone_checkbox.isChecked()):
+                    if (
+                        self.use_matlab_standalone_checkbox.isChecked()
+                        and not self.use_spm_standalone_checkbox.isChecked()
+                    ):
                         config.set_use_matlab_standalone(True)
                         config.set_matlab_standalone_path(matlab_input)
                         config.set_use_matlab(False)
@@ -3746,12 +3729,10 @@ class PopUpPreferences(QDialog):
         c_e = config.get_capsul_engine()
 
         if c_c and c_e:
-
             # sync capsul config from mia config, if module is not used:
 
             # AFNI CapsulConfig
             if not config.get_use_afni():
-
                 # TODO: We only deal here with the global environment
                 cif = c_e.settings.config_id_field
 
@@ -3774,7 +3755,6 @@ class PopUpPreferences(QDialog):
 
             # ANTS CapsulConfig
             if not config.get_use_ants():
-
                 # TODO: We only deal here with the global environment
                 cif = c_e.settings.config_id_field
 
@@ -3827,7 +3807,6 @@ class PopUpPreferences(QDialog):
 
             # SPM standalone CapsulConfig
             if not config.get_use_spm_standalone():
-
                 try:
                     keys = c_c["engine"]["global"][
                         "capsul.engine.module.spm"
@@ -3840,14 +3819,12 @@ class PopUpPreferences(QDialog):
                     dict4clean = dict.fromkeys(keys, False)
 
                     for i in keys:
-
                         if (
                             "standalone"
                             in c_c["engine"]["global"][
                                 "capsul.engine.module.spm"
                             ][i]
                         ):
-
                             if (
                                 c_c["engine"]["global"][
                                     "capsul.engine.module.spm"
@@ -3861,14 +3838,12 @@ class PopUpPreferences(QDialog):
                             pass
 
                     for i in dict4clean:
-
                         if dict4clean[i]:
                             del c_c["engine"]["global"][
                                 "capsul.engine.module.spm"
                             ][i]
 
             if not config.get_use_spm():
-
                 try:
                     keys = c_c["engine"]["global"][
                         "capsul.engine.module.spm"
@@ -3881,14 +3856,12 @@ class PopUpPreferences(QDialog):
                     dict4clean = dict.fromkeys(keys, False)
 
                     for i in keys:
-
                         if (
                             "standalone"
                             in c_c["engine"]["global"][
                                 "capsul.engine.module.spm"
                             ][i]
                         ):
-
                             if (
                                 c_c["engine"]["global"][
                                     "capsul.engine.module.spm"
@@ -3898,7 +3871,6 @@ class PopUpPreferences(QDialog):
                                 dict4clean[i] = True
 
                     for i in dict4clean:
-
                         if dict4clean[i]:
                             del c_c["engine"]["global"][
                                 "capsul.engine.module.spm"
@@ -3912,7 +3884,6 @@ class PopUpPreferences(QDialog):
                 pass
 
             if not config.get_use_matlab():
-
                 try:
                     keys = c_c["engine"]["global"][
                         "capsul.engine.module.matlab"
@@ -3925,7 +3896,6 @@ class PopUpPreferences(QDialog):
                     dict4clean = dict.fromkeys(keys, False)
 
                     for i in keys:
-
                         if (
                             "executable"
                             in c_c["engine"]["global"][
@@ -3935,14 +3905,12 @@ class PopUpPreferences(QDialog):
                             dict4clean[i] = True
 
                     for i in dict4clean:
-
                         if dict4clean[i]:
                             del c_c["engine"]["global"][
                                 "capsul.engine.module.matlab"
                             ][i]["executable"]
 
             if not config.get_use_matlab_standalone():
-
                 try:
                     keys = c_c["engine"]["global"][
                         "capsul.engine.module.matlab"
@@ -3955,7 +3923,6 @@ class PopUpPreferences(QDialog):
                     dict4clean = dict.fromkeys(keys, False)
 
                     for i in keys:
-
                         if (
                             "mcr_directory"
                             in c_c["engine"]["global"][
@@ -3965,7 +3932,6 @@ class PopUpPreferences(QDialog):
                             dict4clean[i] = True
 
                     for i in dict4clean:
-
                         if dict4clean[i]:
                             del c_c["engine"]["global"][
                                 "capsul.engine.module.matlab"
@@ -4985,7 +4951,6 @@ class PopUpSelectFilter(PopUpFilterSelection):
         """Saves the modifications and updates the data browser."""
 
         for item in self.list_widget_filters.selectedItems():
-
             # Current filter updated
             filter_name = item.text()
             filter_object = self.project.getFilter(filter_name)
@@ -5456,7 +5421,6 @@ class PopUpShowHistory(QDialog):
         for scan in self.project.session.get_documents_names(
             COLLECTION_CURRENT
         ):
-
             if scan in str(value):
                 value_scan = scan
 

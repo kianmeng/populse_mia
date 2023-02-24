@@ -130,9 +130,7 @@ class DataViewerTab(Qt.QWidget):
 
         # Try import detected viewers
         for viewer_name in detected_viewer:
-
             if viewer_name not in self.viewers_loaded:
-
                 try:
                     viewer_module = importlib.import_module(
                         "%s.%s" % (__name__.rsplit(".", 1)[0], viewer_name)

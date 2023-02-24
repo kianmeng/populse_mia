@@ -47,6 +47,8 @@ from zipfile import ZipFile, is_zipfile
 import yaml
 # capsul import
 from capsul.api import get_process_instance
+# Populse_MIA import
+from populse_mia.software_properties import Config, verCmp
 # PyQt5 import
 from PyQt5 import QtCore
 # QAbstractItemView is not available from soma (see in PackageLibraryDialog)
@@ -62,9 +64,6 @@ from soma.qt_gui.qt_backend.Qt import (QApplication, QDialog, QFileDialog,
 from soma.qt_gui.qt_backend.QtCore import (QAbstractItemModel, QByteArray,
                                            QMimeData, QModelIndex, Qt, Signal)
 from soma.qt_gui.qt_backend.QtWidgets import QGroupBox, QListWidget, QMenu
-
-# Populse_MIA import
-from populse_mia.software_properties import Config, verCmp
 
 
 class DictionaryTreeModel(QAbstractItemModel):
@@ -380,7 +379,6 @@ class InstallProcesses(QDialog):
             """
 
             if module_name:
-
                 # Reloading the package
                 if module_name in sys.modules.keys():
                     del sys.modules[module_name]
@@ -416,7 +414,6 @@ class InstallProcesses(QDialog):
                 for importer, modname, ispkg in pkgutil.iter_modules(
                     pkg.__path__
                 ):
-
                     if ispkg:
                         _add_package(
                             proc_dic, str(module_name + "." + modname)
@@ -425,7 +422,6 @@ class InstallProcesses(QDialog):
                 for k, v in sorted(list(pkg.__dict__.items())):
                     # Checking each class of in the package
                     if inspect.isclass(v):
-
                         try:
                             print(
                                 "\nInstalling %s.%s ..."
@@ -440,12 +436,10 @@ class InstallProcesses(QDialog):
                             pkg_iter = proc_dic
 
                             for element in path_list:
-
                                 if element in pkg_iter.keys():
                                     pkg_iter = pkg_iter[element]
 
                                 else:
-
                                     if element is path_list[-1]:
                                         pkg_iter[element] = "process_enabled"
 
@@ -478,7 +472,6 @@ class InstallProcesses(QDialog):
             """
 
             for dname, dirs, files in os.walk(path):
-
                 for fname in files:
                     # Modifying only .py files (pipelines are saved with
                     # this extension)
@@ -495,20 +488,21 @@ class InstallProcesses(QDialog):
                             f.write(s)
 
         try:
-            self.main_window.statusBar().showMessage("Package installation, "
-                                                     "please wait ...")
+            self.main_window.statusBar().showMessage(
+                "Package installation, " "please wait ..."
+            )
             QApplication.processEvents()
 
         except AttributeError:
-            self.main_window.status_label.setText("Package installation, "
-                                                  "please wait ...")
+            self.main_window.status_label.setText(
+                "Package installation, " "please wait ..."
+            )
 
         self.result_add_package = True
         filename = self.path_edit.text()
         config = Config()
 
         if not os.path.isdir(filename):
-
             if not os.path.isfile(filename):
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Critical)
@@ -530,7 +524,6 @@ class InstallProcesses(QDialog):
                 return
 
         try:
-
             if (
                 os.path.abspath(
                     os.path.join(config.get_mia_path(), "processes")
@@ -564,7 +557,6 @@ class InstallProcesses(QDialog):
                 ),
                 "r",
             ) as stream:
-
                 try:
                     if verCmp(yaml.__version__, "5.1", "sup"):
                         process_dic = yaml.load(stream, Loader=yaml.FullLoader)
@@ -611,10 +603,8 @@ class InstallProcesses(QDialog):
             ]
 
             if is_zipfile(filename):
-
                 # Extraction of the zipped content
                 with ZipFile(filename, "r") as zip_ref:
-
                     packages_name = [
                         member.split("/")[0]
                         for member in zip_ref.namelist()
@@ -638,7 +628,6 @@ class InstallProcesses(QDialog):
                 ):
                     # Copy MIA_processes in a temporary folder
                     if mia_processes_not_found:
-
                         if (package_name == "mia_processes") and (
                             os.path.exists(
                                 os.path.join(
@@ -660,7 +649,6 @@ class InstallProcesses(QDialog):
                             )
 
                     if is_zipfile(filename):
-
                         with ZipFile(filename, "r") as zip_ref:
                             members_to_extract = [
                                 member
@@ -693,7 +681,6 @@ class InstallProcesses(QDialog):
                     date = datetime.now().strftime("%Y%m%d%H%M%S")
 
                     if is_zipfile(filename):
-
                         with ZipFile(filename, "r") as zip_ref:
                             temp_dir = tempfile.mkdtemp()
                             members_to_extract = [
@@ -862,7 +849,6 @@ class InstallProcesses(QDialog):
                 shutil.rmtree(temp_dir)
 
         else:
-
             if self.result_add_package:
                 messg = (
                     'The "{0}" library has been ' "correctly installed."
@@ -1616,7 +1602,6 @@ class PackageLibraryDialog(QDialog):
         config = Config()
 
         if module_name:
-
             if (
                 os.path.abspath(
                     os.path.join(config.get_mia_path(), "processes")
@@ -1641,11 +1626,9 @@ class PackageLibraryDialog(QDialog):
 
                 # Checking if there are subpackages
                 if hasattr(pkg, "__path__"):
-
                     for importer, modname, ispkg in pkgutil.iter_modules(
                         pkg.__path__
                     ):
-
                         if ispkg and modname != "__main__":
                             err_msg += self.add_package(
                                 str(module_name + "." + modname),
@@ -1654,10 +1637,8 @@ class PackageLibraryDialog(QDialog):
                             )
 
                 for k, v in sorted(list(pkg.__dict__.items())):
-
                     # Checking each class of in the package
                     if inspect.isclass(v):
-
                         try:
                             get_process_instance(
                                 "%s.%s" % (module_name, v.__name__)
@@ -1682,7 +1663,6 @@ class PackageLibraryDialog(QDialog):
                             recurs = False
 
                             for element in path_list:
-
                                 if element == class_name:
                                     recurs = True
 
@@ -1693,9 +1673,7 @@ class PackageLibraryDialog(QDialog):
                                     pkg_iter = pkg_iter[element]
 
                                 else:
-
                                     if element is path_list[-1]:
-
                                         if (
                                             element == class_name
                                             or recurs is True
@@ -1793,7 +1771,6 @@ class PackageLibraryDialog(QDialog):
                         __import__(part)
 
                     except ImportError:
-
                         try:
                             flag = True
 
@@ -1935,7 +1912,6 @@ class PackageLibraryDialog(QDialog):
             return deleted_packages
 
         if to_delete.split(".")[0] in ["nipype", "mia_processes", "capsul"]:
-
             if from_pipeline_manager:
                 inform_text = (
                     "This package belongs to "
@@ -1993,7 +1969,6 @@ class PackageLibraryDialog(QDialog):
                 )
 
                 for sub_pkg in sub_deleted_packages:
-
                     if sub_pkg not in deleted_packages:
                         deleted_packages.append(sub_pkg)
 
@@ -2009,16 +1984,13 @@ class PackageLibraryDialog(QDialog):
                         is_import = False
 
                         for root, dirs, files in os.walk(path):
-
                             if "__init__.py" in files:
-
                                 with open(
                                     os.path.join(root, "__init__.py"), "r"
                                 ) as f:
                                     lines = f.readlines()
 
                                 for line in lines:
-
                                     if (
                                         not line.startswith("#")
                                         and "import" in line
@@ -2067,7 +2039,6 @@ class PackageLibraryDialog(QDialog):
                     )
 
                     if os.path.isfile(init):
-
                         with open(init, "r") as f:
                             lines = f.readlines()
 
@@ -2076,7 +2047,6 @@ class PackageLibraryDialog(QDialog):
                         imports_string = ""
 
                         for line in lines:
-
                             if (line.startswith("#") is False) and (
                                 "import" in line
                             ):
@@ -2085,11 +2055,9 @@ class PackageLibraryDialog(QDialog):
                                 imports_in_init[from_package] = []
 
                         for line in lines:
-
                             if (line.startswith("#") is False) and (
                                 ("import" in line) or (import_line is True)
                             ):
-
                                 if "from" in line:
                                     from_package = line.split(" ")[1]
                                     from_package = from_package[1:]
@@ -2131,7 +2099,6 @@ class PackageLibraryDialog(QDialog):
                             )
 
                         for key in imports_in_init:
-
                             if pkg_list[index - 1] in imports_in_init[key]:
                                 filename = key + ".py"
                                 delete_all = True
@@ -2216,7 +2183,6 @@ class PackageLibraryDialog(QDialog):
                                         )
 
                                     if remove:
-
                                         for pkg in deleted_packages:
                                             self.remove_package_with_text(
                                                 pkg, False
@@ -2226,16 +2192,12 @@ class PackageLibraryDialog(QDialog):
                                     import_line = False
 
                                     with open(init, "w") as f:
-
                                         for line in lines:
-
                                             if key in line:
-
                                                 if "(" in line:
                                                     import_line = True
 
                                             elif import_line is True:
-
                                                 if ")" in line:
                                                     import_line = False
 
@@ -2250,7 +2212,6 @@ class PackageLibraryDialog(QDialog):
                                     is_import = False
 
                                     for line in lines:
-
                                         if (
                                             not line.startswith("#")
                                             and "import" in line
@@ -2264,7 +2225,6 @@ class PackageLibraryDialog(QDialog):
                                         os.remove(init)
 
                                         for elt in os.listdir(dir_init):
-
                                             if elt == "__pycache__":
                                                 shutil.rmtree(
                                                     os.path.join(
@@ -2308,9 +2268,7 @@ class PackageLibraryDialog(QDialog):
             package_removed = True
 
         if package_removed is True:
-
             if update_view:
-
                 if _2del not in self.delete_dic:
                     self.del_list.addItem(_2del)
                     self.delete_dic[_2del] = self.del_list.count() - 1
@@ -2320,7 +2278,6 @@ class PackageLibraryDialog(QDialog):
                 self.add_list.takeItem(self.add_dic[_2del])
                 self.add_dic.pop(_2del)
                 for key in self.add_dic:
-
                     if self.add_dic[key] > index:
                         self.add_dic[key] = self.add_dic[key] - 1
 
@@ -2329,7 +2286,6 @@ class PackageLibraryDialog(QDialog):
                 self.remove_list.takeItem(self.remove_dic[_2del])
                 self.remove_dic.pop(_2del)
                 for key in self.remove_dic:
-
                     if self.remove_dic[key] > index:
                         self.remove_dic[key] = self.remove_dic[key] - 1
 
@@ -2371,7 +2327,6 @@ class PackageLibraryDialog(QDialog):
             ),
             "r",
         ) as stream:
-
             try:
                 if verCmp(yaml.__version__, "5.1", "sup"):
                     return yaml.load(stream, Loader=yaml.FullLoader)
@@ -2450,7 +2405,6 @@ class PackageLibraryDialog(QDialog):
         config = Config()
 
         if package:
-
             if (
                 os.path.abspath(
                     os.path.join(config.get_mia_path(), "processes")
@@ -2473,9 +2427,7 @@ class PackageLibraryDialog(QDialog):
                 check_flag = False
 
             for element in path_list:
-
                 if element in pkg_iter.keys():
-
                     if element is not path_list[-1]:
                         pkg_iter = pkg_iter[element]
 
@@ -2612,7 +2564,6 @@ class PackageLibraryDialog(QDialog):
         self.paths = self.package_library.paths
 
         if self.process_config:
-
             if self.process_config.get("Packages"):
                 del self.process_config["Packages"]
 
@@ -2727,9 +2678,7 @@ class ProcessLibrary(QTreeView):
         config = Config()
 
         if event.key() == QtCore.Qt.Key_Delete and not config.get_user_mode():
-
             for idx in self.selectedIndexes():
-
                 if idx.isValid:
                     model = idx.model()
                     idx = idx.sibling(idx.row(), 0)
@@ -2921,7 +2870,6 @@ class ProcessLibraryWidget(QWidget):
             ),
             "r",
         ) as stream:
-
             try:
                 if verCmp(yaml.__version__, "5.1", "sup"):
                     return yaml.load(stream, Loader=yaml.FullLoader)
@@ -3029,9 +2977,7 @@ def node_structure_from_dict(datadict, parent=None, root_node=None):
         parent = root_node
 
     for name, data in sorted(datadict.items()):
-
         if isinstance(data, dict):
-
             if True in [
                 True for value in data.values() if value == "process_enabled"
             ]:
@@ -3042,7 +2988,6 @@ def node_structure_from_dict(datadict, parent=None, root_node=None):
                 ]
 
             else:
-
                 list_name = []
                 list_values = [
                     value for value in data.values() if isinstance(value, dict)
@@ -3052,7 +2997,6 @@ def node_structure_from_dict(datadict, parent=None, root_node=None):
                     value = list_values.pop()
 
                     for i in value.values():
-
                         if not isinstance(i, dict):
                             list_name.append(i)
 

@@ -9,11 +9,10 @@ from __future__ import absolute_import, print_function
 import os
 
 from anatomist.simpleviewer.anasimpleviewer import AnaSimpleViewer
-from soma.qt_gui.qt_backend import Qt
-
 from populse_mia.data_manager.project import COLLECTION_CURRENT, TAG_FILENAME
 from populse_mia.user_interface.data_browser.data_browser import \
     TableDataBrowser
+from soma.qt_gui.qt_backend import Qt
 
 from ..data_viewer import DataViewer
 
@@ -25,7 +24,6 @@ class MiaViewer(Qt.QWidget, DataViewer):
     """
 
     def __init__(self, init_global_handlers=None):
-
         super(MiaViewer, self).__init__()
 
         self.anaviewer = AnaSimpleViewer(init_global_handlers)

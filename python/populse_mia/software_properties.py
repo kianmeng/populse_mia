@@ -72,7 +72,6 @@ def verCmp(first_ver, sec_ver, comp):
         return [int(x) for x in re.sub(r"(\.0+)*$", "", v).split(".")]
 
     if comp == "eq":
-
         if normalise(first_ver) == normalise(sec_ver):
             return True
 
@@ -80,7 +79,6 @@ def verCmp(first_ver, sec_ver, comp):
             return False
 
     elif comp == "sup":
-
         if (normalise(first_ver) > normalise(sec_ver)) or (
             verCmp(first_ver, sec_ver, "eq")
         ):
@@ -90,7 +88,6 @@ def verCmp(first_ver, sec_ver, comp):
             return False
 
     elif comp == "inf":
-
         if (normalise(first_ver) < normalise(sec_ver)) or (
             verCmp(first_ver, sec_ver, "eq")
         ):
@@ -627,9 +624,7 @@ class Config:
         )
 
         if os.path.isfile(dot_mia_config):
-
             with open(dot_mia_config, "r") as stream:
-
                 try:
                     if verCmp(yaml.__version__, "5.1", "sup"):
                         mia_home_config = yaml.load(
@@ -682,7 +677,6 @@ class Config:
                     )
 
         else:  # Only for admin mode
-
             try:
                 self.mia_path = self.config["mia_user_path"]
                 return self.mia_path
@@ -955,7 +949,6 @@ class Config:
             return {}
 
         with open(config_file, "rb") as stream:
-
             try:
                 stream = b"".join(stream.readlines())
                 decrypted = f.decrypt(stream)
@@ -1059,7 +1052,6 @@ class Config:
         new_engine = capsul_engine()
 
         for environment, config in engine_config.items():
-
             if environment == "capsul_engine":
                 continue
 
@@ -1608,7 +1600,6 @@ class Config:
         engine_config = capsul_config.get("engine")
 
         if engine_config:
-
             for environment, config in engine_config.items():
                 c = dict(config)
 

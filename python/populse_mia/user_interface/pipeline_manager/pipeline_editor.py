@@ -38,18 +38,17 @@ from capsul.pipeline.python_export import save_py_pipeline
 from capsul.pipeline.xml import save_xml_pipeline
 from capsul.qt_gui.widgets.pipeline_developer_view import (
     NodeGWidget, PipelineDeveloperView)
+from populse_mia.software_properties import Config, verCmp
+# Populse_MIA imports
+from populse_mia.user_interface.pipeline_manager.node_controller import \
+    FilterWidget
+from populse_mia.user_interface.pop_ups import PopUpClosePipeline
 # PyQt5 imports
 from PyQt5 import Qt, QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox
 # soma-base imports
 from soma.utils.weak_proxy import weak_proxy
 from traits.api import TraitError
-
-from populse_mia.software_properties import Config, verCmp
-# Populse_MIA imports
-from populse_mia.user_interface.pipeline_manager.node_controller import \
-    FilterWidget
-from populse_mia.user_interface.pop_ups import PopUpClosePipeline
 
 unicode = str
 
@@ -221,7 +220,6 @@ class PipelineEditor(PipelineDeveloperView):
                 plug_name = pipeline_parameter
 
             while check_plug is True:
-
                 if plug_name in self.scene.pipeline.pipeline_node.plugs:
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Warning)
@@ -270,7 +268,6 @@ class PipelineEditor(PipelineDeveloperView):
             pipeline_parameter = plug_name
 
             if optional is None:
-
                 try:
                     optional = dial.optional.isChecked()
 
@@ -278,7 +275,6 @@ class PipelineEditor(PipelineDeveloperView):
                     pass
 
             if weak_link is None:
-
                 try:
                     weak_link = dial.weak.isChecked()
 
@@ -388,7 +384,6 @@ class PipelineEditor(PipelineDeveloperView):
             _temp_plug_name = [_temp_plug_name]
 
         for pip_plug_name in _temp_plug_name:
-
             if pip_plug_name[0] in ("inputs", "outputs"):
                 plug_name = pip_plug_name[1]
                 plug = self.scene.pipeline.pipeline_node.plugs[plug_name]
@@ -580,7 +575,6 @@ class PipelineEditor(PipelineDeveloperView):
                     ),
                     "r",
                 ) as stream:
-
                     try:
                         if verCmp(yaml.__version__, "5.1", "sup"):
                             dic = yaml.load(stream, Loader=yaml.FullLoader)
@@ -650,7 +644,6 @@ class PipelineEditor(PipelineDeveloperView):
                     or removed_inputs
                     or removed_outputs
                 ):
-
                     # Checking the links of the node
                     link_to_del = set()
                     for link, glink in six.iteritems(self.scene.glinks):
@@ -768,9 +761,7 @@ class PipelineEditor(PipelineDeveloperView):
         # Collecting the links from the node that is being deleted
         links = []
         for plug_name, plug in node.plugs.items():
-
             if plug.output or (invert_io and not plug.output):
-
                 for link_to in plug.links_to:
                     (
                         dest_node_name,
@@ -785,7 +776,6 @@ class PipelineEditor(PipelineDeveloperView):
                     dest_plug_name = None
 
                     for plug_name_d, plug_d in dest_node.plugs.items():
-
                         if plug_d == dest_plug:
                             dest_plug_name = plug_name_d
                             break
@@ -798,7 +788,6 @@ class PipelineEditor(PipelineDeveloperView):
                     links.append(link_to_add)
 
             else:
-
                 for link_from in plug.links_from:
                     (
                         source_node_name,
@@ -813,7 +802,6 @@ class PipelineEditor(PipelineDeveloperView):
                     source_plug_name = None
 
                     for plug_name_d, plug_d in source_node.plugs.items():
-
                         if plug_d == source_plug:
                             source_plug_name = plug_name_d
                             break
@@ -885,7 +873,6 @@ class PipelineEditor(PipelineDeveloperView):
         parameter_list = []
 
         for parameter_name, plug in six.iteritems(node.plugs):
-
             if parameter_name in (
                 "nodes_activation",
                 "selection_changed",
@@ -906,7 +893,6 @@ class PipelineEditor(PipelineDeveloperView):
                 )
                 and (optional or not node.get_trait(parameter_name).optional)
             ):
-
                 p_name = self._export_plug(
                     parameter_name,
                     temp_plug_name=(node_name, parameter_name),
@@ -972,7 +958,6 @@ class PipelineEditor(PipelineDeveloperView):
             if not os.path.isfile(
                 os.path.abspath(os.path.join(folder, "__init__.py"))
             ):
-
                 with open(
                     os.path.abspath(os.path.join(folder, "__init__.py")), "w"
                 ):
@@ -1185,7 +1170,6 @@ class PipelineEditor(PipelineDeveloperView):
                     self.undos.pop()
 
                 for i, item in enumerate(self.redos):
-
                     if item[0] == to_redo and history_maker[1] == item[1]:
                         self.redos.pop(i)
 
@@ -1214,8 +1198,7 @@ class PipelineEditor(PipelineDeveloperView):
         # Removing links of the selected node and copy the origin/destination
         links_to_copy = []
 
-        for (source_parameter, source_plug) in six.iteritems(old_node.plugs):
-
+        for source_parameter, source_plug in six.iteritems(old_node.plugs):
             for (
                 dest_node_name,
                 dest_parameter,
@@ -1262,7 +1245,6 @@ class PipelineEditor(PipelineDeveloperView):
 
         # Setting the same links as the original node
         for link in links_to_copy:
-
             if link[0] == "to":
                 pipeline.add_link(
                     new_node_name
@@ -1923,7 +1905,6 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
             ),
             "r",
         ) as stream:
-
             try:
                 if verCmp(yaml.__version__, "5.1", "sup"):
                     dic = yaml.load(stream, Loader=yaml.FullLoader)
@@ -2177,7 +2158,6 @@ def find_filename(paths_list, packages_list, file_name):
     filenames = [file_name + ".py", file_name + ".xml"]
 
     for filename in filenames:
-
         for path in paths_list:
             new_path = path
 
@@ -2187,7 +2167,6 @@ def find_filename(paths_list, packages_list, file_name):
             # Making sure that the filename is found (has somme issues
             # with case sensitivity)
             if os.path.isdir(new_path):
-
                 for f in os.listdir(new_path):
                     new_file = os.path.join(new_path, f)
 
@@ -2222,7 +2201,6 @@ def get_path(name, dictionary, prev_paths=None, pckg=None):
         # so the key is a module name.
 
         if isinstance(value, str):
-
             if key == name:
                 new_paths.append(key)
                 return new_paths
@@ -2255,7 +2233,6 @@ def save_pipeline(pipeline, filename):
     saved = False
 
     for ext, writer in six.iteritems(formats):
-
         if filename.endswith(ext):
             writer(pipeline, filename)
             saved = True
