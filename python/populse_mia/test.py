@@ -67,7 +67,8 @@ from unittest.mock import MagicMock, Mock
 uts_dir = os.path.isdir(
              os.path.join(os.path.dirname(
                               os.path.dirname(
-                                  os.path.dirname(__file__))),
+                                  os.path.dirname(
+                                      os.path.realpath(__file__)))),
                           "miautdata"))
 
 if not uts_dir:
