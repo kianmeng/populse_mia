@@ -636,6 +636,7 @@ class TestMIACase(unittest.TestCase):
         config = Config(config_path=self.config_path)
         config.set_opened_projects([])
         config.saveConfig()
+        QApplication.processEvents()
         self.app.exit()
         del self.app
 
