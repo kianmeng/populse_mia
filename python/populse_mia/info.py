@@ -141,6 +141,7 @@ REQUIRES = [
     "nipype",
     "pillow",
     "populse-db >= 2.1.0",
+    "pre-commit",
     "pyqt5",
     "python-dateutil",
     "pyyaml",
