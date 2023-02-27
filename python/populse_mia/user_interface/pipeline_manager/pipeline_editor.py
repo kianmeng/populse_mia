@@ -30,25 +30,38 @@ import sys
 
 import six
 import yaml
+
 # Capsul imports
-from capsul.api import (Node, PipelineNode, Process, Switch, capsul_engine,
-                        get_process_instance)
+from capsul.api import (
+    Node,
+    PipelineNode,
+    Process,
+    Switch,
+    capsul_engine,
+    get_process_instance,
+)
 from capsul.pipeline.pipeline_nodes import ProcessNode
 from capsul.pipeline.python_export import save_py_pipeline
 from capsul.pipeline.xml import save_xml_pipeline
 from capsul.qt_gui.widgets.pipeline_developer_view import (
-    NodeGWidget, PipelineDeveloperView)
+    NodeGWidget,
+    PipelineDeveloperView,
+)
+
 # PyQt5 imports
 from PyQt5 import Qt, QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox
+
 # soma-base imports
 from soma.utils.weak_proxy import weak_proxy
 from traits.api import TraitError
 
 from populse_mia.software_properties import Config, verCmp
+
 # Populse_MIA imports
-from populse_mia.user_interface.pipeline_manager.node_controller import \
-    FilterWidget
+from populse_mia.user_interface.pipeline_manager.node_controller import (
+    FilterWidget,
+)
 from populse_mia.user_interface.pop_ups import PopUpClosePipeline
 
 unicode = str

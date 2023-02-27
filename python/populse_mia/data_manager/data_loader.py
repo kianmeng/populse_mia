@@ -35,25 +35,41 @@ from datetime import datetime
 from time import sleep, time
 
 # Populse_db imports
-from populse_db.database import (FIELD_TYPE_BOOLEAN, FIELD_TYPE_DATE,
-                                 FIELD_TYPE_DATETIME, FIELD_TYPE_FLOAT,
-                                 FIELD_TYPE_INTEGER, FIELD_TYPE_LIST_BOOLEAN,
-                                 FIELD_TYPE_LIST_DATE,
-                                 FIELD_TYPE_LIST_DATETIME,
-                                 FIELD_TYPE_LIST_FLOAT,
-                                 FIELD_TYPE_LIST_INTEGER,
-                                 FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
-                                 FIELD_TYPE_STRING, FIELD_TYPE_TIME)
+from populse_db.database import (
+    FIELD_TYPE_BOOLEAN,
+    FIELD_TYPE_DATE,
+    FIELD_TYPE_DATETIME,
+    FIELD_TYPE_FLOAT,
+    FIELD_TYPE_INTEGER,
+    FIELD_TYPE_LIST_BOOLEAN,
+    FIELD_TYPE_LIST_DATE,
+    FIELD_TYPE_LIST_DATETIME,
+    FIELD_TYPE_LIST_FLOAT,
+    FIELD_TYPE_LIST_INTEGER,
+    FIELD_TYPE_LIST_STRING,
+    FIELD_TYPE_LIST_TIME,
+    FIELD_TYPE_STRING,
+    FIELD_TYPE_TIME,
+)
+
 # PyQt5 imports
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import QProgressDialog
 
-from populse_mia.data_manager.database_mia import (TAG_ORIGIN_BUILTIN,
-                                                   TAG_ORIGIN_USER)
+from populse_mia.data_manager.database_mia import (
+    TAG_ORIGIN_BUILTIN,
+    TAG_ORIGIN_USER,
+)
+
 # Populse_MIA imports
-from populse_mia.data_manager.project import (COLLECTION_CURRENT,
-                                              COLLECTION_INITIAL, TAG_CHECKSUM,
-                                              TAG_FILENAME, TAG_TYPE, TYPE_NII)
+from populse_mia.data_manager.project import (
+    COLLECTION_CURRENT,
+    COLLECTION_INITIAL,
+    TAG_CHECKSUM,
+    TAG_FILENAME,
+    TAG_TYPE,
+    TYPE_NII,
+)
 
 
 class ImportProgress(QProgressDialog):

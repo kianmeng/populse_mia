@@ -29,47 +29,92 @@ from functools import partial
 from sys import platform
 
 # Populse_db imports
-from populse_db.database import (FIELD_TYPE_DATE, FIELD_TYPE_DATETIME,
-                                 FIELD_TYPE_FLOAT, FIELD_TYPE_LIST_BOOLEAN,
-                                 FIELD_TYPE_LIST_DATE,
-                                 FIELD_TYPE_LIST_DATETIME,
-                                 FIELD_TYPE_LIST_FLOAT,
-                                 FIELD_TYPE_LIST_INTEGER,
-                                 FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
-                                 FIELD_TYPE_STRING, FIELD_TYPE_TIME)
+from populse_db.database import (
+    FIELD_TYPE_DATE,
+    FIELD_TYPE_DATETIME,
+    FIELD_TYPE_FLOAT,
+    FIELD_TYPE_LIST_BOOLEAN,
+    FIELD_TYPE_LIST_DATE,
+    FIELD_TYPE_LIST_DATETIME,
+    FIELD_TYPE_LIST_FLOAT,
+    FIELD_TYPE_LIST_INTEGER,
+    FIELD_TYPE_LIST_STRING,
+    FIELD_TYPE_LIST_TIME,
+    FIELD_TYPE_STRING,
+    FIELD_TYPE_TIME,
+)
+
 # PyQt5 imports
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QIcon, QPixmap
-from PyQt5.QtWidgets import (QAbstractItemView, QAction, QApplication,
-                             QDateEdit, QDateTimeEdit, QDoubleSpinBox, QFrame,
-                             QGridLayout, QHBoxLayout, QItemDelegate, QMenu,
-                             QMessageBox, QProgressDialog, QPushButton,
-                             QSplitter, QTableWidget, QTableWidgetItem,
-                             QTimeEdit, QToolBar, QToolButton, QVBoxLayout,
-                             QWidget)
+from PyQt5.QtWidgets import (
+    QAbstractItemView,
+    QAction,
+    QApplication,
+    QDateEdit,
+    QDateTimeEdit,
+    QDoubleSpinBox,
+    QFrame,
+    QGridLayout,
+    QHBoxLayout,
+    QItemDelegate,
+    QMenu,
+    QMessageBox,
+    QProgressDialog,
+    QPushButton,
+    QSplitter,
+    QTableWidget,
+    QTableWidgetItem,
+    QTimeEdit,
+    QToolBar,
+    QToolButton,
+    QVBoxLayout,
+    QWidget,
+)
 
-from populse_mia.data_manager.database_mia import (TAG_ORIGIN_BUILTIN,
-                                                   TAG_ORIGIN_USER)
-from populse_mia.data_manager.project import (BRICK_NAME, COLLECTION_BRICK,
-                                              COLLECTION_CURRENT,
-                                              COLLECTION_INITIAL, TAG_BRICKS,
-                                              TAG_CHECKSUM, TAG_FILENAME,
-                                              TAG_HISTORY)
+from populse_mia.data_manager.database_mia import (
+    TAG_ORIGIN_BUILTIN,
+    TAG_ORIGIN_USER,
+)
+from populse_mia.data_manager.project import (
+    BRICK_NAME,
+    COLLECTION_BRICK,
+    COLLECTION_CURRENT,
+    COLLECTION_INITIAL,
+    TAG_BRICKS,
+    TAG_CHECKSUM,
+    TAG_FILENAME,
+    TAG_HISTORY,
+)
 from populse_mia.software_properties import Config
-from populse_mia.user_interface.data_browser.advanced_search import \
-    AdvancedSearch
+from populse_mia.user_interface.data_browser.advanced_search import (
+    AdvancedSearch,
+)
 from populse_mia.user_interface.data_browser.count_table import CountTable
 from populse_mia.user_interface.data_browser.mini_viewer import MiniViewer
 from populse_mia.user_interface.data_browser.modify_table import ModifyTable
+
 # Populse_MIA imports
 from populse_mia.user_interface.data_browser.rapid_search import RapidSearch
 from populse_mia.user_interface.pop_ups import (
-    ClickableLabel, PopUpAddPath, PopUpAddTag, PopUpCloneTag,
-    PopUpDataBrowserCurrentSelection, PopUpMultipleSort, PopUpProperties,
-    PopUpRemoveScan, PopUpRemoveTag, PopUpSelectFilter, PopUpShowHistory)
-from populse_mia.utils.utils import (check_value_type, set_item_data,
-                                     table_to_database)
+    ClickableLabel,
+    PopUpAddPath,
+    PopUpAddTag,
+    PopUpCloneTag,
+    PopUpDataBrowserCurrentSelection,
+    PopUpMultipleSort,
+    PopUpProperties,
+    PopUpRemoveScan,
+    PopUpRemoveTag,
+    PopUpSelectFilter,
+    PopUpShowHistory,
+)
+from populse_mia.utils.utils import (
+    check_value_type,
+    set_item_data,
+    table_to_database,
+)
 
 # Variable shown everywhere when no value for the tag
 not_defined_value = "*Not Defined*"

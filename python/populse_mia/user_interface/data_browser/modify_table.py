@@ -18,16 +18,29 @@ Contains:
 from datetime import datetime
 
 # Populse_db imports
-from populse_db.database import (FIELD_TYPE_LIST_BOOLEAN, FIELD_TYPE_LIST_DATE,
-                                 FIELD_TYPE_LIST_DATETIME,
-                                 FIELD_TYPE_LIST_FLOAT,
-                                 FIELD_TYPE_LIST_INTEGER,
-                                 FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME)
+from populse_db.database import (
+    FIELD_TYPE_LIST_BOOLEAN,
+    FIELD_TYPE_LIST_DATE,
+    FIELD_TYPE_LIST_DATETIME,
+    FIELD_TYPE_LIST_FLOAT,
+    FIELD_TYPE_LIST_INTEGER,
+    FIELD_TYPE_LIST_STRING,
+    FIELD_TYPE_LIST_TIME,
+)
+
 # PyQt5 imports
-from PyQt5.QtWidgets import (QDialog, QHBoxLayout, QMessageBox, QPushButton,
-                             QTableWidget, QTableWidgetItem, QVBoxLayout)
+from PyQt5.QtWidgets import (
+    QDialog,
+    QHBoxLayout,
+    QMessageBox,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+)
 
 from populse_mia.data_manager.project import COLLECTION_CURRENT
+
 # Populse_MIA imports
 from populse_mia.utils.utils import check_value_type
 

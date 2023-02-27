@@ -12,8 +12,9 @@ from anatomist.simpleviewer.anasimpleviewer import AnaSimpleViewer
 from soma.qt_gui.qt_backend import Qt
 
 from populse_mia.data_manager.project import COLLECTION_CURRENT, TAG_FILENAME
-from populse_mia.user_interface.data_browser.data_browser import \
-    TableDataBrowser
+from populse_mia.user_interface.data_browser.data_browser import (
+    TableDataBrowser,
+)
 
 from ..data_viewer import DataViewer
 

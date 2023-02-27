@@ -32,33 +32,54 @@ from os.path import expanduser
 import yaml
 from packaging import version
 from PyQt5.QtCore import QCoreApplication, Qt
+
 # PyQt5 imports
 from PyQt5.QtGui import QCursor, QIcon
-from PyQt5.QtWidgets import (QAction, QApplication, QLabel, QMainWindow, QMenu,
-                             QMessageBox, QPushButton, QTabWidget, QVBoxLayout,
-                             QWidget)
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QLabel,
+    QMainWindow,
+    QMenu,
+    QMessageBox,
+    QPushButton,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
+)
 
 import populse_mia.data_manager.data_loader as data_loader
-from populse_mia.data_manager.project import (COLLECTION_CURRENT, TAG_HISTORY,
-                                              Project)
+from populse_mia.data_manager.project import (
+    COLLECTION_CURRENT,
+    TAG_HISTORY,
+    Project,
+)
+
 # Populse_MIA imports
 from populse_mia.data_manager.project_properties import SavedProjects
 from populse_mia.software_properties import Config
 from populse_mia.user_interface.data_browser.data_browser import DataBrowser
-from populse_mia.user_interface.data_viewer.data_viewer_tab import \
-    DataViewerTab
-from populse_mia.user_interface.pipeline_manager.pipeline_manager_tab import \
-    PipelineManagerTab
+from populse_mia.user_interface.data_viewer.data_viewer_tab import (
+    DataViewerTab,
+)
+from populse_mia.user_interface.pipeline_manager.pipeline_manager_tab import (
+    PipelineManagerTab,
+)
 from populse_mia.user_interface.pipeline_manager.process_library import (
-    InstallProcesses, PackageLibraryDialog)
-from populse_mia.user_interface.pop_ups import (PopUpDeletedProject,
-                                                PopUpDeleteProject,
-                                                PopUpNewProject,
-                                                PopUpOpenProject,
-                                                PopUpPreferences,
-                                                PopUpProperties, PopUpQuit,
-                                                PopUpSaveProjectAs,
-                                                PopUpSeeAllProjects)
+    InstallProcesses,
+    PackageLibraryDialog,
+)
+from populse_mia.user_interface.pop_ups import (
+    PopUpDeletedProject,
+    PopUpDeleteProject,
+    PopUpNewProject,
+    PopUpOpenProject,
+    PopUpPreferences,
+    PopUpProperties,
+    PopUpQuit,
+    PopUpSaveProjectAs,
+    PopUpSeeAllProjects,
+)
 
 CLINICAL_TAGS = [
     "Site",

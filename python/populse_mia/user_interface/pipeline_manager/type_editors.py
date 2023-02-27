@@ -9,8 +9,9 @@ import traits.api as traits
 from soma.qt_gui import controller_widget
 from soma.qt_gui.controls.Directory import DirectoryControlWidget
 from soma.qt_gui.controls.File import FileControlWidget
-from soma.qt_gui.controls.List_File_offscreen import \
-    OffscreenListFileControlWidget
+from soma.qt_gui.controls.List_File_offscreen import (
+    OffscreenListFileControlWidget,
+)
 from soma.qt_gui.qt_backend import Qt, QtGui, QtWidgets
 from soma.utils.weak_proxy import weak_proxy
 
@@ -120,8 +121,9 @@ class PopulseFileControlWidget(FileControlWidget):
         """
         # this import is not at the beginning of the file to avoid a cyclic
         # import issue.
-        from populse_mia.user_interface.pipeline_manager.node_controller import \
-            PlugFilter
+        from populse_mia.user_interface.pipeline_manager.node_controller import (
+            PlugFilter,
+        )
 
         project = widget.user_data.get("project")
         scan_list = widget.user_data.get("scan_list")
@@ -208,8 +210,9 @@ class PopulseDirectoryControlWidget(DirectoryControlWidget):
         """
         # this import is not at the beginning of the file to avoid a cyclic
         # import issue.
-        from populse_mia.user_interface.pipeline_manager.node_controller import \
-            PlugFilter
+        from populse_mia.user_interface.pipeline_manager.node_controller import (
+            PlugFilter,
+        )
 
         project = widget.user_data.get("project")
         scan_list = widget.user_data.get("scan_list")
@@ -343,8 +346,9 @@ class PopulseOffscreenListFileControlWidget(OffscreenListFileControlWidget):
         """
         # this import is not at the beginning of the file to avoid a cyclic
         # import issue.
-        from populse_mia.user_interface.pipeline_manager.node_controller import \
-            PlugFilter
+        from populse_mia.user_interface.pipeline_manager.node_controller import (
+            PlugFilter,
+        )
 
         project = widget.user_data.get("project")
         scan_list = widget.user_data.get("scan_list")

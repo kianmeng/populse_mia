@@ -21,16 +21,28 @@ from functools import partial
 import nibabel as nib
 import numpy as np  # a N-dimensional array object
 import skimage as sk
+
 # Populse_MIA imports
 # from populse_mia.software_properties import verCmp
 from packaging import version
 from PyQt5 import QtCore
+
 # PyQt5 imports
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QImage, QPixmap
-from PyQt5.QtWidgets import (QCheckBox, QFrame, QHBoxLayout, QLabel, QLineEdit,
-                             QScrollArea, QSizePolicy, QSlider, QVBoxLayout,
-                             QWidget)
+from PyQt5.QtWidgets import (
+    QCheckBox,
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QScrollArea,
+    QSizePolicy,
+    QSlider,
+    QVBoxLayout,
+    QWidget,
+)
+
 # from scipy.ndimage import rotate  # to work with NumPy arrays
 from skimage.transform import resize
 

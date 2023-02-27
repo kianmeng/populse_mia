@@ -42,6 +42,7 @@ import anatomist.direct.api as ana
 from six.moves import zip
 from soma import aims
 from soma.aims import colormaphints
+
 # determine wheter we are using Qt4 or Qt5, and hack a little bit accordingly
 # the boolean qt4 gloabl variable will tell it for later usage
 from soma.qt_gui import qt_backend
@@ -53,21 +54,27 @@ import time
 import numpy as np
 import PyQt5
 import six
+
 # the following imports have to be made after the qApp.startingUp() test
 # since they do instantiate Anatomist for registry to work.
-from anatomist.cpp.simplecontrols import (ResetFOVAction, Simple2DControl,
-                                          Simple3DControl,
-                                          registerSimpleControls)
+from anatomist.cpp.simplecontrols import (
+    ResetFOVAction,
+    Simple2DControl,
+    Simple3DControl,
+    registerSimpleControls,
+)
 from PyQt5.QtGui import QColor, QIcon, QLabel, QSlider, QWidget
 from PyQt5.QtWidgets import QMessageBox
 from soma.qt_gui.qt_backend import Qt, QtCore, QtGui, uic
 from soma.qt_gui.qt_backend.uic import loadUi
 
 from populse_mia.software_properties import Config
-from populse_mia.user_interface.data_viewer.anatomist_2 import \
-    resources_snd_window
-from populse_mia.user_interface.data_viewer.anatomist_2.snd_window import \
-    NewWindowViewer
+from populse_mia.user_interface.data_viewer.anatomist_2 import (
+    resources_snd_window,
+)
+from populse_mia.user_interface.data_viewer.anatomist_2.snd_window import (
+    NewWindowViewer,
+)
 
 
 class LeftSimple3DControl(Simple2DControl):

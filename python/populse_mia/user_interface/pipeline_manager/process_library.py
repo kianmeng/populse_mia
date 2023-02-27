@@ -45,22 +45,43 @@ from functools import partial
 from zipfile import ZipFile, is_zipfile
 
 import yaml
+
 # capsul import
 from capsul.api import get_process_instance
+
 # PyQt5 import
 from PyQt5 import QtCore
+
 # QAbstractItemView is not available from soma (see in PackageLibraryDialog)
 from PyQt5.QtWidgets import QAbstractItemView
+
 # PyQt / PySide import, via soma
 from soma.qt_gui import qt_backend
 from soma.qt_gui.qt_backend import QtGui
-from soma.qt_gui.qt_backend.Qt import (QApplication, QDialog, QFileDialog,
-                                       QHBoxLayout, QLabel, QLineEdit,
-                                       QMessageBox, QPushButton, QSplitter,
-                                       QTreeView, QTreeWidget, QTreeWidgetItem,
-                                       QVBoxLayout, QWidget)
-from soma.qt_gui.qt_backend.QtCore import (QAbstractItemModel, QByteArray,
-                                           QMimeData, QModelIndex, Qt, Signal)
+from soma.qt_gui.qt_backend.Qt import (
+    QApplication,
+    QDialog,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QSplitter,
+    QTreeView,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
+from soma.qt_gui.qt_backend.QtCore import (
+    QAbstractItemModel,
+    QByteArray,
+    QMimeData,
+    QModelIndex,
+    Qt,
+    Signal,
+)
 from soma.qt_gui.qt_backend.QtWidgets import QGroupBox, QListWidget, QMenu
 
 # Populse_MIA import

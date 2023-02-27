@@ -35,12 +35,23 @@ from pathlib import Path
 
 import yaml
 from packaging import version
+
 # PyQt5 imports
 from PyQt5 import QtCore
 from PyQt5.QtCore import QDir, QLockFile, Qt
-from PyQt5.QtWidgets import (QApplication, QDialog, QFileDialog, QHBoxLayout,
-                             QLabel, QLineEdit, QMessageBox, QPushButton,
-                             QScrollArea, QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (
+    QApplication,
+    QDialog,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QScrollArea,
+    QVBoxLayout,
+    QWidget,
+)
 
 pypath = []
 
@@ -348,14 +359,17 @@ if len(pkg_error) > 0:
 # to sys.path, we can import these projects:
 
 import capsul.api as capsul_api
+
 # capsul imports
 from capsul.api import get_process_instance
+
 # soma-base imports
 from soma.qt_gui.qtThread import QtThreadCall
 
 from populse_mia.data_manager.project import Project
 from populse_mia.data_manager.project_properties import SavedProjects
 from populse_mia.software_properties import Config
+
 # populse_mia imports
 from populse_mia.user_interface.main_window import MainWindow
 from populse_mia.utils.utils import check_python_version

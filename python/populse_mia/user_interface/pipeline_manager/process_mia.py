@@ -21,6 +21,7 @@ Module used by MIA bricks to run processes.
 
 # Capsul imports
 import copy
+
 # Other imports
 import os
 import traceback
@@ -31,14 +32,19 @@ import six
 import traits.api as traits
 from capsul.api import Pipeline, Process, capsul_engine
 from capsul.attributes.completion_engine import (
-    ProcessCompletionEngine, ProcessCompletionEngineFactory)
-from capsul.attributes.completion_engine_factory import \
-    BuiltinProcessCompletionEngineFactory
+    ProcessCompletionEngine,
+    ProcessCompletionEngineFactory,
+)
+from capsul.attributes.completion_engine_factory import (
+    BuiltinProcessCompletionEngineFactory,
+)
 from capsul.pipeline.pipeline_nodes import ProcessNode
 from capsul.pipeline.process_iteration import ProcessIteration
 from capsul.process.process import NipypeProcess
+
 # nipype imports
 from nipype.interfaces.base import File, InputMultiObject, traits_extension
+
 # Soma-base import
 from soma.controller.trait_utils import relax_exists_constraint
 from soma.utils.weak_proxy import get_ref

@@ -25,15 +25,23 @@ import yaml
 from capsul.api import Pipeline
 from capsul.pipeline import pipeline_tools
 from capsul.pipeline.pipeline_nodes import PipelineNode, ProcessNode
-# Populse_db imports
-from populse_db.database import (FIELD_TYPE_DATETIME, FIELD_TYPE_INTEGER,
-                                 FIELD_TYPE_JSON, FIELD_TYPE_LIST_STRING,
-                                 FIELD_TYPE_STRING)
 
-from populse_mia.data_manager.database_mia import (TAG_ORIGIN_BUILTIN,
-                                                   TAG_ORIGIN_USER,
-                                                   DatabaseMIA)
+# Populse_db imports
+from populse_db.database import (
+    FIELD_TYPE_DATETIME,
+    FIELD_TYPE_INTEGER,
+    FIELD_TYPE_JSON,
+    FIELD_TYPE_LIST_STRING,
+    FIELD_TYPE_STRING,
+)
+
+from populse_mia.data_manager.database_mia import (
+    TAG_ORIGIN_BUILTIN,
+    TAG_ORIGIN_USER,
+    DatabaseMIA,
+)
 from populse_mia.data_manager.filter import Filter
+
 # Populse_MIA imports
 from populse_mia.software_properties import Config, verCmp
 from populse_mia.utils.utils import set_item_data
@@ -1135,8 +1143,9 @@ class Project:
             - modified_visibilities
         """
         # To avoid circular imports
-        from populse_mia.user_interface.data_browser.data_browser import \
-            not_defined_value
+        from populse_mia.user_interface.data_browser.data_browser import (
+            not_defined_value,
+        )
 
         # We can redo if we have an action to make again
         if len(self.redos) > 0:
@@ -1483,8 +1492,9 @@ class Project:
         """
 
         # To avoid circular imports
-        from populse_mia.user_interface.data_browser.data_browser import \
-            not_defined_value
+        from populse_mia.user_interface.data_browser.data_browser import (
+            not_defined_value,
+        )
 
         # We can undo if we have an action to revert
         if len(self.undos) > 0:

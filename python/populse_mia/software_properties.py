@@ -27,6 +27,7 @@ import platform
 import re
 
 import yaml
+
 # Capsul import
 from capsul.api import capsul_engine
 from cryptography.fernet import Fernet

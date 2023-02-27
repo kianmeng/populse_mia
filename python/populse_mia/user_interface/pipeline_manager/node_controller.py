@@ -26,37 +26,59 @@ from functools import partial
 import sip
 import six
 from capsul.attributes.completion_engine import ProcessCompletionEngine
+
 # capsul imports
 from capsul.pipeline.pipeline_nodes import PipelineNode
 from capsul.pipeline.process_iteration import ProcessIteration
-from capsul.qt_gui.widgets.attributed_process_widget import \
-    AttributedProcessWidget
+from capsul.qt_gui.widgets.attributed_process_widget import (
+    AttributedProcessWidget,
+)
 from matplotlib.backends.qt_compat import QtWidgets
+
 # PyQt5 imports
 from PyQt5 import Qt
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (QApplication, QDialog, QDialogButtonBox,
-                             QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-                             QMessageBox, QPushButton, QToolButton,
-                             QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (
+    QApplication,
+    QDialog,
+    QDialogButtonBox,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QToolButton,
+    QVBoxLayout,
+    QWidget,
+)
+
 # soma-base imports
 from soma.controller import trait_ids
 from traits.api import TraitError, Undefined
 
 # Populse_MIA imports
 from populse_mia.data_manager.filter import Filter
-from populse_mia.data_manager.project import (COLLECTION_BRICK,
-                                              COLLECTION_CURRENT, TAG_FILENAME)
+from populse_mia.data_manager.project import (
+    COLLECTION_BRICK,
+    COLLECTION_CURRENT,
+    TAG_FILENAME,
+)
 from populse_mia.software_properties import Config
-from populse_mia.user_interface.data_browser.advanced_search import \
-    AdvancedSearch
+from populse_mia.user_interface.data_browser.advanced_search import (
+    AdvancedSearch,
+)
 from populse_mia.user_interface.data_browser.data_browser import (
-    TableDataBrowser, not_defined_value)
+    TableDataBrowser,
+    not_defined_value,
+)
 from populse_mia.user_interface.data_browser.rapid_search import RapidSearch
 from populse_mia.user_interface.pipeline_manager.process_mia import ProcessMIA
-from populse_mia.user_interface.pop_ups import (PopUpSelectTagCountTable,
-                                                PopUpVisualizedTags)
+from populse_mia.user_interface.pop_ups import (
+    PopUpSelectTagCountTable,
+    PopUpVisualizedTags,
+)
 
 from . import type_editors
 
@@ -114,8 +136,9 @@ class PlugFilter(QWidget):
         super(PlugFilter, self).__init__(None)
 
         from populse_mia.data_manager.project import COLLECTION_CURRENT
-        from populse_mia.user_interface.data_browser.rapid_search import \
-            RapidSearch
+        from populse_mia.user_interface.data_browser.rapid_search import (
+            RapidSearch,
+        )
 
         self.project = project
         self.node_controller = node_controller

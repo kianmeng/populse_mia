@@ -24,14 +24,24 @@ from functools import reduce  # Valid in Python 2.6+, required in Python 3
 import PyQt5.QtCore as QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QIcon, QPixmap
-from PyQt5.QtWidgets import (QDialog, QHBoxLayout, QLabel, QPushButton,
-                             QTableWidget, QTableWidgetItem, QVBoxLayout)
+from PyQt5.QtWidgets import (
+    QDialog,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+)
 
 from populse_mia.data_manager.project import COLLECTION_CURRENT, TAG_FILENAME
+
 # Populse_MIA imports
 from populse_mia.software_properties import Config
-from populse_mia.user_interface.pop_ups import (ClickableLabel,
-                                                PopUpSelectTagCountTable)
+from populse_mia.user_interface.pop_ups import (
+    ClickableLabel,
+    PopUpSelectTagCountTable,
+)
 from populse_mia.utils.utils import set_item_data, table_to_database
 
 

@@ -19,13 +19,25 @@ Contains:
 import os
 
 # Populse_db imports
-from populse_db.database import (ALL_TYPES, FIELD_TYPE_BOOLEAN,
-                                 FIELD_TYPE_STRING)
+from populse_db.database import (
+    ALL_TYPES,
+    FIELD_TYPE_BOOLEAN,
+    FIELD_TYPE_STRING,
+)
+
 # PyQt5 imports
 from PyQt5.QtCore import QObjectCleanupHandler
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import (QComboBox, QGridLayout, QHBoxLayout, QLineEdit,
-                             QMessageBox, QPushButton, QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (
+    QComboBox,
+    QGridLayout,
+    QHBoxLayout,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 # Populse_MIA imports
 from populse_mia.data_manager.project import COLLECTION_CURRENT, TAG_FILENAME

@@ -7,16 +7,28 @@ import os.path as osp
 import traits.api as traits
 from capsul.api import Pipeline, Process, capsul_engine
 
-from populse_mia.data_manager.project import (BRICK_EXEC, BRICK_EXEC_TIME,
-                                              BRICK_ID, BRICK_INIT,
-                                              BRICK_INIT_TIME, BRICK_INPUTS,
-                                              BRICK_NAME, BRICK_OUTPUTS,
-                                              COLLECTION_BRICK,
-                                              COLLECTION_CURRENT,
-                                              COLLECTION_INITIAL, TAG_BRICKS,
-                                              TAG_CHECKSUM, TAG_EXP_TYPE,
-                                              TAG_FILENAME, TAG_TYPE, TYPE_MAT,
-                                              TYPE_NII, TYPE_TXT, TYPE_UNKNOWN)
+from populse_mia.data_manager.project import (
+    BRICK_EXEC,
+    BRICK_EXEC_TIME,
+    BRICK_ID,
+    BRICK_INIT,
+    BRICK_INIT_TIME,
+    BRICK_INPUTS,
+    BRICK_NAME,
+    BRICK_OUTPUTS,
+    COLLECTION_BRICK,
+    COLLECTION_CURRENT,
+    COLLECTION_INITIAL,
+    TAG_BRICKS,
+    TAG_CHECKSUM,
+    TAG_EXP_TYPE,
+    TAG_FILENAME,
+    TAG_TYPE,
+    TYPE_MAT,
+    TYPE_NII,
+    TYPE_TXT,
+    TYPE_UNKNOWN,
+)
 
 
 class ProtoProcess(object):

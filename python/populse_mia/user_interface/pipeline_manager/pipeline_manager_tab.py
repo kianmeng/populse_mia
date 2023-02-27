@@ -36,28 +36,50 @@ import uuid
 from collections import OrderedDict
 
 import six
+
 # Soma_workflow import
 import soma_workflow.constants as swconstants
 import traits.api as traits
+
 # Capsul imports
-from capsul.api import (NipypeProcess, Pipeline, PipelineNode, Process,
-                        ProcessNode, Switch, get_process_instance)
+from capsul.api import (
+    NipypeProcess,
+    Pipeline,
+    PipelineNode,
+    Process,
+    ProcessNode,
+    Switch,
+    get_process_instance,
+)
 from capsul.attributes.completion_engine import ProcessCompletionEngine
 from capsul.engine import WorkflowExecutionError
 from capsul.pipeline import pipeline_tools
 from capsul.pipeline.pipeline_workflow import workflow_from_pipeline
 from capsul.pipeline.process_iteration import ProcessIteration
 from matplotlib.backends.qt_compat import QtWidgets
+
 # MIA processes imports
 from mia_processes.bricks.tools.tools import Input_Filter
+
 # PyQt5 imports
 from PyQt5 import Qt, QtCore
 from PyQt5.QtCore import QThread, QTimer, Signal
 from PyQt5.QtGui import QCursor, QIcon, QMovie
-from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QMenu,
-                             QMessageBox, QProgressDialog, QPushButton,
-                             QScrollArea, QSplitter, QToolBar, QVBoxLayout,
-                             QWidget)
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QHBoxLayout,
+    QMenu,
+    QMessageBox,
+    QProgressDialog,
+    QPushButton,
+    QScrollArea,
+    QSplitter,
+    QToolBar,
+    QVBoxLayout,
+    QWidget,
+)
+
 # Soma_base import
 from soma.controller.trait_utils import is_file_trait
 from soma.qt_gui.qtThread import QtThreadCall
@@ -65,30 +87,49 @@ from traits.api import TraitListObject, Undefined
 from traits.trait_errors import TraitError
 
 # Populse_MIA imports
-from populse_mia.data_manager.project import (BRICK_EXEC, BRICK_EXEC_TIME,
-                                              BRICK_INIT, BRICK_INIT_TIME,
-                                              BRICK_INPUTS, BRICK_NAME,
-                                              BRICK_OUTPUTS, COLLECTION_BRICK,
-                                              COLLECTION_CURRENT,
-                                              COLLECTION_HISTORY,
-                                              COLLECTION_INITIAL,
-                                              HISTORY_BRICKS, HISTORY_PIPELINE,
-                                              TAG_BRICKS, TAG_CHECKSUM,
-                                              TAG_FILENAME, TAG_HISTORY,
-                                              TAG_TYPE, TYPE_MAT, TYPE_NII,
-                                              TYPE_TXT, TYPE_UNKNOWN)
+from populse_mia.data_manager.project import (
+    BRICK_EXEC,
+    BRICK_EXEC_TIME,
+    BRICK_INIT,
+    BRICK_INIT_TIME,
+    BRICK_INPUTS,
+    BRICK_NAME,
+    BRICK_OUTPUTS,
+    COLLECTION_BRICK,
+    COLLECTION_CURRENT,
+    COLLECTION_HISTORY,
+    COLLECTION_INITIAL,
+    HISTORY_BRICKS,
+    HISTORY_PIPELINE,
+    TAG_BRICKS,
+    TAG_CHECKSUM,
+    TAG_FILENAME,
+    TAG_HISTORY,
+    TAG_TYPE,
+    TYPE_MAT,
+    TYPE_NII,
+    TYPE_TXT,
+    TYPE_UNKNOWN,
+)
 from populse_mia.software_properties import Config
-from populse_mia.user_interface.pipeline_manager.iteration_table import \
-    IterationTable
+from populse_mia.user_interface.pipeline_manager.iteration_table import (
+    IterationTable,
+)
 from populse_mia.user_interface.pipeline_manager.node_controller import (
-    CapsulNodeController, NodeController)
-from populse_mia.user_interface.pipeline_manager.pipeline_editor import \
-    PipelineEditorTabs
-from populse_mia.user_interface.pipeline_manager.process_library import \
-    ProcessLibraryWidget
+    CapsulNodeController,
+    NodeController,
+)
+from populse_mia.user_interface.pipeline_manager.pipeline_editor import (
+    PipelineEditorTabs,
+)
+from populse_mia.user_interface.pipeline_manager.process_library import (
+    ProcessLibraryWidget,
+)
 from populse_mia.user_interface.pipeline_manager.process_mia import ProcessMIA
-from populse_mia.user_interface.pop_ups import (PopUpInheritanceDict,
-                                                PopUpSelectIteration)
+from populse_mia.user_interface.pop_ups import (
+    PopUpInheritanceDict,
+    PopUpSelectIteration,
+)
 
 
 class PipelineManagerTab(QWidget):
@@ -3483,9 +3524,11 @@ class StatusWidget(QWidget):
             if not checked:
                 return
         else:
-            from soma_workflow.gui.workflowGui import (ApplicationModel,
-                                                       MainWindow,
-                                                       SomaWorkflowWidget)
+            from soma_workflow.gui.workflowGui import (
+                ApplicationModel,
+                MainWindow,
+                SomaWorkflowWidget,
+            )
 
             model = ApplicationModel()
             sw_widget = MainWindow(

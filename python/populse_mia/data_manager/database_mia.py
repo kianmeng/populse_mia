@@ -19,16 +19,26 @@ populse_db and some of its methods
 ##########################################################################
 
 # Populse_db imports
-from populse_db.database import (FIELD_TYPE_BOOLEAN, FIELD_TYPE_DATE,
-                                 FIELD_TYPE_DATETIME, FIELD_TYPE_FLOAT,
-                                 FIELD_TYPE_INTEGER, FIELD_TYPE_JSON,
-                                 FIELD_TYPE_LIST_BOOLEAN, FIELD_TYPE_LIST_DATE,
-                                 FIELD_TYPE_LIST_DATETIME,
-                                 FIELD_TYPE_LIST_FLOAT,
-                                 FIELD_TYPE_LIST_INTEGER, FIELD_TYPE_LIST_JSON,
-                                 FIELD_TYPE_LIST_STRING, FIELD_TYPE_LIST_TIME,
-                                 FIELD_TYPE_STRING, FIELD_TYPE_TIME, Database,
-                                 DatabaseSession)
+from populse_db.database import (
+    FIELD_TYPE_BOOLEAN,
+    FIELD_TYPE_DATE,
+    FIELD_TYPE_DATETIME,
+    FIELD_TYPE_FLOAT,
+    FIELD_TYPE_INTEGER,
+    FIELD_TYPE_JSON,
+    FIELD_TYPE_LIST_BOOLEAN,
+    FIELD_TYPE_LIST_DATE,
+    FIELD_TYPE_LIST_DATETIME,
+    FIELD_TYPE_LIST_FLOAT,
+    FIELD_TYPE_LIST_INTEGER,
+    FIELD_TYPE_LIST_JSON,
+    FIELD_TYPE_LIST_STRING,
+    FIELD_TYPE_LIST_TIME,
+    FIELD_TYPE_STRING,
+    FIELD_TYPE_TIME,
+    Database,
+    DatabaseSession,
+)
 
 TAG_ORIGIN_BUILTIN = "builtin"
 TAG_ORIGIN_USER = "user"
