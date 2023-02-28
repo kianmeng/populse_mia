@@ -331,23 +331,27 @@ if len(pkg_error) > 0:
 
     if len(pkg_error) == 1:
         msg.setText(
-            "{0} package not found !\nPlease install "
-            "the package and "
-            "start again mia ...".format(pkg_error[0])
+            "An issue has been detected with the {0} package. "
+            "Please (re)install this package and/or fix the "
+            "problems displayed in the standard output. "
+            "Then, start again Mia ...".format(pkg_error[0])
         )
 
     elif len(pkg_error) == 2:
         msg.setText(
-            "{0} and {1} packages not found !\n"
-            "Please install the packages and start again mia "
-            "...".format(pkg_error[0], pkg_error[1])
+            "An issue has been detected with the {0} and {1} packages. "
+            "Please (re)install these package and/or fix the "
+            "problems displayed in the standard output. "
+            "Then, start again Mia ...".format(pkg_error[0], pkg_error[1])
         )
 
     else:
         msg.setText(
-            "{0}, {1} and {2} packages not found !\n"
-            "Please install the packages and start again mia "
-            "...".format(pkg_error[0], pkg_error[1], pkg_error[2])
+            "An issue has been detected with the {0}, {1} and {3} packages. "
+            "Please (re)install these package and/or fix the "
+            "problems displayed in the standard output. "
+            "Then, start again Mia ...".format(pkg_error[0], pkg_error[1],
+                                               pkg_error[2])
         )
 
     msg.setStandardButtons(QMessageBox.Ok)
