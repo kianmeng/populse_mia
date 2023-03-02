@@ -5374,7 +5374,7 @@ class PopUpShowHistory(QDialog):
                 engine = Config.get_capsul_engine()
                 try:
                     pipeline = engine.get_process_instance(self.pipeline_xml)
-                except Exception as e:
+                except Exception:
                     pipeline = None
 
                 if pipeline is not None:
@@ -5389,8 +5389,9 @@ class PopUpShowHistory(QDialog):
                                     pipeline = pipeline.nodes[key].process
                                     full_brick_name.pop(0)
                                     self.unitary_pipeline = True
-                    # handle cases of named pipeline/brick without being a single Pipeline node
-                    # (e.g. a pipeline alone without exporting plugs)
+                    # handle cases of named pipeline/brick without being a
+                    # single Pipeline node (e.g. a pipeline alone without
+                    # exporting plugs)
                     if (
                         not self.unitary_pipeline
                         and pipeline.name != "CustomPipeline"
@@ -5426,9 +5427,10 @@ class PopUpShowHistory(QDialog):
                         self.node_selected(
                             selected_name, pipeline.nodes[selected_name]
                         )
-                    except:
+                    except Exception:
                         print(
-                            "\nerror in naming association brick\\pipeline, cannot select node"
+                            "\nerror in naming association brick\\pipeline, "
+                            "cannot select node ..."
                         )
                         pass
 
@@ -5924,7 +5926,7 @@ class PopUpVisualizedTags(QWidget):
             )
 
     def click_unselect_tag(self):
-        """Removes the unselected tags from populse_mia.e "selected tag" table."""
+        """Removes the unselected tags from populse_mia table."""
 
         rows = sorted(
             [

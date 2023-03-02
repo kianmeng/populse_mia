@@ -75,7 +75,8 @@ def check_value_type(value, value_type, is_subvalue=False):
     :param value: Value of the cell
     :param value_type: Type expected
     :param is_subvalue: To know if the value is a subvalue of a list
-    :returns: True if the value is valid to replace the old one, False otherwise
+    :returns: True if the value is valid to replace the old
+              one, False otherwise
     """
 
     if (value_type == FIELD_TYPE_INTEGER) or (
@@ -103,9 +104,9 @@ def check_value_type(value, value_type, is_subvalue=False):
     ):
         return (
             value == "True"
-            or value == True
+            or value is True
             or value == "False"
-            or value == False
+            or value is False
         )
 
     elif (value_type == FIELD_TYPE_STRING) or (

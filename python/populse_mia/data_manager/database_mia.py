@@ -21,21 +21,7 @@ populse_db and some of its methods
 # Populse_db imports
 from populse_db.database import (
     FIELD_TYPE_BOOLEAN,
-    FIELD_TYPE_DATE,
-    FIELD_TYPE_DATETIME,
-    FIELD_TYPE_FLOAT,
-    FIELD_TYPE_INTEGER,
-    FIELD_TYPE_JSON,
-    FIELD_TYPE_LIST_BOOLEAN,
-    FIELD_TYPE_LIST_DATE,
-    FIELD_TYPE_LIST_DATETIME,
-    FIELD_TYPE_LIST_FLOAT,
-    FIELD_TYPE_LIST_INTEGER,
-    FIELD_TYPE_LIST_JSON,
-    FIELD_TYPE_LIST_STRING,
-    FIELD_TYPE_LIST_TIME,
     FIELD_TYPE_STRING,
-    FIELD_TYPE_TIME,
     Database,
     DatabaseSession,
 )
@@ -136,7 +122,7 @@ class DatabaseSessionMIA(DatabaseSession):
         :param name: field name (str)
         :param field_type: field type (string, int, float, boolean, date,
                            datetime, time, list_string, list_int, list_float,
-                           list_boolean, list_date, list_datetime, or list_time)
+                           list_boolean, list_date, list_datetime or list_time)
         :param description: field description (str or None)
         :param visibility: Bool to know if the field is visible in the
                            databrowser

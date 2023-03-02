@@ -19,7 +19,7 @@ import glob
 import json
 import os
 import tempfile
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import yaml
 from capsul.api import Pipeline
@@ -734,7 +734,7 @@ class Project:
                         output = path[lp:]
                         outputs.add(output)
 
-        procs = {}
+        # procs = {}
 
         for brid, brdesc in bricks.items():
             out_data = brdesc["outputs"]
@@ -818,8 +818,8 @@ class Project:
 
     def get_finished_bricks_in_workflows(self, engine):
         """blabla"""
-        import soma_workflow.client as swclient
-        from soma_workflow import constants
+        # import soma_workflow.client as swclient
+        # from soma_workflow import constants
 
         swm = engine.study_config.modules["SomaWorkflowConfig"]
         swm.connect_resource(engine.connected_to())

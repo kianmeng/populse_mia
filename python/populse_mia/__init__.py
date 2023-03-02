@@ -46,3 +46,5 @@ role in an analysis project: “the scan type”, “the subject being scanned�
 ###############################################################################
 
 from .info import __version__
+
+_ = __version__

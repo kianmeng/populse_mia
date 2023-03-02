@@ -350,8 +350,9 @@ if len(pkg_error) > 0:
             "An issue has been detected with the {0}, {1} and {3} packages. "
             "Please (re)install these package and/or fix the "
             "problems displayed in the standard output. "
-            "Then, start again Mia ...".format(pkg_error[0], pkg_error[1],
-                                               pkg_error[2])
+            "Then, start again Mia ...".format(
+                pkg_error[0], pkg_error[1], pkg_error[2]
+            )
         )
 
     msg.setStandardButtons(QMessageBox.Ok)
