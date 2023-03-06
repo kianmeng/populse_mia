@@ -6,7 +6,6 @@ from functools import partial
 
 import six
 import traits.api as traits
-from soma.qt_gui import controller_widget
 from soma.qt_gui.controls.Directory import DirectoryControlWidget
 from soma.qt_gui.controls.File import FileControlWidget
 from soma.qt_gui.controls.List_File_offscreen import (
@@ -78,7 +77,6 @@ class PopulseFileControlWidget(FileControlWidget):
             except ValueError:
                 return False
 
-        main_window = user_data.get("main_window")
         # files in a list don't get a Filter button.
         if (
             project
@@ -303,7 +301,6 @@ class PopulseOffscreenListFileControlWidget(OffscreenListFileControlWidget):
 
         project = user_data.get("project")
         scan_list = user_data.get("scan_list")
-        main_window = user_data.get("main_window")
         connected_inputs = user_data.get("connected_inputs", set())
         if (
             project

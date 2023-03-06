@@ -23,9 +23,7 @@ Contains:
 # for details.
 ##########################################################################
 
-import json
 import os
-import re
 import sys
 
 import six
@@ -37,7 +35,6 @@ from capsul.api import (
     PipelineNode,
     Process,
     Switch,
-    capsul_engine,
     get_process_instance,
 )
 from capsul.pipeline.pipeline_nodes import ProcessNode
@@ -49,8 +46,8 @@ from capsul.qt_gui.widgets.pipeline_developer_view import (
 )
 
 # PyQt5 imports
-from PyQt5 import Qt, QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox
+from PyQt5 import Qt, QtCore, QtWidgets
+from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 # soma-base imports
 from soma.utils.weak_proxy import weak_proxy
@@ -578,7 +575,6 @@ class PipelineEditor(PipelineDeveloperView):
 
             if node_name and isinstance(node, PipelineNode):
                 sub_pipeline_process = node.process
-                current_process_id = sub_pipeline_process.id
 
                 # Reading the process configuration file
                 with open(
@@ -2150,7 +2146,7 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
             if pipeline.trait("database_scans"):
                 try:
                     setattr(pipeline, "database_scans", self.scan_list)
-                except Exception as e:
+                except Exception:
                     import traceback
 
                     traceback.print_exc()

@@ -21,7 +21,7 @@ import yaml
 from packaging import version
 
 # Populse_MIA imports
-from populse_mia.software_properties import Config, verCmp
+from populse_mia.software_properties import Config
 
 
 class SavedProjects:
@@ -113,13 +113,12 @@ class SavedProjects:
                 except yaml.YAMLError as exc:
                     print(exc)
 
-        except FileNotFoundError as exc:
+        except FileNotFoundError:
             with open(
                 os.path.join(config.get_config_path(), "saved_projects.yml"),
                 "w",
             ) as stream:
                 yaml.dump({"paths": []}, stream, default_flow_style=False)
-
                 return {"paths": []}
 
     def removeSavedProject(self, path):

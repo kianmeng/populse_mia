@@ -69,7 +69,7 @@ def verCmp(first_ver, sec_ver, comp):
         :return: a list of integer (ex. [0, 13, 0])
         """
 
-        v = re.sub("[^0-9\.]", "", v)
+        v = re.sub(r"[^0-9\.]", "", v)
         return [int(x) for x in re.sub(r"(\.0+)*$", "", v).split(".")]
 
     if comp == "eq":
@@ -670,7 +670,7 @@ class Config:
                     self.mia_path = mia_home_config["mia_user_path"]
                     return self.mia_path
 
-                except (yaml.YAMLError, KeyError) as e:
+                except (yaml.YAMLError, KeyError):
                     print(
                         "\nMia path (where is located the processes and "
                         "the properties folders) has not "

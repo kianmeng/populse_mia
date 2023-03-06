@@ -2662,7 +2662,6 @@ class TableDataBrowser(QTableWidget):
         """Update the background of all the cells."""
 
         # itemChanged signal is always disconnected when calling this method
-
         tags = [
             self.horizontalHeaderItem(column).text()
             for column in range(len(self.horizontalHeader()))
@@ -2671,12 +2670,10 @@ class TableDataBrowser(QTableWidget):
             self.item(row, 0).text() if self.item(row, 0) else None
             for row in range(self.rowCount())
         ]
-
         dbs = self.project.session
         collection_row = dbs.get_collection(COLLECTION_CURRENT)
         primary_key = collection_row.primary_key
-        collection_init = dbs.get_collection(COLLECTION_INITIAL)
-        primary_key_init = collection_row.primary_key
+
         if scans:
             req = "%s IN [%s]" % (
                 primary_key,
@@ -2695,7 +2692,6 @@ class TableDataBrowser(QTableWidget):
             documents_init = []
 
         fields = {f.field_name: f for f in dbs.get_fields(COLLECTION_CURRENT)}
-
         table_scans = {
             self.item(row, 0).text(): row for row in range(self.rowCount())
         }
@@ -2708,8 +2704,10 @@ class TableDataBrowser(QTableWidget):
         # count visible rows odd/even
         row_even = []
         even = True
+
         for ro in range(self.rowCount()):
             row_even.append(even)
+
             if not self.isRowHidden(ro):
                 even = not even
 
@@ -2738,32 +2736,39 @@ class TableDataBrowser(QTableWidget):
                 for column, tag in zip(table_tags, tags):
                     if not self.isColumnHidden(column):
                         item = self.item(row, column)
-
                         color = QColor()
 
                         if column == 0:
                             if even:
                                 color.setRgb(255, 255, 255)  # White
+
                             else:
                                 color.setRgb(230, 230, 230)  # Grey
+
                         # Avoid issues after switching tab and not saving
                         elif scan[tag] is None:
                             if even:
                                 color.setRgb(245, 215, 215)  # Pink
+
                             else:
                                 color.setRgb(245, 175, 175)  # Red
+
                         # Raw tag
                         elif fields[tag].origin == TAG_ORIGIN_BUILTIN:
                             current_value = scan[tag]
                             initial_value = scan_init[tag]
+
                             if current_value != initial_value:
                                 if even:
                                     color.setRgb(200, 230, 245)  # Cyan
+
                                 else:
                                     color.setRgb(150, 215, 230)  # Blue
+
                             else:
                                 if even:
                                     color.setRgb(255, 255, 255)  # White
+
                                 else:
                                     color.setRgb(230, 230, 230)  # Grey
 
@@ -2771,6 +2776,7 @@ class TableDataBrowser(QTableWidget):
                         else:
                             if even:
                                 color.setRgb(245, 215, 215)  # Pink
+
                             else:
                                 color.setRgb(245, 175, 175)  # Red
 
@@ -2778,6 +2784,7 @@ class TableDataBrowser(QTableWidget):
 
         # Auto-save
         config = Config()
+
         if config.isAutoSave() is True:
             self.project.saveModifications()
 

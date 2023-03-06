@@ -36,7 +36,6 @@ from __future__ import absolute_import, print_function
 
 import os
 import sys
-from optparse import OptionParser
 
 import anatomist.direct.api as ana
 from six.moves import zip
@@ -48,7 +47,6 @@ from soma.aims import colormaphints
 from soma.qt_gui import qt_backend
 
 qt_backend.set_qt_backend(compatible_qt5=True)
-import importlib
 import time
 
 import numpy as np
@@ -58,20 +56,15 @@ import six
 # the following imports have to be made after the qApp.startingUp() test
 # since they do instantiate Anatomist for registry to work.
 from anatomist.cpp.simplecontrols import (
-    ResetFOVAction,
     Simple2DControl,
-    Simple3DControl,
     registerSimpleControls,
 )
-from PyQt5.QtGui import QColor, QIcon, QLabel, QSlider, QWidget
+from PyQt5.QtGui import QColor, QIcon, QLabel, QWidget
 from PyQt5.QtWidgets import QMessageBox
-from soma.qt_gui.qt_backend import Qt, QtCore, QtGui, uic
+from soma.qt_gui.qt_backend import Qt, QtCore
 from soma.qt_gui.qt_backend.uic import loadUi
 
 from populse_mia.software_properties import Config
-from populse_mia.user_interface.data_viewer.anatomist_2 import (
-    resources_snd_window,
-)
 from populse_mia.user_interface.data_viewer.anatomist_2.snd_window import (
     NewWindowViewer,
 )
@@ -89,7 +82,6 @@ class LeftSimple3DControl(Simple2DControl):
     def eventAutoSubscription(self, pool):
         key = QtCore.Qt
         NoModifier = key.NoModifier
-        ShiftModifier = key.ShiftModifier
         ControlModifier = key.ControlModifier
         super(LeftSimple3DControl, self).eventAutoSubscription(pool)
         self.mouseLongEventUnsubscribe(key.LeftButton, NoModifier)
@@ -357,9 +349,10 @@ class AnaSimpleViewer2(Qt.QObject):
 
     def changeOpacity(self):
         """
-        Changes opacity of selected object (to be more precise it changes the mixing rate between objects when multiple ones are
-        displayed)
+        Changes opacity of selected object (to be more precise it changes the
+        mixing rate between objects when multiple ones are displayed)
         """
+
         if self.selectedObjects() and len(self.displayedObjects) == 1:
             diffuse_vect = self.selectedObjects()[0].getInfo()["material"][
                 "diffuse"
@@ -372,12 +365,11 @@ class AnaSimpleViewer2(Qt.QObject):
                     self.slider.value() / 100,
                 ]
             )
+
         elif self.selectedObjects():
             index = self.displayedObjects.index(self.selectedObjects()[0])
             a = ana.Anatomist("-b")
-            list = Qt.QObject.findChild(
-                self.awidget, QtCore.QObject, "objectslist"
-            )
+
             if index == 0:
                 a.execute(
                     "TexturingParams",
@@ -386,6 +378,7 @@ class AnaSimpleViewer2(Qt.QObject):
                     rate=self.slider.value() / 100,
                     mode="linear_B_if_A_black",
                 )
+
             else:
                 corrected_val = abs(self.slider.value() - 100)
                 a.execute(
@@ -447,7 +440,7 @@ class AnaSimpleViewer2(Qt.QObject):
         0 : World coordinates
         1 : Image referential
         """
-        a = ana.Anatomist("-b")
+        ana.Anatomist("-b")
         self.deleteObjects(self.aobjects)
         self.loadObject(self.files, config_changed=True)
 
@@ -886,7 +879,7 @@ class AnaSimpleViewer2(Qt.QObject):
         """
         Register an object in anasimpleviewer objects list, and display it
         """
-        a = ana.Anatomist("-b")
+        ana.Anatomist("-b")
         ojectlist = Qt.QObject.findChild(
             self.awidget, QtCore.QObject, "objectslist"
         )
@@ -895,6 +888,7 @@ class AnaSimpleViewer2(Qt.QObject):
         self.aobjects.append(obj)
         self.displayedObjects.append(obj)
         self.colorBackgroundList()
+
         if obj.objectType == "VOLUME":
             # volume are checked for possible adequate colormaps
             # prints the header of volume ana.cpp.AObjectConverter.aims(obj)
@@ -902,16 +896,21 @@ class AnaSimpleViewer2(Qt.QObject):
                 ana.cpp.AObjectConverter.aims(obj)
             )
             obj.attributed()["colormaphints"] = hints
+
         bb = obj.boundingbox()
+
         if not bb:
             # not a viewable object
             return
+
         # create the 4 windows if they don't exist
         if len(self.awindows) == 0:
             if views == None:
                 self.createTotalWindow(["Axial", "Sagittal", "Coronal"])
+
             else:
                 self.createTotalWindow(views)
+
         # view obj in these views
         self.addObject(obj)
         # set the cursot at the center of the object (actually, overcome a bug
@@ -951,27 +950,34 @@ class AnaSimpleViewer2(Qt.QObject):
         the 2D fusion.
         """
         a = ana.Anatomist("-b")
+
         if obj in self.fusion2d:
             return
-        hasvr = False
+
+        # hasvr = False
         if self.volrender:
             # delete the previous volume rendering
             a.deleteObjects(self.volrender)
-            hasvr = True
+            # hasvr = True
             self.volrender = None
+
         if len(self.fusion2d) == 0:
             # only one object
             self.fusion2d = [None, obj]
+
         else:
             # several objects: fusion them
             fusobjs = self.fusion2d[1:] + [obj]
             f2d = a.fusionObjects(fusobjs, method="Fusion2DMethod")
             f2d.releaseAppRef()
+
             if self.fusion2d[0] is not None:
                 # destroy the previous fusion
                 a.deleteObjects(self.fusion2d[0])
+
             else:
                 a.removeObjects(self.fusion2d[1], self.awindows)
+
             self.fusion2d = [f2d] + fusobjs
             # repalette( fusobjs )
             obj = f2d
@@ -994,8 +1000,10 @@ class AnaSimpleViewer2(Qt.QObject):
             ]
             hints = [x for x in hints if "volume_contents_likelihoods" in x]
             cmaps = colormaphints.chooseColormaps(hints)
+
             for x, y in zip(children, cmaps):
                 x.setPalette(y)
+
         # call a lower-level function for display and volume rendering
         self._displayVolume(obj, opts)
 
@@ -1004,33 +1012,46 @@ class AnaSimpleViewer2(Qt.QObject):
         Hides a volume from views (low-level function: use removeObject)
         """
         a = ana.Anatomist("-b")
+
         if obj in self.fusion2d:
-            hasvr = False
+            # hasvr = False
+
             if self.volrender:
                 a.deleteObjects(self.volrender)
                 self.volrender = None
-                hasvr = True
+                # hasvr = True
+
             fusobjs = [o for o in self.fusion2d[1:] if o != obj]
+
             if len(fusobjs) >= 2:
                 f2d = a.fusionObjects(fusobjs, method="Fusion2DMethod")
                 f2d.releaseAppRef()
+
             else:
                 f2d = None
+
             if self.fusion2d[0] is not None:
                 a.deleteObjects(self.fusion2d[0])
+
             else:
                 a.removeObjects(self.fusion2d[1], self.awindows)
+
             if len(fusobjs) == 0:
                 self.fusion2d = []
+
             else:
                 self.fusion2d = [f2d] + fusobjs
+
             # repalette( fusobjs )
             if f2d:
                 obj = f2d
+
             elif len(fusobjs) == 1:
                 obj = fusobjs[0]
+
             else:
                 return
+
             self._displayVolume(obj, opts)
 
     def get_new_mesh2d_color(self):
@@ -1150,7 +1171,7 @@ class AnaSimpleViewer2(Qt.QObject):
         )
         row = objectlist.row(item)
         # remove item from objectlist
-        itembis = objectlist.takeItem(row)
+        # itembis = objectlist.takeItem(row)
         object_name = self.aobjects[i].name
         # Add blank icon as spaceItem
         sources_images_dir = Config().getSourceImageDir()
@@ -1437,7 +1458,7 @@ class AnaSimpleViewer2(Qt.QObject):
             return
         t = aims.Tree()
         osel = [o.getInternalRep() for o in sel]
-        options = ana.cpp.OptionMatcher.commonOptions(osel, t)
+        # options = ana.cpp.OptionMatcher.commonOptions(osel, t)
         menu = ana.cpp.OptionMatcher.popupMenu(osel, t)
         prop = menu.addAction("Object properties")
         prop.triggered.connect(self.object_properties)

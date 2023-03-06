@@ -38,7 +38,6 @@ from PyQt5.QtGui import QCursor, QIcon
 from PyQt5.QtWidgets import (
     QAction,
     QApplication,
-    QLabel,
     QMainWindow,
     QMenu,
     QMessageBox,
@@ -604,7 +603,7 @@ class MainWindow(QMainWindow):
                 yes_button = self.msg.addButton(
                     "Open MIA preferences", QMessageBox.YesRole
                 )
-                ok_button = self.msg.addButton(QMessageBox.Ok)
+                self.msg.addButton(QMessageBox.Ok)
                 self.msg.exec()
 
                 if self.msg.clickedButton() == yes_button:
@@ -691,7 +690,7 @@ class MainWindow(QMainWindow):
             yes_button = self.msg.addButton(
                 "Open MIA preferences", QMessageBox.YesRole
             )
-            ok_button = self.msg.addButton(QMessageBox.Ok)
+            self.msg.addButton(QMessageBox.Ok)
             self.msg.exec()
 
             if self.msg.clickedButton() == yes_button:
@@ -872,7 +871,7 @@ class MainWindow(QMainWindow):
                 yes_button = self.msg.addButton(
                     "Open MIA preferences", QMessageBox.YesRole
                 )
-                ok_button = self.msg.addButton(QMessageBox.Ok)
+                self.msg.addButton(QMessageBox.Ok)
                 self.msg.exec()
 
                 if self.msg.clickedButton() == yes_button:
@@ -998,6 +997,7 @@ class MainWindow(QMainWindow):
         """Remove the useless raw files of the current project, close the
         database connection. The project is not valid any longer after this
         call."""
+
         folder = self.project.folder
 
         # If it's unnamed project, we can remove the whole project
@@ -1009,32 +1009,37 @@ class MainWindow(QMainWindow):
             shutil.rmtree(folder)
 
         else:
-            for filename in glob.glob(
-                os.path.join(os.path.abspath(folder), "data", "raw_data", "*")
-            ):
-                scan = os.path.basename(filename)
-                # The file is removed only if it's not a scan in the project,
-                # and if it's not a logExport
-                # Json files associated to nii files are kept for the raw_
-                # data folder
-                file_name, file_extension = os.path.splitext(scan)
-                file_in_database = False
+            # I don't understand why files from raw_data are automatically
+            # transferred to derived_data, if they are not in db. I comment
+            # on this feature in the following lines. We can uncomment if
+            # this action makes sense ...
+            # for filename in glob.glob(
+            #    os.path.join(os.path.abspath(folder), "data", "raw_data", "*")
+            # ):
+            #    scan = os.path.basename(filename)
+            #    # The file is removed only if it's not a scan in the project,
+            #    # and if it's not a logExport
+            #    # Json files associated to nii files are kept for the raw_
+            #    # data folder
+            #    file_name, file_extension = os.path.splitext(scan)
+            #    file_in_database = False
+            #
+            #    for database_scan in self.project.session.get_documents_names(
+            #        COLLECTION_CURRENT
+            #    ):
+            #        if file_name in database_scan:
+            #            file_in_database = True
+            #
+            #    if "logExport" in scan:
+            #        file_in_database = True
+            #
+            #    if not file_in_database:
+            #        os.rename(filename, filename.replace("raw_data",
+            #                                             "derived_data"))
 
-                for database_scan in self.project.session.get_documents_names(
-                    COLLECTION_CURRENT
-                ):
-                    if file_name in database_scan:
-                        file_in_database = True
-
-                if "logExport" in scan:
-                    file_in_database = True
-
-                # I don't understand why files from raw_data are automatically
-                # transferred to derived_data. I comment on this feature in the
-                # next 3 lines. We can uncomment if this action makes sense ...
-                # if not file_in_database:
-                #    os.rename(filename, filename.replace("raw_data",
-                #                                         "derived_data"))
+            # I don't understand why files from derived_data are automatically
+            # deleted if they are not in db. I comment on this feature in the
+            # following lines. We can uncomment if this action makes sense ...
             # for filename in glob.glob(
             #         os.path.join(os.path.relpath(
             #             self.project.folder), 'data', 'derived_data', '*')):
@@ -1046,32 +1051,33 @@ class MainWindow(QMainWindow):
             #                 "data", "derived_data", scan)) is None and
             #             "logExport" not in scan):
             #         os.remove(filename)
-            for filename in glob.glob(
-                os.path.join(
-                    os.path.abspath(self.project.folder),
-                    "data",
-                    "downloaded_data",
-                    "*",
-                )
-            ):
-                scan = os.path.basename(filename)
 
-                # The file is removed only if it's not a scan in the project,
-                # and if it's not a logExport
-                if (
-                    self.project.session.get_document(
-                        COLLECTION_CURRENT,
-                        os.path.join("data", "downloaded_data", scan),
-                    )
-                    is None
-                    and "logExport" not in scan
-                ):
-                    # I don't understand why files in downloaded_data are
-                    # automatically deleted. I comment on this feature in the
-                    # following line. We can uncomment if this action
-                    # makes sense...
-                    # os.remove(filename)
-                    self.project.unsavedModifications = True
+            # I don't understand why files in downloaded_data are
+            # automatically deleted if they are not in db. I comment on this
+            # feature in the following line. We can uncomment if this action
+            # makes sense...
+            # for filename in glob.glob(
+            #     os.path.join(
+            #        os.path.abspath(self.project.folder),
+            #        "data",
+            #        "downloaded_data",
+            #        "*",
+            #    )
+            # ):
+            #    scan = os.path.basename(filename)
+            #
+            #    # The file is removed only if it's not a scan in the project,
+            #    # and if it's not a logExport
+            #    if (
+            #        self.project.session.get_document(
+            #            COLLECTION_CURRENT,
+            #            os.path.join("data", "downloaded_data", scan),
+            #        )
+            #        is None
+            #        and "logExport" not in scan
+            #    ):
+            #        os.remove(filename)
+            #        self.project.unsavedModifications = True
 
             # close database, and files
             self.project.session = None
@@ -1130,7 +1136,7 @@ class MainWindow(QMainWindow):
             yes_button = self.msg.addButton(
                 "Open MIA preferences", QMessageBox.YesRole
             )
-            ok_button = self.msg.addButton(QMessageBox.Ok)
+            self.msg.addButton(QMessageBox.Ok)
             self.msg.exec()
 
             if self.msg.clickedButton() == yes_button:
@@ -1166,7 +1172,6 @@ class MainWindow(QMainWindow):
                 data_path = os.path.join(as_folder, "data")
 
                 raw_data_path = os.path.join(data_path, "raw_data")
-                derived_data_path = os.path.join(data_path, "derived_data")
                 downloaded_data_path = os.path.join(
                     data_path, "downloaded_data"
                 )
@@ -1380,6 +1385,8 @@ class MainWindow(QMainWindow):
             import jupyter_core.application
             import qtconsole  # to check it is installed
 
+            # flake8 ignore F401
+
             ipfunc = (
                 "from jupyter_core import application; "
                 "app = application.JupyterApp(); app.initialize(); app.start()"
@@ -1428,6 +1435,8 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def run_ipconsole_kernel(mode="qtconsole"):
+        """blabla"""
+
         print("run_ipconsole_kernel:", mode)
         import IPython
         from IPython.lib import guisupport
@@ -1436,11 +1445,12 @@ class MainWindow(QMainWindow):
         qtapp = Qt.QApplication.instance()
         qtapp._in_event_loop = True
         guisupport.in_event_loop = True
-        ipversion = [int(x) for x in IPython.__version__.split(".")]
+        # ipversion = [int(x) for x in IPython.__version__.split(".")]
 
         from ipykernel.kernelapp import IPKernelApp
 
         app = IPKernelApp.instance()
+
         if not app.initialized() or not app.kernel:
             print("runing IP console kernel")
             app.hb_port = 50042  # don't know why this is not set automatically

@@ -23,17 +23,14 @@ Contains:
 import copy
 import datetime
 import functools
-import inspect
 import io
 import json
 import os
-import re
 import sys
 import threading
 import time
 import traceback
 import uuid
-from collections import OrderedDict
 
 import six
 
@@ -48,7 +45,6 @@ from capsul.api import (
     PipelineNode,
     Process,
     ProcessNode,
-    Switch,
     get_process_instance,
 )
 from capsul.attributes.completion_engine import ProcessCompletionEngine
@@ -57,9 +53,6 @@ from capsul.pipeline import pipeline_tools
 from capsul.pipeline.pipeline_workflow import workflow_from_pipeline
 from capsul.pipeline.process_iteration import ProcessIteration
 from matplotlib.backends.qt_compat import QtWidgets
-
-# MIA processes imports
-from mia_processes.bricks.tools.tools import Input_Filter
 
 # PyQt5 imports
 from PyQt5 import Qt, QtCore
@@ -71,8 +64,6 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QMenu,
     QMessageBox,
-    QProgressDialog,
-    QPushButton,
     QScrollArea,
     QSplitter,
     QToolBar,
@@ -84,7 +75,6 @@ from PyQt5.QtWidgets import (
 from soma.controller.trait_utils import is_file_trait
 from soma.qt_gui.qtThread import QtThreadCall
 from traits.api import TraitListObject, Undefined
-from traits.trait_errors import TraitError
 
 # Populse_MIA imports
 from populse_mia.data_manager.project import (
@@ -126,10 +116,7 @@ from populse_mia.user_interface.pipeline_manager.process_library import (
     ProcessLibraryWidget,
 )
 from populse_mia.user_interface.pipeline_manager.process_mia import ProcessMIA
-from populse_mia.user_interface.pop_ups import (
-    PopUpInheritanceDict,
-    PopUpSelectIteration,
-)
+from populse_mia.user_interface.pop_ups import PopUpInheritanceDict
 
 
 class PipelineManagerTab(QWidget):
@@ -145,7 +132,7 @@ class PipelineManagerTab(QWidget):
         - add_process_to_preview: add a process to the pipeline
         - build_iterated_pipeline:
         - cleanup_older_init:
-        - complete_pipeline_parameters
+        - complete_pipeline_parameters:
         - controller_value_changed: update history when a pipeline node is
           changed
         - displayNodeParameters: display the node controller when a node is
@@ -673,7 +660,7 @@ class PipelineManagerTab(QWidget):
 
         # get all tags values for inputs
         for param, parent_file in parent_files.items():
-            database_parent_file = None
+            # database_parent_file = None
             relfile = os.path.abspath(os.path.normpath(parent_file))[
                 len(db_dir) :
             ]
@@ -689,7 +676,7 @@ class PipelineManagerTab(QWidget):
             )
 
             if scan:
-                database_parent_file = scan
+                # database_parent_file = scan
                 # banished_tags = set([TAG_TYPE, TAG_EXP_TYPE, TAG_BRICKS,
                 #                TAG_CHECKSUM, TAG_FILENAME])
                 banished_tags = set(
@@ -971,17 +958,22 @@ class PipelineManagerTab(QWidget):
 
         for i in range(2):
             p = 0
+
             for plug in params[i]:
                 if plug in forbidden:
                     continue
-                trait = pipeline.trait(plug)
+
                 it_btn = Qt.QCheckBox()
                 db_btn = None
+
                 if i == 0:
                     db_btn = Qt.QCheckBox()
+
                     if not check_db_compat(pipeline, plug):
                         db_btn.setEnabled(False)
+
                     c = 2
+
                 else:
                     c = 4
 
@@ -990,18 +982,22 @@ class PipelineManagerTab(QWidget):
                 )
 
                 param_lay.addWidget(it_btn, p + 1, i * 3)
+
                 if db_btn:
                     param_lay.addWidget(db_btn, p + 1, i * 3 + 1)
                     db_btn.toggled.connect(
                         functools.partial(db_clicked, param_btns[i], p)
                     )
+
                 param_lay.addWidget(Qt.QLabel(plug), p + 1, c)
                 param_btns[i].append([plug, it_btn, db_btn])
                 it_btn.setChecked(True)
                 p += 1
+
         param_lay.setRowStretch(max(len(inputs), len(outputs)) - 1, 1)
 
         res = dialog.exec_()
+
         if res != dialog.Accepted:
             return None
 
@@ -1125,15 +1121,18 @@ class PipelineManagerTab(QWidget):
         # Input_Filter nodes for them, and connect them to the special
         # database_scans input
         in_filter_not_found = False
+
         for plug in database_plugs:
             try:
                 in_filter = engine.get_process_instance(
                     "mia_processes.bricks.tools.Input_Filter"
                 )
+
             except ValueError:
                 in_filter_not_found = True
                 print("Input filter not found in library.")
                 break
+
             node_name = "%s_filter" % plug
             it_pipeline.add_process(node_name, in_filter)
             it_pipeline.add_link(
@@ -1145,6 +1144,7 @@ class PipelineManagerTab(QWidget):
             # and the input of the filter.
             if "database_scans" in it_pipeline.user_traits():
                 it_pipeline.add_link("database_scans->%s.input" % node_name)
+
             else:
                 old_traits = list(it_pipeline.user_traits().keys())
                 it_pipeline.export_parameter(
@@ -1154,7 +1154,8 @@ class PipelineManagerTab(QWidget):
 
         if not in_filter_not_found:
             self.pipelineEditorTabs.get_current_editor().iterated = True
-        compl = ProcessCompletionEngine.get_completion_engine(it_pipeline)
+
+        # compl = ProcessCompletionEngine.get_completion_engine(it_pipeline)
         return it_pipeline
 
     def check_requirements(self, environment="global", message_list=None):
@@ -1183,13 +1184,17 @@ class PipelineManagerTab(QWidget):
         the database.
         """
 
-        # get a working / configured CapsulEngine
-        engine = self.get_capsul_engine()
+        # FIXME: It seems that the following line is only used for UTs (test.
+        #        testMIAPipelineManageTab.test_complete_pipeline_parameters).
+        #        I think we could find a cleaner way ...
+        _ = self.get_capsul_engine()
+
         if not pipeline:
             pipeline = self.get_pipeline_or_process()
+
         completion = ProcessCompletionEngine.get_completion_engine(pipeline)
+
         if completion:
-            attributes = completion.get_attribute_values()
             completion.complete_parameters()
 
     def controller_value_changed(self, signal_list):
@@ -2199,8 +2204,6 @@ class PipelineManagerTab(QWidget):
         to_upate = self.project.finished_bricks(
             self.get_capsul_engine(), pipeline=pipeline, include_done=False
         )
-
-        outputs = to_upate["outputs"]
         bricks = to_upate["bricks"]
 
         # set state of bricks: done + exec date
@@ -2365,9 +2368,8 @@ class PipelineManagerTab(QWidget):
             self.nodeController.update_parameters()
 
     def register_completion_attributes(self, pipeline):
-        # get a working / configured CapsulEngine
+        """blabla"""
 
-        engine = self.get_capsul_engine()
         completion = ProcessCompletionEngine.get_completion_engine(pipeline)
         if not completion:
             return
@@ -2385,6 +2387,7 @@ class PipelineManagerTab(QWidget):
             self.project.session.get_fields_names(COLLECTION_CURRENT)
         )
         attributes = {k: v for k, v in attributes.items() if k in tag_list}
+
         if not attributes:
             return
 
@@ -2393,14 +2396,19 @@ class PipelineManagerTab(QWidget):
             todo = []
             values = []
             todo = [value]
+
             while todo:
                 item = todo.pop(0)
+
                 if isinstance(item, list):
                     todo += item
+
                 elif isinstance(item, str):
                     apath = os.path.abspath(os.path.normpath(item))
+
                     if apath.startswith(proj_dir):
                         values.append(apath[pl:])
+
             for value in values:
                 try:
                     self.project.session.set_values(
@@ -2409,6 +2417,7 @@ class PipelineManagerTab(QWidget):
                     self.project.session.set_values(
                         COLLECTION_INITIAL, value, attributes
                     )
+
                 except ValueError:
                     pass  # outputs not used / inactivated
 
@@ -2513,7 +2522,7 @@ class PipelineManagerTab(QWidget):
                 if res == 0:
                     return
                 resource = cd.ui.combo_resources.currentText()
-                login = cd.ui.lineEdit_login.text()
+                # login = cd.ui.lineEdit_login.text()
                 passwd = cd.ui.lineEdit_password.text()
                 rsa_key = cd.ui.lineEdit_rsa_password.text()
                 if resource not in (
@@ -2665,7 +2674,6 @@ class PipelineManagerTab(QWidget):
         """
 
         print("show_status")
-        log = getattr(self, "last_run_log", "")
         status_widget = StatusWidget(self)
         status_widget.show()
         self.status_widget = status_widget
@@ -3320,6 +3328,7 @@ class RunProgress(QWidget):
         # self.hide()
 
     def end_progress(self):
+        """blabla"""
         self.worker.wait()
         QApplication.instance().restoreOverrideCursor()
 
@@ -3337,7 +3346,7 @@ class RunProgress(QWidget):
                 engine.raise_for_status(
                     self.worker.status, self.worker.exec_id
                 )
-            except WorkflowExecutionError as e:
+            except WorkflowExecutionError:
                 mbox_icon = QMessageBox.Critical
                 mbox_title = "Failure"
                 mbox_text = (
@@ -3349,7 +3358,7 @@ class RunProgress(QWidget):
                 mbox_title = "Success"
                 mbox_text = "Pipeline execution was OK."
         mbox = QMessageBox(mbox_icon, mbox_title, mbox_text)
-        timer = QTimer.singleShot(2000, mbox.accept)
+        QTimer.singleShot(2000, mbox.accept)
         mbox.exec()
 
     def start(self):
@@ -3402,10 +3411,6 @@ class RunWorker(QThread):
             if self.interrupt_request:
                 print("*** INTERRUPT ***")
                 return
-
-        # Reading config
-        config = Config()
-        capsul_config = config.get_capsul_config()
 
         engine = self.pipeline_manager.get_capsul_engine()
 
@@ -3527,7 +3532,6 @@ class StatusWidget(QWidget):
             from soma_workflow.gui.workflowGui import (
                 ApplicationModel,
                 MainWindow,
-                SomaWorkflowWidget,
             )
 
             model = ApplicationModel()

@@ -679,7 +679,7 @@ class MiniViewer(QWidget):
                     self.file_paths.remove(file_path)
                     chk = False
 
-                except FileNotFoundError as e:
+                except FileNotFoundError:
                     print(
                         "File "
                         + os.path.abspath(file_path)

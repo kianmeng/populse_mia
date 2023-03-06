@@ -347,7 +347,7 @@ if len(pkg_error) > 0:
 
     else:
         msg.setText(
-            "An issue has been detected with the {0}, {1} and {3} packages. "
+            "An issue has been detected with the {0}, {1} and {2} packages. "
             "Please (re)install these package and/or fix the "
             "problems displayed in the standard output. "
             "Then, start again Mia ...".format(
@@ -616,6 +616,9 @@ def launch_mia():
         # QtWebEngineWidgets need to be imported before QCoreApplication
         # instance is created (used later)
         from soma.qt_gui.qt_backend import QtWebEngineWidgets
+
+        # flake8 ignore F401
+
     except ImportError:
         pass  # QtWebEngineWidgets is not installed
 
@@ -644,8 +647,7 @@ def launch_mia():
     main_window.show()
 
     # make sure to instantiate the QtThreadCall singleton from the main thread
-    qt_thread_call = QtThreadCall()
-
+    QtThreadCall()
     app.exec()
 
 

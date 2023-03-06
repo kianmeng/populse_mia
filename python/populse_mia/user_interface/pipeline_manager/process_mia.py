@@ -19,16 +19,11 @@ Module used by MIA bricks to run processes.
 # for details.
 ##########################################################################
 
-# Capsul imports
-import copy
-
 # Other imports
 import os
 import traceback
 import uuid
-import weakref
 
-import six
 import traits.api as traits
 from capsul.api import Pipeline, Process, capsul_engine
 from capsul.attributes.completion_engine import (

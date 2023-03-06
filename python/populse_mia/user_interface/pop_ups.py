@@ -55,12 +55,11 @@ import subprocess
 from datetime import datetime
 from functools import partial
 
-import six
 import yaml
 
 # Capsul imports
 from capsul.api import capsul_engine
-from capsul.pipeline.pipeline_nodes import PipelineNode, ProcessNode
+from capsul.pipeline.pipeline_nodes import PipelineNode
 from capsul.qt_gui.widgets.pipeline_developer_view import PipelineDeveloperView
 from capsul.qt_gui.widgets.settings_editor import SettingsEditor
 
@@ -216,9 +215,9 @@ class DefaultValueListCreation(QDialog):
         if value != "":
             try:
                 list_value = ast.literal_eval(value)
+
                 if isinstance(list_value, list):
                     # If the previous value was already a list, we fill it
-
                     self.table.setColumnCount(len(list_value))
 
                     for i in range(0, self.table.columnCount()):
@@ -229,8 +228,9 @@ class DefaultValueListCreation(QDialog):
                 else:
                     self.default_init_table()
 
-            except Exception as e:
+            except Exception:
                 self.default_init_table()
+
         else:
             self.default_init_table()
 
@@ -3616,7 +3616,7 @@ class PopUpPreferences(QDialog):
                                 QApplication.restoreOverrideCursor()
                                 return False
 
-                        except Exception as e:
+                        except Exception:
                             self.wrong_path(spm_input, "SPM standalone")
                             QApplication.restoreOverrideCursor()
                             return False
@@ -3717,8 +3717,7 @@ class PopUpPreferences(QDialog):
                 self.msg.setIcon(QMessageBox.Warning)
                 self.msg.setText("Empty MRIFileManager.jar path")
                 self.msg.setInformativeText(
-                    "No path has been entered for "
-                    "MRIFileManager.jar.".format(mri_conv_path)
+                    "No path has been entered for " "MRIFileManager.jar."
                 )
                 self.msg.setWindowTitle("Warning")
                 self.msg.setStandardButtons(QMessageBox.Ok)
@@ -4722,7 +4721,6 @@ class PopUpSaveProjectAs(QDialog):
 
         # Label
         self.label = QLabel("Projects list:")
-        h_box = QHBoxLayout()
 
         project_list.sort()
         for i in range(0, len(project_list)):

@@ -34,7 +34,6 @@ import glob
 import inspect
 import os
 import pkgutil
-import re
 import shutil
 import sys
 import tempfile
@@ -2702,7 +2701,6 @@ class ProcessLibrary(QTreeView):
         if event.key() == QtCore.Qt.Key_Delete and not config.get_user_mode():
             for idx in self.selectedIndexes():
                 if idx.isValid:
-                    model = idx.model()
                     idx = idx.sibling(idx.row(), 0)
                     node = idx.internalPointer()
 
@@ -2739,7 +2737,6 @@ class ProcessLibrary(QTreeView):
         config = Config()
 
         if idx.isValid:
-            model = idx.model()
             idx = idx.sibling(idx.row(), 0)
             node = idx.internalPointer()
 

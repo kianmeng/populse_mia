@@ -24,10 +24,9 @@ import sys
 from functools import partial
 
 import sip
-import six
-from capsul.attributes.completion_engine import ProcessCompletionEngine
 
 # capsul imports
+from capsul.attributes.completion_engine import ProcessCompletionEngine
 from capsul.pipeline.pipeline_nodes import PipelineNode
 from capsul.pipeline.process_iteration import ProcessIteration
 from capsul.qt_gui.widgets.attributed_process_widget import (
@@ -511,6 +510,7 @@ class CapsulNodeController(QWidget):
         """
         self.node_name = node_name
         self.pipeline = pipeline
+
         # The pipeline global inputs and outputs node name cannot be modified
         if self.node_name not in ("inputs", "outputs"):
             self.line_edit_node_name.setText(self.node_name)
@@ -523,12 +523,12 @@ class CapsulNodeController(QWidget):
             self.line_edit_node_name.setReadOnly(True)
 
         if self.process_widget:
-            item = self.layout().takeAt(1)
+            # item = self.layout().takeAt(1)
             self.static_release(
                 self.process_widget.attributed_process, self.parameters_changed
             )
             self.process_widget.deleteLater()
-            del item
+            # del item
             self.process_widget = None
 
         # get the list of inputs connected from outputs of upstream nodes
@@ -655,9 +655,6 @@ class CapsulNodeController(QWidget):
         if not old_node_name:
             old_node_name = self.node_name
 
-        # Copying the old node
-        old_node = self.pipeline.nodes[old_node_name]
-
         if isinstance(self.process, ProcessIteration):
             if not new_node_name.startswith("iterated_"):
                 new_node_name = "iterated_" + new_node_name
@@ -773,7 +770,7 @@ class CapsulNodeController(QWidget):
                 "attributes set for process parameters completion"
             )
             mbox = QMessageBox(mbox_icon, mbox_title, mbox_text)
-            timer = Qt.QTimer.singleShot(2000, mbox.accept)
+            Qt.QTimer.singleShot(2000, mbox.accept)
             mbox.exec()
 
 
@@ -1369,7 +1366,6 @@ class NodeController(QWidget):
                               is called from an undo/redo)
         """
         # Copying the old node
-        old_node = self.pipeline.nodes[self.node_name]
         old_node_name = self.node_name
 
         if not new_node_name:
@@ -1595,17 +1591,19 @@ class NodeController(QWidget):
         :param filter_res_list: list of the filtered files
         """
 
-        index = parameters[0]
         pipeline = parameters[1]
         value_type = parameters[2]
 
         # If the list contains only one element, setting
         # this element as the plug value
         len_list = len(filter_res_list)
+
         if len_list > 1:
             res = filter_res_list
+
         elif len_list == 1:
             res = filter_res_list[0]
+
         else:
             res = []
 

@@ -175,14 +175,7 @@ if (
 ### developer configuration:
 
 # Capsul import
-from capsul.api import (
-    PipelineNode,
-    Process,
-    ProcessNode,
-    Switch,
-    capsul_engine,
-    get_process_instance,
-)
+from capsul.api import PipelineNode, ProcessNode, Switch, get_process_instance
 from capsul.attributes.completion_engine import ProcessCompletionEngine
 from capsul.engine import CapsulEngine, WorkflowExecutionError
 from capsul.pipeline.pipeline import Pipeline
@@ -6717,7 +6710,7 @@ class TestMIANodeController(TestMIACase):
         input_filter = ppl_edt_tabs.filter_widget
 
         index_DOCUMENT_1 = input_filter.table_data.get_scan_row(DOCUMENT_1)
-        index_DOCUMENT_2 = input_filter.table_data.get_scan_row(DOCUMENT_2)
+        # index_DOCUMENT_2 = input_filter.table_data.get_scan_row(DOCUMENT_2)
 
         # Tries to search for an empty string and asserts that none of the
         # documents are hidden
