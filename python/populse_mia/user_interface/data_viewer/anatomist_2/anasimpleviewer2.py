@@ -42,8 +42,8 @@ from six.moves import zip
 from soma import aims
 from soma.aims import colormaphints
 
-# determine wheter we are using Qt4 or Qt5, and hack a little bit accordingly
-# the boolean qt4 gloabl variable will tell it for later usage
+# determine whether we are using Qt4 or Qt5, and hack a little bit accordingly
+# the boolean qt4 global variable will tell it for later usage
 from soma.qt_gui import qt_backend
 
 qt_backend.set_qt_backend(compatible_qt5=True)
@@ -440,7 +440,6 @@ class AnaSimpleViewer2(Qt.QObject):
         0 : World coordinates
         1 : Image referential
         """
-        ana.Anatomist("-b")
         self.deleteObjects(self.aobjects)
         self.loadObject(self.files, config_changed=True)
 
@@ -879,7 +878,6 @@ class AnaSimpleViewer2(Qt.QObject):
         """
         Register an object in anasimpleviewer objects list, and display it
         """
-        ana.Anatomist("-b")
         ojectlist = Qt.QObject.findChild(
             self.awidget, QtCore.QObject, "objectslist"
         )
@@ -1171,7 +1169,7 @@ class AnaSimpleViewer2(Qt.QObject):
         )
         row = objectlist.row(item)
         # remove item from objectlist
-        # itembis = objectlist.takeItem(row)
+        objectlist.takeItem(row)
         object_name = self.aobjects[i].name
         # Add blank icon as spaceItem
         sources_images_dir = Config().getSourceImageDir()
@@ -1458,7 +1456,6 @@ class AnaSimpleViewer2(Qt.QObject):
             return
         t = aims.Tree()
         osel = [o.getInternalRep() for o in sel]
-        # options = ana.cpp.OptionMatcher.commonOptions(osel, t)
         menu = ana.cpp.OptionMatcher.popupMenu(osel, t)
         prop = menu.addAction("Object properties")
         prop.triggered.connect(self.object_properties)
