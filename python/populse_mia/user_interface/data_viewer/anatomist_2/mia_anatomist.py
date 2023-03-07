@@ -22,6 +22,7 @@ from __future__ import absolute_import, print_function
 import os
 
 from PyQt5.QtGui import QIcon, QMessageBox
+
 from PyQt5.QtWidgets import QHBoxLayout, QToolButton
 from soma.qt_gui.qt_backend import Qt, QtCore
 
@@ -31,6 +32,9 @@ from populse_mia.user_interface.data_browser.data_browser import (
     TableDataBrowser,
 )
 from populse_mia.user_interface.data_browser.rapid_search import RapidSearch
+
+from populse_mia.user_interface.data_viewer.anatomist_2 import resources
+# flake8 ignore F401
 from populse_mia.user_interface.data_viewer.anatomist_2.anasimpleviewer2 import (
     AnaSimpleViewer2,
 )
