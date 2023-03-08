@@ -2010,10 +2010,10 @@ class PopUpPreferences(QDialog):
         self.tab_tools.setObjectName("tab_tools")
         self.tab_widget.addTab(self.tab_tools, _translate("Dialog", "Tools"))
 
-        ## Groupbox "Global preferences"
+        # Groupbox "Global preferences"
         self.groupbox_global = QtWidgets.QGroupBox("Global preferences")
 
-        ## Auto save
+        # Auto save
         self.save_checkbox = QCheckBox("", self)
         self.save_label = QLabel("Auto save")
 
@@ -2025,7 +2025,7 @@ class PopUpPreferences(QDialog):
         h_box_auto_save.addWidget(self.save_label)
         h_box_auto_save.addStretch(1)
 
-        ## Clinical mode
+        # Clinical mode
         self.clinical_mode_checkbox = QCheckBox("", self)
 
         if config.get_use_clinical() is True:
@@ -2037,7 +2037,7 @@ class PopUpPreferences(QDialog):
         h_box_clinical.addWidget(self.clinical_mode_label)
         h_box_clinical.addStretch(1)
 
-        ## Admin mode + Change password + Edit config
+        # Admin mode + Change password + Edit config
         self.admin_mode_checkbox = QCheckBox("", self)
         self.admin_mode_checkbox.clicked.connect(self.admin_mode_switch)
         self.admin_mode_label = QLabel("Admin mode")
@@ -2073,7 +2073,7 @@ class PopUpPreferences(QDialog):
         h_box_edit_config.addWidget(self.edit_config)
         h_box_edit_config.addStretch(1)
 
-        ## Version 1 controller
+        # Version 1 controller
         self.control_checkbox = QCheckBox("", self)
         self.control_label = QLabel("Version 1 controller")
 
@@ -2090,7 +2090,7 @@ class PopUpPreferences(QDialog):
         h_box_control.addWidget(self.control_label)
         h_box_control.addStretch(1)
 
-        ## Max thumbnails number at the data browser bottom
+        # Max thumbnails number at the data browser bottom
         self.max_thumbnails_label = QLabel(
             "Number of thumbnails " "in Data Browser:"
         )
@@ -2104,7 +2104,7 @@ class PopUpPreferences(QDialog):
         h_box_max_thumbnails.addWidget(self.max_thumbnails_box)
         h_box_max_thumbnails.addStretch(1)
 
-        ## Radiological vs neurological orientation in miniviewer data browser
+        # Radiological vs neurological orientation in miniviewer data browser
         self.radioView_checkbox = QCheckBox("", self)
         self.radioView_label = QLabel(
             "Radiological orientation in " "miniviewer (data browser)"
@@ -2118,7 +2118,7 @@ class PopUpPreferences(QDialog):
         h_box_radioView.addWidget(self.radioView_label)
         h_box_radioView.addStretch(1)
 
-        ## Draws graphic objects
+        # Draws graphic objects
         v_box_global = QtWidgets.QVBoxLayout()
         v_box_global.addLayout(h_box_auto_save)
         v_box_global.addLayout(h_box_clinical)
@@ -2132,10 +2132,10 @@ class PopUpPreferences(QDialog):
 
         self.groupbox_global.setLayout(v_box_global)
 
-        ### Groupbox "Projects preferences"
+        # Groupbox "Projects preferences"
         self.groupbox_projects = QtWidgets.QGroupBox("Projects preferences")
 
-        ### Projects folder label/line edit
+        # Projects folder label/line edit
         self.projects_save_path_label = QLabel("Projects folder:")
         self.projects_save_path_line_edit = QLineEdit(
             config.get_projects_save_path()
@@ -2145,7 +2145,7 @@ class PopUpPreferences(QDialog):
             self.browse_projects_save_path
         )
 
-        ### Max projects in "Saved projects"
+        # Max projects in "Saved projects"
         self.max_projects_label = QLabel(
             'Number of projects in "Saved projects":'
         )
@@ -2156,7 +2156,7 @@ class PopUpPreferences(QDialog):
         # self.max_projects_box.setDecimals(0)
         self.max_projects_box.setSingleStep(1)
 
-        ### Draws graphic objects
+        # Draws graphic objects
         h_box_projects_save = QtWidgets.QHBoxLayout()
         h_box_projects_save.addWidget(self.projects_save_path_line_edit)
         h_box_projects_save.addWidget(self.projects_save_path_browse)
@@ -2179,12 +2179,12 @@ class PopUpPreferences(QDialog):
 
         self.groupbox_projects.setLayout(projects_layout)
 
-        #### Groupbox "POPULSE third party preferences"
+        # Groupbox "POPULSE third party preferences"
         self.groupbox_populse = QtWidgets.QGroupBox(
             "POPULSE third party preference"
         )
 
-        #### MRI File Manager folder label/line edit
+        # MRI File Manager folder label/line edit
         self.mri_conv_path_label = QLabel(
             "Absolute path to MRIManager.jar "
             "file (e.g., mri_conv_dir/"
@@ -2194,7 +2194,7 @@ class PopUpPreferences(QDialog):
         self.mri_conv_path_browse = QPushButton("Browse")
         self.mri_conv_path_browse.clicked.connect(self.browse_mri_conv_path)
 
-        #### Draws graphic objects
+        # Draws graphic objects
         h_box_mri_conv = QtWidgets.QHBoxLayout()
         h_box_mri_conv.addWidget(self.mri_conv_path_line_edit)
         h_box_mri_conv.addWidget(self.mri_conv_path_browse)
@@ -2208,12 +2208,12 @@ class PopUpPreferences(QDialog):
 
         self.groupbox_populse.setLayout(populse_layout)
 
-        #### Groupbox "External resources preferences"
+        # Groupbox "External resources preferences"
         self.groupbox_resources = QtWidgets.QGroupBox(
             "External resources preferences"
         )
 
-        #### Resources folder label/line edit
+        # Resources folder label/line edit
         self.resources_path_label = QLabel(
             "Absolute path to the external resources data (some processes may "
             "require external data to function properly):"
@@ -2222,7 +2222,7 @@ class PopUpPreferences(QDialog):
         self.resources_path_browse = QPushButton("Browse")
         self.resources_path_browse.clicked.connect(self.browse_resources_path)
 
-        #### Draws graphic objects
+        # Draws graphic objects
         h_box_resources = QtWidgets.QHBoxLayout()
         h_box_resources.addWidget(self.resources_path_line_edit)
         h_box_resources.addWidget(self.resources_path_browse)
@@ -3563,8 +3563,8 @@ class PopUpPreferences(QDialog):
                                 # anyway.
 
                                 if (
-                                    self.use_spm_standalone_checkbox.isChecked()
-                                ):
+                                    self.use_spm_standalone_checkbox.isChecked
+                                )():
                                     config.set_use_spm_standalone(True)
                                     config.set_use_matlab_standalone(True)
 
@@ -3577,8 +3577,8 @@ class PopUpPreferences(QDialog):
                                 and (b"(standalone)" in output.split()[2:])
                             ):
                                 if (
-                                    self.use_spm_standalone_checkbox.isChecked()
-                                ):
+                                    self.use_spm_standalone_checkbox.isChecked
+                                )():
                                     config.set_use_spm_standalone(True)
                                     config.set_use_matlab_standalone(True)
                                 config.set_spm_standalone_path(spm_input)
@@ -4001,7 +4001,7 @@ class PopUpPreferences(QDialog):
             #     # try:
             #     #     del c_c['engine']['global'][
             #     #         'capsul.engine.module.spm'][
-            #     #                             'spm12-standalone']['standalone']
+            #     #                           'spm12-standalone']['standalone']
             #     #
             #     # except KeyError:
             #     #     pass
@@ -4015,9 +4015,9 @@ class PopUpPreferences(QDialog):
             #                                    getattr(c, cif))
             #
             #         # settings.new_config('spm', 'global',
-            #         #         {'config_id': 'spm',
-            #         #          'standalone': False,
-            #         #          'directory': config.get_spm_standalone_path()})
+            #         #        {'config_id': 'spm',
+            #         #         'standalone': False,
+            #         #         'directory': config.get_spm_standalone_path()})
             #
             #         # for c in settings.configs('matlab', 'global'):
             #         #     settings.remove_config('matlab', 'global',
@@ -4060,8 +4060,8 @@ class PopUpPreferences(QDialog):
             #         #                            getattr(c, cif))
             #         #
             #         # settings.new_config('matlab', 'global',
-            #         #                {'config_id': 'matlab',
-            #         #                 'executable': config.get_matlab_path()})
+            #         #               {'config_id': 'matlab',
+            #         #                'executable': config.get_matlab_path()})
             #     # try:
             #     #     c_c['engine']['global'][
             #     #         'capsul.engine.module.matlab'][

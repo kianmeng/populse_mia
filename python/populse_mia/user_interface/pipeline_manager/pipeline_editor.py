@@ -174,9 +174,9 @@ class PipelineEditor(PipelineDeveloperView):
 
         # Commented on January, 4th 2020
         # if not (self.main_window.pipeline_manager.iterationTable.
-        #                                          check_box_iterate).isChecked():
-        #     self.main_window.pipeline_manager.run_pipeline_action.setDisabled(
-        #                                                                    True)
+        #                                     check_box_iterate).isChecked():
+        #     (self.main_window.pipeline_manager.run_pipeline_action.
+        #                                         setDisabled)(True)
         # End - commented on January, 4th 2020
 
         self.main_window.statusBar().showMessage(
@@ -325,8 +325,10 @@ class PipelineEditor(PipelineDeveloperView):
 
                 else:
                     self.scene.update_pipeline()
-                    # history_maker = ["export_plug", ('inputs', pipeline_parameter),
-                    #                 pipeline_parameter, optional, weak_link]
+                    # history_maker = ["export_plug",
+                    #                  ('inputs', pipeline_parameter),
+                    #                  pipeline_parameter, optional,
+                    #                  weak_link]
                     history_maker = [
                         "export_plugs",
                         plug_name,
@@ -551,8 +553,8 @@ class PipelineEditor(PipelineDeveloperView):
         # Commented on January, 4th 2020
         # if not (self.main_window.pipeline_manager.
         #         iterationTable.check_box_iterate.isChecked)():
-        #     self.main_window.pipeline_manager.run_pipeline_action.setDisabled(
-        #                                                                    True)
+        #     (self.main_window.pipeline_manager.run_pipeline_action.
+        #                                       setDisabled)(True)
         # End - commented on January, 4th 2020
 
         self.main_window.statusBar().showMessage(
@@ -839,8 +841,8 @@ class PipelineEditor(PipelineDeveloperView):
         # Commented on January, 4th 2020
         # if not (self.main_window.pipeline_manager.iterationTable
         #         .check_box_iterate).isChecked():
-        #     self.main_window.pipeline_manager.run_pipeline_action.setDisabled(
-        #                                                                    True)
+        #     (self.main_window.pipeline_manager.run_pipeline_action.
+        #                                               setDisabled)(True)
         # End - commented on January, 4th 2020
 
         self.main_window.statusBar().showMessage(
@@ -919,9 +921,9 @@ class PipelineEditor(PipelineDeveloperView):
 
         # Commented on January, 4th 2020
         # if not (self.main_window.pipeline_manager.iterationTable.
-        #                                          check_box_iterate).isChecked():
-        #     self.main_window.pipeline_manager.run_pipeline_action.setDisabled(
-        #                                                                    True)
+        #                                    check_box_iterate).isChecked():
+        #     (self.main_window.pipeline_manager.run_pipeline_action.
+        #                                               setDisabled)(True)
         # End - commented on January, 4th 2020
 
         self.main_window.statusBar().showMessage(
@@ -1073,7 +1075,8 @@ class PipelineEditor(PipelineDeveloperView):
     #                     return [hint_tuples(e) for e in item]
     #
     #                 if isinstance(item, dict):
-    #                     return dict((key, hint_tuples(value)) for key, value in
+    #                     return dict((key,
+    #                                  hint_tuples(value)) for key, value in
     #                                 item.items())
     #
     #                 else:
@@ -2057,7 +2060,9 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
         :param index: index of the editor
         """
 
-        # self.main_window.pipeline_manager.run_pipeline_action.setDisabled(True) # commented on January, 4th 2020
+        # commented on January, 4th 2020
+        # self.main_window.pipeline_manager.run_pipeline_action.setDisabled(
+        #                                                                 True)
         self.setCurrentIndex(index)
         self.previousIndex = index
         self.update_current_node(index)
@@ -2065,22 +2070,22 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
     def update_iteration_checkbox(self):
         pipeline = self.get_current_pipeline()
         if not pipeline or not hasattr(pipeline, "nodes"):
-            self.main_window.pipeline_manager.iterationTable.check_box_iterate.setCheckState(
-                Qt.Qt.Unchecked
-            )
+            (
+                self.main_window.pipeline_manager.iterationTable.check_box_iterate.setCheckState
+            )(Qt.Qt.Unchecked)
         else:
             has_iteration = False
             for key in pipeline.nodes.sortedKeys:
                 if "iterated_" in key:
                     has_iteration = True
             if has_iteration:
-                self.main_window.pipeline_manager.iterationTable.check_box_iterate.setCheckState(
-                    Qt.Qt.Checked
-                )
+                (
+                    self.main_window.pipeline_manager.iterationTable.check_box_iterate.setCheckState
+                )(Qt.Qt.Checked)
             else:
-                self.main_window.pipeline_manager.iterationTable.check_box_iterate.setCheckState(
-                    Qt.Qt.Unchecked
-                )
+                (
+                    self.main_window.pipeline_manager.iterationTable.check_box_iterate.setCheckState
+                )(Qt.Qt.Unchecked)
 
     def update_current_node(self, index):
         """Update the node parameters
@@ -2112,9 +2117,9 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
 
         self.update_iteration_checkbox()
         if self.get_current_editor():
-            self.main_window.pipeline_manager.iterationTable.update_iterated_tag(
-                self.get_current_editor().iterated_tag
-            )
+            (
+                self.main_window.pipeline_manager.iterationTable.update_iterated_tag
+            )(self.get_current_editor().iterated_tag)
 
     def update_history(self, editor):
         """Update undo/redo history of an editor.

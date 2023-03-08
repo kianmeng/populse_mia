@@ -123,21 +123,21 @@ class Config:
               Runtime
             - get_max_projects: returns the maximum number of projects
               displayed in the "Saved projects" menu
-            - get_max_thumbnails:  get max thumbnails number at the data browser
-              bottom
+            - get_max_thumbnails:  get max thumbnails number at the data
+              browser bottom
             - get_mia_path: returns the software's install path
             - get_mri_conv_path: returns the MRIManager.jar path
             - getNbAllSlicesMax: returns the maximum number of slices to
               display in the mini viewer
             - get_opened_projects: returns the opened projects
             - getPathToProjectsFolder: returns the project's path
-            - get_projects_save_path: returns the folder where the projects are
-              saved
+            - get_projects_save_path: returns the folder where the projects
+              are saved
             - get_referential: returns boolean to indicate DataViewer
               referential
             - get_resources_path: get the resources path
-            - getShowAllSlices: returns if the "show all slices" checkbox of the
-              mini viewer is activated
+            - getShowAllSlices: returns if the "show all slices" checkbox of
+              the mini viewer is activated
             - getSourceImageDir: get the source directory for project images
             - get_spm_path: returns the path of SPM12 (license version)
             - get_spm_standalone_path: returns the path of SPM12 (standalone
@@ -166,8 +166,8 @@ class Config:
               checkbox in the preferences
             - getViewerConfig: returns the DataViewer configuration (neuro or
               radio), by default neuro
-            - getViewerFramerate: returns the DataViewer framerate for automatic
-              time running images
+            - getViewerFramerate: returns the DataViewer framerate for
+              automatic time running images
             - isAutoSave: checks if auto-save mode is activated
             - isControlV1: checks if the selected display of the controller is
               of V1 type
@@ -534,7 +534,8 @@ class Config:
     def get_matlab_command(self):
         """Get Matlab command.
 
-        :returns: matlab executable path or nothing if matlab path not specified
+        :returns: matlab executable path or nothing if matlab path not
+                  specified
         """
 
         if self.config.get("use_spm_standalone"):

@@ -41,41 +41,12 @@ import time
 import numpy as np
 import PyQt5
 import six
-
-try:
-    import anatomist.direct.api as ana
-
-except ImportError:
-    print(
-        "\nAnatomist seems not to be installed. The data_viewer anatomist "
-        "and anatomist_2 will not work...\n"
-    )
+from PyQt5.QtGui import QColor, QIcon, QLabel, QWidget
+from PyQt5.QtWidgets import QMessageBox
 from six.moves import zip
 from soma import aims
 from soma.aims import colormaphints
-
-# determine whether we are using Qt4 or Qt5, and hack a little bit accordingly
-# the boolean qt4 global variable will tell it for later usage
 from soma.qt_gui import qt_backend
-
-qt_backend.set_qt_backend(compatible_qt5=True)
-
-# the following imports have to be made after the qApp.startingUp() test
-# since they do instantiate Anatomist for registry to work.
-try:
-    from anatomist.cpp.simplecontrols import (
-        Simple2DControl,
-        registerSimpleControls,
-    )
-
-except ImportError:
-    print(
-        "\nAnatomist seems not to be installed. The data_viewer anatomist "
-        "and anatomist_2 will not work...\n"
-    )
-
-from PyQt5.QtGui import QColor, QIcon, QLabel, QWidget
-from PyQt5.QtWidgets import QMessageBox
 from soma.qt_gui.qt_backend import Qt, QtCore
 from soma.qt_gui.qt_backend.uic import loadUi
 
@@ -83,6 +54,29 @@ from populse_mia.software_properties import Config
 from populse_mia.user_interface.data_viewer.anatomist_2.snd_window import (
     NewWindowViewer,
 )
+
+try:
+    import anatomist.direct.api as ana
+except ImportError:
+    print(
+        "\nAnatomist seems not to be installed. The data_viewer anatomist "
+        "and anatomist_2 will not work...\n"
+    )
+# the following imports have to be made after the qApp.startingUp() test
+# since they do instantiate Anatomist for registry to work.
+try:
+    from anatomist.cpp.simplecontrols import (
+        Simple2DControl,
+        registerSimpleControls,
+    )
+except ImportError:
+    print(
+        "\nAnatomist seems not to be installed. The data_viewer anatomist "
+        "and anatomist_2 will not work...\n"
+    )
+# determine whether we are using Qt4 or Qt5, and hack a little bit accordingly
+# the boolean qt4 global variable will tell it for later usage
+qt_backend.set_qt_backend(compatible_qt5=True)
 
 
 class LeftSimple3DControl(Simple2DControl):

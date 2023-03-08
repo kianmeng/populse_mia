@@ -21,7 +21,7 @@
 # for details.
 ##########################################################################
 
-### General imports:
+# General imports:
 
 # Other import
 import ast
@@ -171,8 +171,8 @@ if (
         sys.path.insert(1, soma_workflow_dev_dir)
         del soma_workflow_dev_dir
 
-### Imports after defining the location of populse packages in the case of a
-### developer configuration:
+# Imports after defining the location of populse packages in the case of a
+# developer configuration:
 
 # Capsul import
 from capsul.api import PipelineNode, ProcessNode, Switch, get_process_instance
@@ -295,7 +295,8 @@ class TestMIACase(unittest.TestCase):
               be safely modified
             - proclibview_nipype_state: give the state of nipype in the process
             - proclibview_nipype_reset_state: reset nipype to its initial state
-              (before the start of the current test) in the process library view
+              (before the start of the current test) in the process library
+              view
             - restart_MIA: restarts MIA within a unit test
             - setUp: called automatically before each test method
             - setUpClass: called before tests in the individual class
@@ -533,7 +534,8 @@ class TestMIACase(unittest.TestCase):
                   - 'nipype': 'nipype' is loaded but 'interfaces' not.
                   - 'nipype.interface': 'nipype.interface' is loaded but
                                         'DataGrabber' not.
-                  - 'process_enabled': 'nipype.interface.DataGrabber' is loaded.
+                  - 'process_enabled': 'nipype.interface.DataGrabber' is
+                                       loaded.
         """
 
         if proc_lib_view.to_dict():
@@ -619,8 +621,8 @@ class TestMIACase(unittest.TestCase):
     def restart_MIA(self):
         """Restarts MIA within a unit test.
 
-        - Can be used to restart MIA after changing the controller version in MIA
-          preferences.
+        - Can be used to restart MIA after changing the controller version in
+          Mia preferences.
         """
 
         self.main_window.close()
@@ -1095,7 +1097,8 @@ class TestMIADataBrowser(TestMIACase):
             "pvm-000220_000.nii" in scans_displayed
         )
 
-        # Testing that every scan is back when clicking again on advanced search
+        # Testing that every scan is back when clicking again on
+        # advanced search
         QTest.mouseClick(
             self.main_window.data_browser.advanced_search_button, Qt.LeftButton
         )
@@ -2349,7 +2352,7 @@ class TestMIADataBrowser(TestMIACase):
     #                "-2014-02-14102317-01-G1_Guerbet_Anat-RAREpvm"
     #                "-000220_000.nii" in scans_displayed)
     #
-    ## Trying to remove a scan
+    # Trying to remove a scan
     # self.main_window.data_browser.table_data.selectRow(0)
     # self.main_window.data_browser.table_data.remove_scan()
     # scans_displayed = []
@@ -2453,7 +2456,7 @@ class TestMIADataBrowser(TestMIACase):
         item = self.main_window.data_browser.table_data.item(0, 0)
         scan_name = item.text()
 
-        ### Test for a list:
+        # Test for a list:
         # Values in the db
         value = float(
             self.main_window.project.session.get_value(
@@ -2537,7 +2540,7 @@ class TestMIADataBrowser(TestMIACase):
         self.assertEqual(value, databrowser)
         self.assertEqual(value, value_initial)
 
-        ### Test for a string:
+        # Test for a string:
         # Values in the db
         value = self.main_window.project.session.get_value(
             COLLECTION_CURRENT, scan_name, "Type"
@@ -2981,7 +2984,8 @@ class TestMIADataBrowser(TestMIACase):
 
         send_popup.ok_clicked()
 
-        # Checking that the first 2 scans have been sent to the pipeline manager
+        # Checking that the first 2 scans have been sent to the
+        # pipeline manager
         scans = self.main_window.pipeline_manager.scan_list
         self.assertEqual(len(scans), 2)
         self.assertTrue(scan1 in scans)
@@ -3029,7 +3033,7 @@ class TestMIADataBrowser(TestMIACase):
         item = self.main_window.data_browser.table_data.item(1, 0)
         scan_name = item.text()
 
-        ### Test for a list:
+        # Test for a list:
         # Values in the db
         value = float(
             self.main_window.project.session.get_value(
@@ -3081,7 +3085,7 @@ class TestMIADataBrowser(TestMIACase):
         self.assertEqual(value_initial, float(50000))
         item.setSelected(False)
 
-        ### Test for a string:
+        # Test for a string:
         # Values in the db
         value = self.main_window.project.session.get_value(
             COLLECTION_CURRENT, scan_name, "Type"
@@ -3299,7 +3303,7 @@ class TestMIADataBrowser(TestMIACase):
         # Set often used shortcuts
         table_data = self.main_window.data_browser.table_data
 
-        ### TESTS CHANGE_CELL_COLOR
+        # TESTS CHANGE_CELL_COLOR
         # Adds a new document to the collection
         NEW_DOC = {"FileName": "mock_file_name"}
         self.main_window.project.session.add_document(
@@ -3358,12 +3362,12 @@ class TestMIADataBrowser(TestMIACase):
         self.assertEqual(table_data.item(0, 2).text(), "RARE_B")
         self.assertNotEqual(table_data.item(0, 3).text(), "RARE_B")
 
-        ### TESTS SELECTION_MOVED
+        # TESTS SELECTION_MOVED
 
         # Switch columns of the 2 first tags
         table_data.horizontalHeader().sectionMoved.emit(0, 0, 1)
 
-        ### SELECT_COLUMN
+        # SELECT_COLUMN
         # Selects the whole filename column
         table_data.selectColumn(0)
 
@@ -4043,7 +4047,7 @@ class TestMIADataBrowser(TestMIACase):
         self.assertTrue(TAG_EXP_TYPE in visible_tags)
         self.assertTrue(TAG_TYPE in visible_tags)
 
-        ### Testing when hiding a tag
+        # Testing when hiding a tag
         # Bricks tag selected
         settings.tab_tags.list_widget_selected_tags.item(2).setSelected(True)
         QTest.mouseClick(
@@ -4544,23 +4548,30 @@ class TestMIAMainWindow(TestMIACase):
         # Deletes a scan from data browser
         self.main_window.data_browser.table_data.selectRow(0)
         # FIXME: following line raise exception, only on macos build:
-        ###Traceback (most recent call last):
-        ###File "/Users/appveyor/projects/populse-mia/python/populse_mia/test.py", line 3797, in test_open_recent_project
-        ###self.main_window.data_browser.table_data.remove_scan()
-        ###File "/Users/appveyor/projects/populse-mia/python/populse_mia/user_interface/data_browser/data_browser.py", line 2055, in remove_scan
-        ###scan_path)
-        ###File "/Users/appveyor/projects/populse_db/python/populse_db/database.py", line 724, in remove_document
-        ###self.engine.remove_document(collection, document_id)
-        ###File "/Users/appveyor/projects/populse_db/python/populse_db/engine/sqlite.py", line 628, in remove_document
-        ###self.remove_value(collection, document_id, field.field_name)
-        ###File "/Users/appveyor/projects/populse_db/python/populse_db/engine/sqlite.py", line 612, in remove_value
-        ###self.cursor.execute(sql, [document_id])
-        ###sqlite3.OperationalError: attempt to write a readonly database
+        # Traceback (most recent call last):
+        # File "/Users/appveyor/projects/populse-mia/python/populse_mia/test.py",
+        # line 3797, in test_open_recent_project
+        # self.main_window.data_browser.table_data.remove_scan()
+        # File "/Users/appveyor/projects/populse-mia/python/populse_mia/
+        # user_interface/data_browser/data_browser.py", line 2055, in
+        # remove_scan
+        # scan_path)
+        # File "/Users/appveyor/projects/populse_db/python/populse_db/
+        # database.py", line 724, in remove_document
+        # self.engine.remove_document(collection, document_id)
+        # File "/Users/appveyor/projects/populse_db/python/populse_db/
+        # engine/sqlite.py", line 628, in remove_document
+        # self.remove_value(collection, document_id, field.field_name)
+        # File "/Users/appveyor/projects/populse_db/python/populse_db/
+        # engine/sqlite.py", line 612, in remove_value
+        # self.cursor.execute(sql, [document_id])
+        # sqlite3.OperationalError: attempt to write a readonly database
         # While waiting to investiget and find a fix the line is commented:
         # self.main_window.data_browser.table_data.remove_scan()
 
         # Asserts that there are unsaved modification
-        # FIXME: By commenting the previous line we have to also comment the following line:
+        # FIXME: By commenting the previous line we have to also comment the
+        # following line:
         # self.assertTrue(self.main_window.check_unsaved_modifications())
 
         PopUpQuit.exec = lambda self_: self_.show()
@@ -4926,7 +4937,7 @@ class TestMIAMainWindow(TestMIACase):
         pkg_lib_window.line_edit.setText(PKG)
         pkg_lib_window.layout().children()[0].layout().children()[3].itemAt(
             0
-        ).widget().clicked.emit()  #  Clicks on add package
+        ).widget().clicked.emit()  # Clicks on add package
         pkg_lib_window.ok_clicked()
 
         # Switches to the pipeline manager tab
@@ -5551,12 +5562,12 @@ class TestMIAMainWindow(TestMIACase):
 
         # Calls 'admin_mode_switch', mocking the execution of 'QInputDialog'
         main_wnd.pop_up_preferences.admin_mode_checkbox.setChecked(True)
-        QInputDialog.getText = lambda w, x, y, z,: (None, False)
+        QInputDialog.getText = lambda w, x, y, z: (None, False)
         main_wnd.pop_up_preferences.admin_mode_switch()
 
         # Tries to activate admin mode with the wrong password
         main_wnd.pop_up_preferences.admin_mode_checkbox.setChecked(True)
-        QInputDialog.getText = lambda w, x, y, z,: (
+        QInputDialog.getText = lambda w, x, y, z: (
             "mock_wrong_password",
             True,
         )
@@ -5564,7 +5575,7 @@ class TestMIAMainWindow(TestMIACase):
         self.assertFalse(main_wnd.pop_up_preferences.change_psswd.isVisible())
 
         # Activates admin mode with the correct password
-        QInputDialog.getText = lambda w, x, y, z,: (admin_password, True)
+        QInputDialog.getText = lambda w, x, y, z: (admin_password, True)
         main_wnd.pop_up_preferences.admin_mode_checkbox.setChecked(True)
         main_wnd.pop_up_preferences.admin_mode_switch()
         self.assertTrue(main_wnd.pop_up_preferences.change_psswd.isVisible())
@@ -6216,7 +6227,7 @@ class TestMIAMainWindow(TestMIACase):
             - QMessageBox.show
         """
 
-        ## Validates the Pipeline tab without pressing the 'OK' button:
+        # Validates the Pipeline tab without pressing the 'OK' button:
 
         # Set shortcuts for objects that are often used
         main_wnd = self.main_window
@@ -6253,7 +6264,7 @@ class TestMIAMainWindow(TestMIACase):
         for module in ["afni", "ants", "fsl", "matlab", "spm"]:
             self.assertTrue(getattr(config, "get_use_" + module)())
 
-        ## Validates the Pipeline tab by pressing the 'OK' button:
+        # Validates the Pipeline tab by pressing the 'OK' button:
 
         # Sets the projects folder for the preferences window to close
         # when pressing on 'OK'
@@ -9041,7 +9052,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         ppl_manager = self.main_window.pipeline_manager
 
-        ### INTEGRATED TEST
+        # INTEGRATED TEST
 
         # Mocks the 'initialized' object
         ppl_manager.pipelineEditorTabs.get_current_editor().initialized = True
@@ -9054,7 +9065,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
             ppl_manager.pipelineEditorTabs.get_current_editor().initialized
         )
 
-        ### ISOLATED TEST
+        # ISOLATED TEST
 
         # Mocks again the 'initialized' object
         ppl_manager.pipelineEditorTabs.get_current_editor().initialized = True
@@ -9096,7 +9107,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         ppl_manager = self.main_window.pipeline_manager
 
-        ### INTEGRATED
+        # INTEGRATED
 
         # Gets the capsul engine
         capsul_engine = ppl_manager.get_capsul_engine()
@@ -9104,7 +9115,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # Asserts that the 'capsul_engine' is of class 'CapsulEngine'
         self.assertIsInstance(capsul_engine, CapsulEngine)
 
-        ### ISOLATED
+        # ISOLATED
         ppl_manager.pipelineEditorTabs.get_capsul_engine = MagicMock()
 
         # Gets the capsul engine

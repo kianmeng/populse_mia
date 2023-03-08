@@ -417,7 +417,8 @@ class PopulseUndefinedControlWidget(object):
 
         if control_text in [
             "<undefined>",
-            "<style>background-color: gray; text-color: red;</style><undefined>",
+            "<style>background-color: gray; "
+            "text-color: red;</style><undefined>",
         ]:
             is_valid = True
 

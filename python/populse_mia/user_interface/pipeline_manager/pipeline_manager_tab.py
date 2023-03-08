@@ -295,7 +295,8 @@ class PipelineManagerTab(QWidget):
 
         sources_images_dir = config.getSourceImageDir()
         # commented on January, 4th 2020
-        # initialization button was deleted to avoid issues of indexation into the database.
+        # initialization button was deleted to avoid issues of indexation
+        # into the database.
         # initialization is now performed just befor run in run_pipeline_action
         # self.init_pipeline_action = QAction(
         #     QIcon(os.path.join(sources_images_dir, 'init32.png')),
@@ -309,7 +310,8 @@ class PipelineManagerTab(QWidget):
             self,
         )
         self.run_pipeline_action.triggered.connect(self.runPipeline)
-        # self.run_pipeline_action.setDisabled(True) # commented on January, 4th 2020
+        # commented on January, 4th 2020
+        # self.run_pipeline_action.setDisabled(True)
 
         self.stop_pipeline_action = QAction(
             QIcon(os.path.join(sources_images_dir, "stop32.png")), "Stop", self
@@ -1252,11 +1254,13 @@ class PipelineManagerTab(QWidget):
         ].append(history_maker)
         # self.pipelineEditorTabs.redos[
         #    self.pipelineEditorTabs.get_current_editor()].clear()
-        # self.run_pipeline_action.setDisabled(True) # commented on January, 4th 2020
+        # commented on January, 4th 2020
+        # self.run_pipeline_action.setDisabled(True)
 
         # Cause a segmentation fault
         # from capsul.qt_gui.widgets.pipeline_developer_view import NodeGWidget
-        # for item in self.pipelineEditorTabs.get_current_editor().scene.items():
+        # for item in self.pipelineEditorTabs.get_current_editor(
+        #                                                      ).scene.items():
         #     if isinstance(item, NodeGWidget):
         #         self.pipelineEditorTabs.get_current_editor(
         #
@@ -1518,7 +1522,8 @@ class PipelineManagerTab(QWidget):
         # If the initialization fail, the run pipeline action is disabled
         # The run pipeline action is enabled only when an initialization is
         # successful
-        # self.run_pipeline_action.setDisabled(True) # commented on January, 4th 2020
+        # commented on January, 4th 2020
+        # self.run_pipeline_action.setDisabled(True)
         self.init_clicked = True
         self.pipelineEditorTabs.update_current_node(
             self.pipelineEditorTabs.currentIndex()
@@ -1929,15 +1934,16 @@ class PipelineManagerTab(QWidget):
                                     COLLECTION_BRICK, brick_id
                                 )
                             except ValueError:
-                                # # id is not unique. It happens in iterations
-                                # # FIXME: we need a better way to handle UUIDs in
-                                # #        iterated processes
+                                # id is not unique. It happens in iterations
+                                # FIXME: we need a better way to handle
+                                #        UUIDs in iterated processes
                                 # brick_id = str(uuid.uuid4())
                                 # job.uuid = brick_id
                                 # self.brick_list[-1] = brick_id
                                 # # then try again
-                                # self.project.session.add_document(COLLECTION_BRICK,
-                                #                                   brick_id)
+                                # self.project.session.add_document(
+                                #                          COLLECTION_BRICK,
+                                #                          brick_id)
                                 init_result = False
                                 init_messages.append(
                                     "Error while setting job uuid on "
@@ -1976,10 +1982,10 @@ class PipelineManagerTab(QWidget):
         if main_pipeline:
             node_controller_node_name = self.nodeController.node_name
 
-            #### Todo: Fix the problem of the controller that
-            ####       keeps the name of the old brick deleted until
-            ####       a click on the new one. This can cause a mia
-            ####       crash during the initialisation, for example.
+            # Todo: Fix the problem of the controller that
+            #       keeps the name of the old brick deleted until
+            #       a click on the new one. This can cause a mia
+            #       crash during the initialisation, for example.
 
             if node_controller_node_name in ["inputs", "outputs"]:
                 node_controller_node_name = ""
@@ -2094,7 +2100,8 @@ class PipelineManagerTab(QWidget):
         self.tags_menu.addAction(self.load_pipeline_parameters_action)
         self.tags_menu.addAction(self.save_pipeline_parameters_action)
         self.tags_menu.addSeparator()
-        # self.tags_menu.addAction(self.init_pipeline_action) # commented on January, 4th 2020
+        # commented on January, 4th 2020
+        # self.tags_menu.addAction(self.init_pipeline_action)
         self.tags_menu.addAction(self.run_pipeline_action)
         self.tags_menu.addAction(self.stop_pipeline_action)
         self.tags_menu.addAction(self.show_pipeline_status_action)
@@ -2105,8 +2112,8 @@ class PipelineManagerTab(QWidget):
             QtWidgets.QToolButton.MenuButtonPopup
         )
         self.tags_tool_button.setMenu(self.tags_menu)
-
-        # self.menu_toolbar.addAction(self.init_pipeline_action) # commented on January, 4th 2020
+        # commented on January, 4th 2020
+        # self.menu_toolbar.addAction(self.init_pipeline_action)
         self.menu_toolbar.addAction(self.run_pipeline_action)
         self.menu_toolbar.addAction(self.stop_pipeline_action)
         self.menu_toolbar.addAction(self.show_pipeline_status_action)
@@ -2466,7 +2473,7 @@ class PipelineManagerTab(QWidget):
             # pipeline_progress['tag'] = iterated_tag
             # for tag_value in tag_values:
             # self.brick_list = []
-            ## Status bar update
+            # # Status bar update
             # pipeline_progress['tag_value'] = tag_value
 
             # idx_combo_box = self.iterationTable.combo_box.findText(
@@ -2477,23 +2484,23 @@ class PipelineManagerTab(QWidget):
 
             # self.init_pipeline()
             # self.main_window.statusBar().showMessage(
-            #'Pipeline "{0}" is getting run for {1} {2}. '
-            #'Please wait.'.format(name, iterated_tag, tag_value))
+            # 'Pipeline "{0}" is getting run for {1} {2}. '
+            # 'Please wait.'.format(name, iterated_tag, tag_value))
             # QApplication.processEvents()
             # self.progress = RunProgress(self, pipeline_progress)
-            ##self.progress.show()
-            ##self.progress.exec()
+            # # self.progress.show()
+            # # self.progress.exec()
             # pipeline_progress['counter'] += 1
             # self.init_clicked = False
 
-            ## # self.init_pipeline(self.pipeline)
-            ## idx = self.progress.value()
-            ## idx += 1
-            ## self.progress.setValue(idx)
-            ## QApplication.processEvents()
+            # # self.init_pipeline(self.pipeline)
+            # idx = self.progress.value()
+            # idx += 1
+            # self.progress.setValue(idx)
+            # QApplication.processEvents()
 
             # self.main_window.statusBar().showMessage(
-            #'Pipeline "{0}" has been run for {1} {2}. Please wait.'.format(
+            # 'Pipeline "{0}" has been run for {1} {2}. Please wait.'.format(
             # name, iterated_tag, tag_values))
 
             # else:
@@ -2566,7 +2573,8 @@ class PipelineManagerTab(QWidget):
             self.progress.start()
 
             self.init_clicked = False
-            # self.run_pipeline_action.setDisabled(True) # Commented on January, 4th 2020
+            # Commented on January, 4th 2020
+            # self.run_pipeline_action.setDisabled(True)
 
     def saveParameters(self):
         """
@@ -3022,7 +3030,8 @@ class PipelineManagerTab(QWidget):
 
         if auto_inheritance_dict:
             job.auto_inheritance_dict = auto_inheritance_dict
-            # print('auto_inheritance_dict for', node.name, ':', auto_inheritance_dict)
+            # print('auto_inheritance_dict for',
+            #       node.name, ':', auto_inheritance_dict)
 
     def update_inheritance(self, job, node):
         if node.context_name.split(".")[0] == "Pipeline":
@@ -3210,7 +3219,8 @@ class PipelineManagerTab(QWidget):
 
     def update_user_buttons_states(self, index=-1):
         """
-        Update the visibility of initialize/run/save actions according to pipeline state
+        Update the visibility of initialize/run/save actions according to
+        pipeline state
         """
         # Commented on January, 4th 2020
         # With disabling of init button, run button is always available
@@ -3237,7 +3247,7 @@ class PipelineManagerTab(QWidget):
             self.run_pipeline_action.setDisabled(False)
         # End - Commented on January, 4th 2020
 
-        ### Uncomment below to not allow to save an iterated pipeline: ##
+        # Uncomment below to not allow to save an iterated pipeline: ###
         # if (hasattr(self.pipelineEditorTabs.get_current_editor(),
         #            'iterated') and
         #        self.pipelineEditorTabs.get_current_editor().iterated):
@@ -3246,7 +3256,7 @@ class PipelineManagerTab(QWidget):
         # else:
         #    self.save_pipeline_as_action.setDisabled(False)
         #    self.save_pipeline_action.setDisabled(False)
-        ### End Comment ###
+        # End Comment ###
 
     def update_user_mode(self):
         """

@@ -272,8 +272,6 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
             self.fallback_engine.completion_progress_total
         )
 
-        # print('complete_parameters', self.process.name, ', attributes:', self.fallback_engine.get_attribute_values().export_to_dict())
-
         # handle database attributes and indexation
         self.complete_attributes_with_database(process_inputs)
         in_process = get_ref(self.process)
@@ -300,10 +298,8 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
                         "\n. {0} ({1}) nipype node ...".format(
                             node_name,
                             ".".join(
-                                (
-                                    in_process._nipype_interface.__module__,
-                                    in_process._nipype_interface.__class__.__name__,
-                                )
+                                in_process._nipype_interface.__module__,
+                                in_process._nipype_interface.__class__.__name__,
                             ),
                         )
                     )
@@ -358,14 +354,15 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
             self.complete_parameters_mia(process_inputs)
             self.completion_progress = self.completion_progress_total
 
-            # we must keep a copy of inheritance dict,
-            # since it changes at each iteration and is not included in workflow
-            # TODO: a better solution would be to save for each node the inheritance between plugs
-            #       and not between filenames (that changes over iteration)
+            # we must keep a copy of inheritance dict, since it changes
+            # at each iteration and is not included in workflow
+            # TODO: a better solution would be to save for each
+            #       node the inheritance between plugs and not between
+            #       filenames (that changes over iteration)
             project = self.get_project(in_process)
             if project is not None:
-                # record completion order to perform 2nd pass tags recording and
-                # indexation
+                # record completion order to perform 2nd pass tags recording
+                # and indexation
                 if not hasattr(project, "node_inheritance_history"):
                     project.node_inheritance_history = {}
 
@@ -474,8 +471,9 @@ class MIAProcessCompletionEngineFactory(ProcessCompletionEngineFactory):
     :class:`~capsul.study_config.study_config.StudyConfig` instance by setting
     2 parameters::
 
-        study_config.attributes_schema_paths = study_config.attributes_schema_paths \
-            + ['populse_mia.user_interface.pipeline_manager.process_mia']
+        study_config.attributes_schema_paths = study_config.\
+            attributes_schema_paths + ['populse_mia.user_interface.'
+                                       'pipeline_manager.process_mia']
         study_config.process_completion =  'mia_completion'
 
     Once this is done, the completion system will be activated for all
@@ -555,6 +553,7 @@ class ProcessMIA(Process):
 
     def _after_run_process(self, run_process_result):
         """Try to recover the output values."""
+
         if hasattr(self, "process") and isinstance(
             self.process, NipypeProcess
         ):
@@ -570,10 +569,13 @@ class ProcessMIA(Process):
 
     def _run_process(self):
         """Call the run_process_mia method in the Process_Mia subclass"""
+
         self.run_process_mia()
 
     def init_default_traits(self):
-        """Automatically initialise necessary parameters for nipype or capsul"""
+        """Automatically initialise necessary parameters for
+        nipype or capsul"""
+
         if "output_directory" not in self.user_traits():
             self.add_trait(
                 "output_directory",

@@ -1215,7 +1215,8 @@ class PackageLibrary(QTreeWidget):
     def __init__(self, package_tree, paths):
         """Initialization of the PackageLibrary widget.
 
-        :param package_tree: representation of the packages as a tree-dictionary
+        :param package_tree: representation of the packages as
+                             a tree-dictionary
         :param paths: list of paths to add to the system to import the packages
 
         """
@@ -1718,10 +1719,10 @@ class PackageLibraryDialog(QDialog):
                                         #     print('- %s.%s ...' % (
                                         #         module_name, v.__name__))
                                         #     print(
-                                        #         'This pipeline is now '
-                                        #         'installed but disabled '
-                                        #         '(see File > Package Library '
-                                        #         'Manager to enable it) ...')
+                                        #        'This pipeline is now '
+                                        #        'installed but disabled '
+                                        #        '(see File > Package Library '
+                                        #        'Manager to enable it) ...')
                                         #     pkg_iter[
                                         #         element] = 'process_disabled'
 
@@ -2190,9 +2191,7 @@ class PackageLibraryDialog(QDialog):
                                             )
 
                                         os.remove(file2del)
-                                        (
-                                            self.main_window.statusBar().showMessage
-                                        )(
+                                        self.main_window.statusBar().showMessage(
                                             "{0} was deleted ({1} "
                                             "brick(s)) "
                                             "...".format(
@@ -3065,7 +3064,7 @@ def node_structure_from_dict(datadict, parent=None, root_node=None):
 #             return True
 #         # filter files
 #         filename = source_model.fileName(index0)
-#         #       filename=self.sourceModel().index(row,0,parent).data().lower()
+#         # filename=self.sourceModel().index(row,0,parent).data().lower()
 #         # return True
 #         if filename.count(".py") + filename.count(".xml") == 0:
 #             return False

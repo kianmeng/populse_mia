@@ -1797,7 +1797,7 @@ class TableDataBrowser(QTableWidget):
         self.progress.setAttribute(Qt.WA_DeleteOnClose, True)
         self.progress.show()
 
-        ## Quick fix for #168 populse_mia issue
+        # Quick fix for #168 populse_mia issue
         # try:
         #
         #    if getattr(self.data_browser.main_window, 'test', False):

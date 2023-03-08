@@ -583,8 +583,10 @@ class CapsulNodeController(QWidget):
         # However this signal seems never to be emitted, and I don't understand
         # why. So release_process() has to be called manually from the
         # pipeline manager. Sigh.
-        # self.process_widget.destroyed.connect(partial(self.static_release, process,
-        #                               self.parameters_changed))
+        # self.process_widget.destroyed.connect(partial(
+        #                                             self.static_release,
+        #                                             process,
+        #                                             self.parameters_changed))
 
     @staticmethod
     def static_release(process, param_changed):
@@ -1141,7 +1143,8 @@ class NodeController(QWidget):
             partial(self.update_plug_value_from_filter, plug_name, parameters)
         )
 
-    # def display_parameters(self, node_name: object, process: object, pipeline: object) -> object:
+    # def display_parameters(self, node_name: object,
+    #                        process: object, pipeline: object) -> object:
     def display_parameters(self, node_name, process, pipeline):
         """Display the parameters of the selected node.
 
@@ -1284,15 +1287,13 @@ class NodeController(QWidget):
         self.v_box_final.addWidget(self.button_group_inputs)
         self.v_box_final.addWidget(self.button_group_outputs)
 
-        self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().node_parameters_tmp[
-            node_name
-        ] = {}
+        (
+            self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor
+        )().node_parameters_tmp[node_name] = {}
 
-        self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().node_parameters_tmp[
-            node_name
-        ][
-            "inputs"
-        ] = [
+        (
+            self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor
+        )().node_parameters_tmp[node_name]["inputs"] = [
             x.text() for x in self.line_edit_input
         ]
 

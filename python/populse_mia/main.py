@@ -392,7 +392,8 @@ class PackagesInstall:
             - add_package: provide recursive representation of a package
     """
 
-    _already_loaded = {  # these classes should not appear in available processes
+    _already_loaded = {  # these classes should not appear
+        # in available processes
         "mia_processes.process_matlab.ProcessMatlab",
         "populse_mia.user_interface.pipeline_manager.process_mia.ProcessMIA",
         "capsul.process.process.Process",
@@ -663,9 +664,9 @@ def main():
     - If launched from a cloned git repository ('developer mode'):
         - the mia_path is the cloned git repository.
     - If launched from the site/dist packages ('user mode'):
-        - if the file ~/.populse_mia/configuration.yml file is not found or does
-          not exist or if the returned mia_path parameter is incorrect, a
-          valid mia_path path is requested from the user, in order
+        - if the file ~/.populse_mia/configuration.yml file is not found or
+          does not exist or if the returned mia_path parameter is incorrect,
+          a valid mia_path path is requested from the user, in order
           to try to fix a corruption of this file.
 
     :Contains:
@@ -932,7 +933,8 @@ def verify_processes():
     also change the version available in Mia. Indeed, when starting Mia, the
     verify_processes function will install or update nipype and
     mia_processes libraries in the pipeline library. Currently, it is
-    mandatory to have nipype, capsul and mia_processes installed in the station.
+    mandatory to have nipype, capsul and mia_processes installed in the
+    station.
     All this information, as well as the installed versions and package
     paths are saved in the  mia_path/properties/process_config.yml file.
     When an upgrade or downgrade is performed for a package, the last

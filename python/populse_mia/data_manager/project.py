@@ -1250,8 +1250,8 @@ class Project:
                 )
 
             # if action == "remove_scans":
-            #     # To remove a scan, we only need the FileName of the scan
-            #     # The second element is the list of removed scans (Path class)
+            #     To remove a scan, we only need the FileName of the scan
+            #     The second element is the list of removed scans (Path class)
             #     scans_removed = to_redo[1]
             #     for i in range(0, len(scans_removed)):
             #         # We reput each scan, keeping the same values
@@ -1574,9 +1574,9 @@ class Project:
                 table.update_colors()
                 table.itemChanged.connect(table.change_cell_color)
             # if action == "remove_scans":
-            #     # To reput a removed scan, we need the scans names,
-            #     # and all the values associated
-            #     # The second element is the list of removed scans (Scan class)
+            #     To reput a removed scan, we need the scans names,
+            #     and all the values associated
+            #     The second element is the list of removed scans (Scan class)
             #     scans_removed = to_undo[1]
             #     for i in range(0, len(scans_removed)):
             #         # We reput each scan, keeping the same values
