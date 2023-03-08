@@ -1,7 +1,15 @@
 # -*- coding: utf-8 -*-
 import os
 
-import anatomist.direct.api as ana
+try:
+    import anatomist.direct.api as ana
+
+except ImportError:
+    print(
+        "\nAnatomist seems not to be installed. The data_viewer anatomist "
+        "and anatomist_2 will not work...\n"
+    )
+
 from soma.qt_gui.qt_backend import Qt, QtCore, QtGui
 from soma.qt_gui.qt_backend.uic import loadUi
 

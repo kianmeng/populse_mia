@@ -36,8 +36,20 @@ from __future__ import absolute_import, print_function
 
 import os
 import sys
+import time
 
-import anatomist.direct.api as ana
+import numpy as np
+import PyQt5
+import six
+
+try:
+    import anatomist.direct.api as ana
+
+except ImportError:
+    print(
+        "\nAnatomist seems not to be installed. The data_viewer anatomist "
+        "and anatomist_2 will not work...\n"
+    )
 from six.moves import zip
 from soma import aims
 from soma.aims import colormaphints
@@ -47,18 +59,21 @@ from soma.aims import colormaphints
 from soma.qt_gui import qt_backend
 
 qt_backend.set_qt_backend(compatible_qt5=True)
-import time
-
-import numpy as np
-import PyQt5
-import six
 
 # the following imports have to be made after the qApp.startingUp() test
 # since they do instantiate Anatomist for registry to work.
-from anatomist.cpp.simplecontrols import (
-    Simple2DControl,
-    registerSimpleControls,
-)
+try:
+    from anatomist.cpp.simplecontrols import (
+        Simple2DControl,
+        registerSimpleControls,
+    )
+
+except ImportError:
+    print(
+        "\nAnatomist seems not to be installed. The data_viewer anatomist "
+        "and anatomist_2 will not work...\n"
+    )
+
 from PyQt5.QtGui import QColor, QIcon, QLabel, QWidget
 from PyQt5.QtWidgets import QMessageBox
 from soma.qt_gui.qt_backend import Qt, QtCore
@@ -77,9 +92,11 @@ class LeftSimple3DControl(Simple2DControl):
     """
 
     def __init__(self, prio=25, name="LeftSimple3DControl"):
+        """blabla"""
         super(LeftSimple3DControl, self).__init__(prio, name)
 
     def eventAutoSubscription(self, pool):
+        """blabla"""
         key = QtCore.Qt
         NoModifier = key.NoModifier
         ControlModifier = key.ControlModifier
@@ -110,9 +127,11 @@ class VolRenderControl(LeftSimple3DControl):
     """
 
     def __init__(self, prio=25, name="VolRenderControl"):
+        """blabla"""
         super(VolRenderControl, self).__init__(prio, name)
 
     def eventAutoSubscription(self, pool):
+        """blabla"""
         super(VolRenderControl, self).eventAutoSubscription(pool)
         self.mouseLongEventUnsubscribe(Qt.Qt.MiddleButton, Qt.Qt.NoModifier)
         self.mouseLongEventSubscribe(
@@ -151,6 +170,7 @@ class AnaSimpleViewer2(Qt.QObject):
     _global_handlers_initialized = False
 
     def __init__(self, init_global_handlers=None):
+        """blabla"""
         Qt.QObject.__init__(self)
 
         a = ana.Anatomist("-b")
@@ -174,6 +194,7 @@ class AnaSimpleViewer2(Qt.QObject):
 
         # connect GUI actions callbacks
         def findChild(x, y):
+            """blabla"""
             return Qt.QObject.findChild(x, QtCore.QObject, y)
 
         # findChild(awin, 'actionprint_view').triggered.connect(self.addNewView)
