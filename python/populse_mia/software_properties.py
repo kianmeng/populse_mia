@@ -454,14 +454,15 @@ class Config:
 
         # Freesurfer
         if use_freesurfer:
-            m = eeconf.setdefault("capsul.engine.module.freesurfer", {}
-                                  ).setdefault("freesurfer", {})
+            m = eeconf.setdefault(
+                "capsul.engine.module.freesurfer", {}
+            ).setdefault("freesurfer", {})
             m["config_id"] = "freesurfer"
             m["config_environment"] = "global"
             m["setup"] = freesurfer_setup
             # TODO: change fs subject dir
             m["subjects_dir"] = os.path.dirname(freesurfer_setup)
-            #m["directory"] = os.path.dirname(freesurfer_setup)
+            # m["directory"] = os.path.dirname(freesurfer_setup)
 
         # attributes completion
         m = eeconf.setdefault(
@@ -1101,9 +1102,9 @@ class Config:
 
             if environment == "capsul_engine":
                 continue
-            print('\n new_engine', new_engine)   
-            print('environment', environment)
-            print('config', config)     
+            print("\n new_engine", new_engine)
+            print("environment", environment)
+            print("config", config)
             new_engine.import_configs(environment, config)
 
         engine_config = new_engine.settings.export_config_dict("global")
@@ -1136,11 +1137,12 @@ class Config:
 
         # freesurfer
         freesurfer = engine_config.get("global", {}).get(
-            "capsul.engine.module.freesurfer")
+            "capsul.engine.module.freesurfer"
+        )
         use_freesurfer = False
         if freesurfer:
             freesurfer = next(iter(freesurfer.values()))
-            freesurfer_setup_path = freesurfer.get('setup')
+            freesurfer_setup_path = freesurfer.get("setup")
 
             if freesurfer_setup_path:
                 use_freesurfer = True

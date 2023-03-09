@@ -2457,7 +2457,8 @@ class PopUpPreferences(QDialog):
         self.use_freesurfer_checkbox = QCheckBox("", self)
 
         self.freesurfer_label = QLabel(
-            "freesurfer path (e.g. freesurfer_dir/FreeSurferEnv.sh):")
+            "freesurfer path (e.g. freesurfer_dir/FreeSurferEnv.sh):"
+        )
         self.freesurfer_choice = QLineEdit(config.get_freesurfer_setup())
         self.freesurfer_browse = QPushButton("Browse")
         self.freesurfer_browse.clicked.connect(self.browse_freesurfer)
@@ -2559,7 +2560,7 @@ class PopUpPreferences(QDialog):
 
         if config.get_use_ants():
             self.use_ants_checkbox.setChecked(True)
-  
+
         if config.get_use_freesurfer():
             self.use_freesurfer_checkbox.setChecked(True)
 
@@ -2666,7 +2667,9 @@ class PopUpPreferences(QDialog):
         self.use_fsl_checkbox.stateChanged.connect(self.use_fsl_changed)
         self.use_afni_checkbox.stateChanged.connect(self.use_afni_changed)
         self.use_ants_checkbox.stateChanged.connect(self.use_ants_changed)
-        self.use_freesurfer_checkbox.stateChanged.connect(self.use_freesurfer_changed)
+        self.use_freesurfer_checkbox.stateChanged.connect(
+            self.use_freesurfer_changed
+        )
 
     def browse_fsl(self):
         """Called when fsl browse button is clicked."""
@@ -3011,8 +3014,8 @@ class PopUpPreferences(QDialog):
             # for mod, val in conf.items():
             # if 'config_id' not in val:
             # val['config_id'] = mod.split('.')[-1]
-            print('\n env a', env)
-            print('c', c)
+            print("\n env a", env)
+            print("c", c)
             engine.settings.import_configs(env, c, cont_on_error=True)
 
         dialog = SettingsEditor(engine)
@@ -3061,7 +3064,9 @@ class PopUpPreferences(QDialog):
             if use_freesurfer:
                 self.freesurfer_choice.setText(config.get_freesurfer_setup())
 
-            use_freesurfer = Qt.Qt.Checked if use_freesurfer else Qt.Qt.Unchecked
+            use_freesurfer = (
+                Qt.Qt.Checked if use_freesurfer else Qt.Qt.Unchecked
+            )
             self.use_freesurfer_checkbox.setCheckState(use_freesurfer)
 
             # fsl
@@ -3343,8 +3348,9 @@ class PopUpPreferences(QDialog):
                 freesurfer_cmd = "recon-all"
 
                 if os.path.isdir(freesurfer_dir):
-                    freesurfer_cmd = os.path.join(freesurfer_dir, 'bin',
-                                                  freesurfer_cmd)
+                    freesurfer_cmd = os.path.join(
+                        freesurfer_dir, "bin", freesurfer_cmd
+                    )
 
                 else:
                     self.wrong_path(freesurfer_dir, "freesurfer")
@@ -3903,7 +3909,6 @@ class PopUpPreferences(QDialog):
 
             # freesurfer CapsulConfig
             if not config.get_use_freesurfer():
-
                 # TODO: We only deal here with the global environment
                 cif = c_e.settings.config_id_field
 
