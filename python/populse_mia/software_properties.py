@@ -461,8 +461,7 @@ class Config:
             m["config_environment"] = "global"
             m["setup"] = freesurfer_setup
             # TODO: change fs subject dir
-            m["subjects_dir"] = os.path.dirname(freesurfer_setup)
-            # m["directory"] = os.path.dirname(freesurfer_setup)
+            m["subjects_dir"] = ''
 
         # attributes completion
         m = eeconf.setdefault(
@@ -1102,9 +1101,6 @@ class Config:
 
             if environment == "capsul_engine":
                 continue
-            print("\n new_engine", new_engine)
-            print("environment", environment)
-            print("config", config)
             new_engine.import_configs(environment, config)
 
         engine_config = new_engine.settings.export_config_dict("global")

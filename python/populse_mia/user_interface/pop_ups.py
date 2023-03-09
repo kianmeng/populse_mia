@@ -3014,8 +3014,6 @@ class PopUpPreferences(QDialog):
             # for mod, val in conf.items():
             # if 'config_id' not in val:
             # val['config_id'] = mod.split('.')[-1]
-            print("\n env a", env)
-            print("c", c)
             engine.settings.import_configs(env, c, cont_on_error=True)
 
         dialog = SettingsEditor(engine)
