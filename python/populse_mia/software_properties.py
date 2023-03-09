@@ -461,7 +461,7 @@ class Config:
             m["config_environment"] = "global"
             m["setup"] = freesurfer_setup
             # TODO: change fs subject dir
-            m["subjects_dir"] = ''
+            m["subjects_dir"] = ""
 
         # attributes completion
         m = eeconf.setdefault(
