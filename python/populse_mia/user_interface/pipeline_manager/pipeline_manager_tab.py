@@ -1454,9 +1454,12 @@ class PipelineManagerTab(QWidget):
     def get_missing_mandatory_parameters(self):
         """check on missing parameters for
         each job"""
+
         missing_inputs = []
+
         for node in self.node_list:
             job = None
+
             for item in node.get_missing_mandatory_parameters():
                 # we must also check that the parameter is not a temporary
                 # in the workflow
@@ -1466,22 +1469,31 @@ class PipelineManagerTab(QWidget):
                         for j in self.workflow.jobs
                         if hasattr(j, "process") and j.process() is node
                     ]
+
                     if len(job) != 0:
                         job = job[0]
+
                     else:
                         job = None
+
                     if job:
                         value = job.param_dict.get(item)
+
                         if value not in (None, Undefined, []):
                             # gets a non-null value in the workflow
                             continue
+                # fmt: off
                 if (
-                    node
-                    is self.pipelineEditorTabs.get_current_pipeline().pipeline_node
+                    node is
+                        self.pipelineEditorTabs.
+                        get_current_pipeline().pipeline_node
                 ):
                     item_name = item
+                # fmt: on
+
                 else:
                     item_name = "%s.%s" % (node.context_name, item)
+
                 missing_inputs.append(item_name)
 
         return missing_inputs
@@ -2051,9 +2063,12 @@ class PipelineManagerTab(QWidget):
 
                 if self.msg.clickedButton() == yes_button:
                     self.main_window.software_preferences_pop_up()
+                    # fmt: off
                     (
-                        self.main_window.pop_up_preferences.tab_widget.setCurrentIndex
+                        self.main_window.pop_up_preferences.
+                        tab_widget.setCurrentIndex
                     )(1)
+                    # fmt: on
 
                 self.main_window.statusBar().showMessage(
                     'Pipeline "{0}" was not initialised successfully.'.format(

@@ -119,9 +119,12 @@ class PopulseFileControlWidget(FileControlWidget):
         """
         # this import is not at the beginning of the file to avoid a cyclic
         # import issue.
-        from populse_mia.user_interface.pipeline_manager.node_controller import (
-            PlugFilter,
-        )
+        # fmt: off
+        # isort: off
+        from populse_mia.user_interface.pipeline_manager.\
+            node_controller import PlugFilter
+        # isort: on
+        # fmt: on
 
         project = widget.user_data.get("project")
         scan_list = widget.user_data.get("scan_list")
@@ -208,9 +211,12 @@ class PopulseDirectoryControlWidget(DirectoryControlWidget):
         """
         # this import is not at the beginning of the file to avoid a cyclic
         # import issue.
-        from populse_mia.user_interface.pipeline_manager.node_controller import (
-            PlugFilter,
-        )
+        # fmt: off
+        # isort: off
+        from populse_mia.user_interface.pipeline_manager.\
+            node_controller import PlugFilter
+        # fmt: on
+        # isort: on
 
         project = widget.user_data.get("project")
         scan_list = widget.user_data.get("scan_list")
@@ -343,9 +349,12 @@ class PopulseOffscreenListFileControlWidget(OffscreenListFileControlWidget):
         """
         # this import is not at the beginning of the file to avoid a cyclic
         # import issue.
-        from populse_mia.user_interface.pipeline_manager.node_controller import (
-            PlugFilter,
-        )
+        # fmt: off
+        # isort: off
+        from populse_mia.user_interface.pipeline_manager.\
+            node_controller import PlugFilter
+        # isort: on
+        # fmt: on
 
         project = widget.user_data.get("project")
         scan_list = widget.user_data.get("scan_list")
@@ -361,13 +370,18 @@ class PopulseOffscreenListFileControlWidget(OffscreenListFileControlWidget):
             main_window,
         )
         widget.pop_up.show()
+        # fmt: off
         widget.pop_up.plug_value_changed.connect(
             partial(
-                PopulseOffscreenListFileControlWidget.update_plug_value_from_filter,
+                (
+                    PopulseOffscreenListFileControlWidget.
+                    update_plug_value_from_filter
+                ),
                 widget,
                 plug_name,
             )
         )
+        # fmt: on
 
     @staticmethod
     def update_plug_value_from_filter(widget, plug_name, filter_res_list):

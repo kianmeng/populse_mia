@@ -291,39 +291,51 @@ class IterationTable(QWidget):
         )
 
         if ui_select.exec_():
+            # fmt: off
             if (
-                self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().iterated_tag
-                is None
+                self.main_window.pipeline_manager.pipelineEditorTabs.
+                get_current_editor().iterated_tag is None
                 and ui_select.selected_tag is None
             ):
+                # fmt: on
                 pass
 
             else:
-                self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().iterated_tag = (
-                    ui_select.selected_tag
-                )
+                (self.main_window.pipeline_manager.pipelineEditorTabs.
+                 get_current_editor)().iterated_tag = ui_select.selected_tag
 
                 # Retrieve tag values
                 self.update_selected_tag(ui_select.selected_tag)
 
     def filter_values(self):
+        """blabla"""
+
+        # fmt: off
         iterated_tag = (
-            self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().iterated_tag
+            self.main_window.pipeline_manager.pipelineEditorTabs.
+            get_current_editor().iterated_tag
         )
         tag_values = (
-            self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().all_tag_values_list
+            self.main_window.pipeline_manager.pipelineEditorTabs.
+            get_current_editor().all_tag_values_list
         )
+        # fmt: on
+
         ui_iteration = PopUpSelectIteration(iterated_tag, tag_values)
+
         if ui_iteration.exec_():
             tag_values_list = [
                 t.replace("&", "") for t in ui_iteration.final_values
             ]
-            self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().tag_values_list = (
-                tag_values_list
-            )
+            # fmt: off
+            (
+                self.main_window.pipeline_manager.pipelineEditorTabs.
+                get_current_editor
+            )().tag_values_list = tag_values_list
+            # fmt: on
+
             self.combo_box.clear()
             self.combo_box.addItems(tag_values_list)
-
             self.update_table()
 
     def select_visualized_tag(self, idx):
@@ -368,13 +380,16 @@ class IterationTable(QWidget):
             self.iterated_tag_label.setText(tag_name + ":")
 
             # duplicate the values list to have the initial, unfiltered, one
+            # fmt: off
             self.all_tag_values = list(
-                self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().all_tag_values_list
+                self.main_window.pipeline_manager.pipelineEditorTabs.
+                get_current_editor().all_tag_values_list
             )
             self.combo_box.addItems(
-                self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().tag_values_list
+                self.main_window.pipeline_manager.pipelineEditorTabs.
+                get_current_editor().tag_values_list
             )
-
+            # fmt: on
             self.update_table()
 
     def update_table(self):
@@ -393,10 +408,13 @@ class IterationTable(QWidget):
         self.iteration_table.clear()
         self.iteration_table.setColumnCount(len(self.push_buttons))
 
+        # fmt: off
         if (
-            self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().iterated_tag
+            self.main_window.pipeline_manager.pipelineEditorTabs.
+            get_current_editor().iterated_tag
             is not None
         ):
+            # fmt: on
             # Headers
             for idx in range(len(self.push_buttons)):
                 # FIXME should not use GUI text values !!
@@ -411,11 +429,14 @@ class IterationTable(QWidget):
                 item.setText(header_name)
                 self.iteration_table.setHorizontalHeaderItem(idx, item)
 
-            # Searching the database scans that correspond to iterated tag value
+            # Searching the database scans that correspond to
+            # iterated tag value
+            # fmt: off
             filter_query = (
                 "({"
                 + str(
-                    self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().iterated_tag
+                    self.main_window.pipeline_manager.pipelineEditorTabs.
+                    get_current_editor().iterated_tag
                 )
                 + "} "
                 + "=="
@@ -423,6 +444,7 @@ class IterationTable(QWidget):
                 + str(self.combo_box.currentText()).replace("&", "")
                 + '")'
             )
+            # fmt: on
             scans_list = self.project.session.filter_documents(
                 COLLECTION_CURRENT, filter_query
             )
@@ -455,16 +477,21 @@ class IterationTable(QWidget):
                     self.iteration_table.setItem(row, idx, item)
 
             all_iterations_scans = []
+
+            # fmt: off
             for (
                 tag_value
             ) in (
-                self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().tag_values_list
+                self.main_window.pipeline_manager.pipelineEditorTabs.
+                get_current_editor().tag_values_list
             ):
-                # Searching the database scans that correspond to iterated tag value
+                # Searching the database scans that correspond to
+                # iterated tag value
                 filter_query = (
                     "({"
                     + str(
-                        self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().iterated_tag
+                        self.main_window.pipeline_manager.pipelineEditorTabs.
+                        get_current_editor().iterated_tag
                     )
                     + "} "
                     + "=="
@@ -472,6 +499,7 @@ class IterationTable(QWidget):
                     + str(tag_value)
                     + '")'
                 )
+                # fmt: on
                 scans_list = self.project.session.filter_documents(
                     COLLECTION_CURRENT, filter_query
                 )
@@ -484,30 +512,42 @@ class IterationTable(QWidget):
             self.all_iterations_scans = all_iterations_scans
             # self.scans = True
 
-            # This will change the scans list in the current Pipeline Manager tab
+            # This will change the scans list in the current
+            # Pipeline Manager tab
             self.iteration_table_updated.emit(
                 self.iteration_scans, self.all_iterations_scans
             )
 
     def update_selected_tag(self, selected_tag):
+        """blabla"""
+
         tag_values_list = []
         scans_names = self.project.session.get_documents_names(
             COLLECTION_CURRENT
         )
+
         if not self.scan_list:
             self.scan_list = scans_names
+
         scans_names = list(set(scans_names).intersection(self.scan_list))
+
         for scan_name in scans_names:
             tag_value = self.project.session.get_value(
                 COLLECTION_CURRENT, scan_name, selected_tag
             )
+
             if str(tag_value) not in tag_values_list:
                 tag_values_list.append(str(tag_value))
 
-        self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().tag_values_list = (
-            tag_values_list
-        )
-        self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().all_tag_values_list = (
-            tag_values_list
-        )
+        # fmt: off
+        (
+            self.main_window.pipeline_manager.pipelineEditorTabs.
+            get_current_editor
+        )().tag_values_list = tag_values_list
+
+        (
+            self.main_window.pipeline_manager.pipelineEditorTabs.
+            get_current_editor
+        )().all_tag_values_list = tag_values_list
+        # fmt: on
         self.update_iterated_tag(selected_tag)

@@ -545,13 +545,14 @@ class CapsulNodeController(QWidget):
 
         # force initializing the completion engine
         ProcessCompletionEngine.get_completion_engine(process)
-
+        # fmt: off
         self.process_widget = AttributedProcessWidget(
             process,
             override_control_types={
                 "File": type_editors.PopulseFileControlWidget,
                 "Directory": type_editors.PopulseDirectoryControlWidget,
-                "List_File": type_editors.PopulseOffscreenListFileControlWidget,
+                "List_File": type_editors.
+                PopulseOffscreenListFileControlWidget,
                 "Undefined": type_editors.PopulseUndefinedControlWidget,
             },
             separate_outputs=True,
@@ -565,6 +566,7 @@ class CapsulNodeController(QWidget):
             scroll=False,
             userlevel=userlevel,
         )
+        # fmt: on
 
         if hasattr(process, "completion_engine"):
             compl = process.completion_engine
@@ -701,10 +703,12 @@ class CapsulNodeController(QWidget):
                 history_maker.append(self.pipeline.nodes[new_node_name])
                 history_maker.append(new_node_name)
                 history_maker.append(old_node_name)
-
+            # fmt:off
             (
-                self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().update_history
+                self.main_window.pipeline_manager.pipelineEditorTabs.
+                get_current_editor().update_history
             )(history_maker, from_undo, from_redo)
+            # fmt: on
 
             self.main_window.statusBar().showMessage(
                 'Node name "{0}" has been changed to "{1}".'.format(
@@ -1286,32 +1290,36 @@ class NodeController(QWidget):
         self.v_box_final.addLayout(self.h_box_node_name)
         self.v_box_final.addWidget(self.button_group_inputs)
         self.v_box_final.addWidget(self.button_group_outputs)
-
+        # fmt: off
         (
-            self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor
+            self.main_window.pipeline_manager.pipelineEditorTabs.
+            get_current_editor
         )().node_parameters_tmp[node_name] = {}
 
         (
-            self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor
+            self.main_window.pipeline_manager.pipelineEditorTabs.
+            get_current_editor
         )().node_parameters_tmp[node_name]["inputs"] = [
             x.text() for x in self.line_edit_input
         ]
 
-        self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().node_parameters_tmp[
-            node_name
-        ][
-            "outputs"
-        ] = [
+        (
+            self.main_window.pipeline_manager.pipelineEditorTabs.
+            get_current_editor
+        )().node_parameters_tmp[node_name]["outputs"] = [
             x.text() for x in self.line_edit_output
         ]
 
         if (
-            "outputs"
-            in self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().node_parameters_tmp
+            "outputs" in
+                self.main_window.pipeline_manager.pipelineEditorTabs.
+                get_current_editor().node_parameters_tmp
         ):
-            del self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().node_parameters_tmp[
-                "outputs"
-            ]
+            del (
+                self.main_window.pipeline_manager.pipelineEditorTabs.
+                get_current_editor().node_parameters_tmp["outputs"]
+            )
+        # fmt: on
 
         # Commented on January, 4th 2020
         # if self.main_window.pipeline_manager.pipelineEditorTabs\
@@ -1434,7 +1442,9 @@ class NodeController(QWidget):
         :param process: process of the node
         """
 
-        # self.main_window.pipeline_manager.run_pipeline_action.setDisabled(True) # commented on January, 4th 2020
+        # commented on January, 4th 2020
+        # self.main_window.pipeline_manager.run_pipeline_action.setDisabled(
+        #                                                                True)
 
         if process is None:
             try:

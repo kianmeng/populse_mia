@@ -2191,7 +2191,9 @@ class PackageLibraryDialog(QDialog):
                                             )
 
                                         os.remove(file2del)
-                                        self.main_window.statusBar().showMessage(
+                                        (
+                                            self.main_window.statusBar
+                                        )().showMessage(
                                             "{0} was deleted ({1} "
                                             "brick(s)) "
                                             "...".format(

@@ -4549,7 +4549,8 @@ class TestMIAMainWindow(TestMIACase):
         self.main_window.data_browser.table_data.selectRow(0)
         # FIXME: following line raise exception, only on macos build:
         # Traceback (most recent call last):
-        # File "/Users/appveyor/projects/populse-mia/python/populse_mia/test.py",
+        # File "/Users/appveyor/projects/populse-mia/python/populse_mia/
+        # test.py",
         # line 3797, in test_open_recent_project
         # self.main_window.data_browser.table_data.remove_scan()
         # File "/Users/appveyor/projects/populse-mia/python/populse_mia/
@@ -4700,7 +4701,8 @@ class TestMIAMainWindow(TestMIACase):
         )
         os.makedirs(mock_proc_fldr, exist_ok=True)
 
-        # Make a '__init__.py' in the mock_proc_fldr that raise an 'ImportError'
+        # Make a '__init__.py' in the mock_proc_fldr that raise
+        # an 'ImportError'
         init_file = open(os.path.join(mock_proc_fldr, "__init__.py"), "w")
         init_file.write("raise ImportError('mock_import_error')")
         init_file.close()
@@ -9517,13 +9519,16 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # of a 'Pipeline' and 'postprocess_pipeline_execution' to throw an
         # exception
         ppl_manager.progress = RunProgress(ppl_manager)
+        # fmt: off
         (
-            ppl_manager.progress.worker.pipeline_manager.get_pipeline_or_process
+            ppl_manager.progress.worker.pipeline_manager.
+            get_pipeline_or_process
         ) = Mock(return_value=ppl.nodes["rename_1"].process)
         (
-            ppl_manager.progress.worker.pipeline_manager.postprocess_pipeline_execution
+            ppl_manager.progress.worker.pipeline_manager.
+            postprocess_pipeline_execution
         ) = Mock(side_effect=ValueError())
-
+        # fmt: on
         print("\n\n** an exception message is expected below\n")
         ppl_manager.progress.worker.run()
 
@@ -9688,14 +9693,15 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # project
         # test_proj_path = self.get_new_test_project()
         # folder = os.path.join(test_proj_path, 'data', 'raw_data')
-        # NII_FILE_1 = ('Guerbet-C6-2014-Rat-K52-Tube27-2014-02-14102317-04-G3_'
-        #              'Guerbet_MDEFT-MDEFTpvm-000940_800.nii')
+        # NII_FILE_1 = ('Guerbet-C6-2014-Rat-K52-Tube27-2014-02-14102317-
+        #                      '04-G3_Guerbet_MDEFT-MDEFTpvm-000940_800.nii')
         # DOCUMENT_1 = os.path.abspath(os.path.join(folder, NII_FILE_1))
 
         # Creates a project with another project already opened
         # self.main_window.data_browser.table_data.add_path()
 
-        # pop_up_add_path = self.main_window.data_browser.table_data.pop_up_add_path
+        # pop_up_add_path = (self.main_window.data_browser.
+        #                                         table_data.pop_up_add_path)
 
         # pop_up_add_path.file_line_edit.setText(DOCUMENT_1)
         # pop_up_add_path.save_path()
@@ -9705,7 +9711,8 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # self.main_window.redo()
 
         # Mocks not saving the pipeline
-        # QMessageBox.exec = lambda self_, *arg: self_.buttons()[-1].clicked.emit()
+        # QMessageBox.exec = lambda self_, *arg: self_.buttons(
+        #                                                  )[-1].clicked.emit()
 
         # Switches to pipeline manager
         self.main_window.tabs.setCurrentIndex(2)

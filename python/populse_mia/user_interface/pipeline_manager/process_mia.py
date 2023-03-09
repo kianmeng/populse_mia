@@ -245,9 +245,12 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
                         process.process, "_nipype_interface"
                     ):
                         # ProcessMIA with a NipypeProcess inside
+                        # fmt: off
                         iscript = (
-                            process.process._nipype_interface.mlab.inputs.script_file
+                            process.process._nipype_interface.
+                            mlab.inputs.script_file
                         )
+                        # fmt: on
 
                     else:
                         iscript = process.name + ".m"
@@ -294,16 +297,21 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
                     node_name = in_process.context_name
 
                 if isinstance(in_process, NipypeProcess):
+                    # fmt: off
                     print(
                         "\n. {0} ({1}) nipype node ...".format(
                             node_name,
                             ".".join(
-                                in_process._nipype_interface.__module__,
-                                in_process._nipype_interface.__class__.__name__,
+                                (
+                                    in_process._nipype_interface.
+                                    __module__,
+                                    in_process._nipype_interface.
+                                    __class__.__name__,
+                                )
                             ),
                         )
                     )
-
+                    # fmt: on
                 else:
                     print(
                         "\n. {0} ({1}) regular node ...".format(

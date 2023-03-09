@@ -2068,24 +2068,40 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
         self.update_current_node(index)
 
     def update_iteration_checkbox(self):
+        """blabla"""
+
         pipeline = self.get_current_pipeline()
+
         if not pipeline or not hasattr(pipeline, "nodes"):
+            # fmt: off
             (
-                self.main_window.pipeline_manager.iterationTable.check_box_iterate.setCheckState
+                self.main_window.pipeline_manager.iterationTable.
+                check_box_iterate.setCheckState
             )(Qt.Qt.Unchecked)
+            # fmt: on
+
         else:
             has_iteration = False
+
             for key in pipeline.nodes.sortedKeys:
                 if "iterated_" in key:
                     has_iteration = True
+
             if has_iteration:
+                # fmt: off
                 (
-                    self.main_window.pipeline_manager.iterationTable.check_box_iterate.setCheckState
+                    self.main_window.pipeline_manager.iterationTable.
+                    check_box_iterate.setCheckState
                 )(Qt.Qt.Checked)
+                # fmt: on
+
             else:
+                # fmt: off
                 (
-                    self.main_window.pipeline_manager.iterationTable.check_box_iterate.setCheckState
+                    self.main_window.pipeline_manager.iterationTable.
+                    check_box_iterate.setCheckState
                 )(Qt.Qt.Unchecked)
+                # fmt: on
 
     def update_current_node(self, index):
         """Update the node parameters
@@ -2116,10 +2132,14 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
         self.main_window.pipeline_manager.update_user_buttons_states()
 
         self.update_iteration_checkbox()
+
+        # fmt: off
         if self.get_current_editor():
             (
-                self.main_window.pipeline_manager.iterationTable.update_iterated_tag
+                self.main_window.pipeline_manager.iterationTable.
+                update_iterated_tag
             )(self.get_current_editor().iterated_tag)
+        # fmt: on
 
     def update_history(self, editor):
         """Update undo/redo history of an editor.
