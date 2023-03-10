@@ -286,6 +286,13 @@ class Config:
 
         return self.config.get("ants", "")
 
+    def get_freesurfer_setup(self):
+        """Get the freesurfer path
+
+        :returns: string of path to freesurfer
+        """
+        return self.config.get("freesurfer_setup", "")
+
     def getBackgroundColor(self):
         """Get background color.
 
@@ -344,6 +351,9 @@ class Config:
 
         use_ants = self.get_use_ants()
         ants_path = self.get_ants_path()
+
+        use_freesurfer = self.get_use_freesurfer()
+        freesurfer_setup = self.get_freesurfer_setup()
 
         # Make synchronisation from Mia pref to Capsul config:
 
@@ -439,6 +449,17 @@ class Config:
             m["config_id"] = "ants"
             m["config_environment"] = "global"
             m["directory"] = ants_path
+
+        # Freesurfer
+        if use_freesurfer:
+            m = eeconf.setdefault(
+                "capsul.engine.module.freesurfer", {}
+            ).setdefault("freesurfer", {})
+            m["config_id"] = "freesurfer"
+            m["config_environment"] = "global"
+            m["setup"] = freesurfer_setup
+            # TODO: change fs subject dir
+            m["subjects_dir"] = ""
 
         # attributes completion
         m = eeconf.setdefault(
@@ -840,6 +861,14 @@ class Config:
 
         return self.config.get("use_fsl", False)
 
+    def get_use_freesurfer(self):
+        """Get the value of "use freesurfer" checkbox in the preferences.
+
+        :returns: boolean
+        """
+
+        return self.config.get("use_freesurfer", False)
+
     def get_use_matlab(self):
         """Get the value of "use matlab" checkbox in the preferences.
 
@@ -1015,6 +1044,16 @@ class Config:
         # Then save the modification
         self.saveConfig()
 
+    # def set_freesurfer_path(self, path):
+    #     """Set the freesurfer path
+
+    #     :param path: string of freesurfer path
+    #     """
+
+    #     self.config["freesurfer"] = path
+    #     # Then save the modification
+    #     self.saveConfig()
+
     def setAutoSave(self, save):
         """Set auto-save mode.
 
@@ -1056,7 +1095,6 @@ class Config:
         for environment, config in engine_config.items():
             if environment == "capsul_engine":
                 continue
-
             new_engine.import_configs(environment, config)
 
         engine_config = new_engine.settings.export_config_dict("global")
@@ -1086,6 +1124,21 @@ class Config:
                 self.set_ants_path(ants_path)
 
             self.set_use_ants(use_ants)
+
+        # freesurfer
+        freesurfer = engine_config.get("global", {}).get(
+            "capsul.engine.module.freesurfer"
+        )
+        use_freesurfer = False
+        if freesurfer:
+            freesurfer = next(iter(freesurfer.values()))
+            freesurfer_setup_path = freesurfer.get("setup")
+
+            if freesurfer_setup_path:
+                use_freesurfer = True
+                self.set_freesurfer_setup(freesurfer_setup_path)
+
+            self.set_use_freesurfer(use_freesurfer)
 
         # fsl
         fsl = engine_config.get("global", {}).get("capsul.engine.module.fsl")
@@ -1268,6 +1321,16 @@ class Config:
         """
 
         self.config["fsl_config"] = path
+        # Then save the modification
+        self.saveConfig()
+
+    def set_freesurfer_setup(self, path):
+        """Set  the freesurfer config file
+
+        :param path: string of path to freesurfer/FreeSurferEnv.sh
+        """
+
+        self.config["freesurfer_setup"] = path
         # Then save the modification
         self.saveConfig()
 
@@ -1482,6 +1545,16 @@ class Config:
         """
 
         self.config["use_ants"] = use_ants
+        # Then save the modification
+        self.saveConfig()
+
+    def set_use_freesurfer(self, use_freesurfer):
+        """Set the value of "use_freesurfer" checkbox in the preferences.
+
+        :param use_freesurfer: boolean
+        """
+
+        self.config["use_freesurfer"] = use_freesurfer
         # Then save the modification
         self.saveConfig()
 

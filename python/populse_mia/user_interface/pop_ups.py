@@ -2491,6 +2491,38 @@ class PopUpPreferences(QDialog):
 
         self.groupbox_ants.setLayout(v_box_ants)
 
+        # Groupbox "freesurfer"
+        self.groupbox_freesurfer = QtWidgets.QGroupBox("freesurfer")
+
+        self.use_freesurfer_label = QLabel("Use freesurfer")
+        self.use_freesurfer_checkbox = QCheckBox("", self)
+
+        self.freesurfer_label = QLabel(
+            "freesurfer path (e.g. freesurfer_dir/FreeSurferEnv.sh):"
+        )
+        self.freesurfer_choice = QLineEdit(config.get_freesurfer_setup())
+        self.freesurfer_browse = QPushButton("Browse")
+        self.freesurfer_browse.clicked.connect(self.browse_freesurfer)
+
+        h_box_use_freesurfer = QtWidgets.QHBoxLayout()
+        h_box_use_freesurfer.addWidget(self.use_freesurfer_checkbox)
+        h_box_use_freesurfer.addWidget(self.use_freesurfer_label)
+        h_box_use_freesurfer.addStretch(1)
+
+        h_box_freesurfer_path = QtWidgets.QHBoxLayout()
+        h_box_freesurfer_path.addWidget(self.freesurfer_choice)
+        h_box_freesurfer_path.addWidget(self.freesurfer_browse)
+
+        v_box_freesurfer_path = QtWidgets.QVBoxLayout()
+        v_box_freesurfer_path.addWidget(self.freesurfer_label)
+        v_box_freesurfer_path.addLayout(h_box_freesurfer_path)
+
+        v_box_freesurfer = QtWidgets.QVBoxLayout()
+        v_box_freesurfer.addLayout(h_box_use_freesurfer)
+        v_box_freesurfer.addLayout(v_box_freesurfer_path)
+
+        self.groupbox_freesurfer.setLayout(v_box_freesurfer)
+
         # Groupbox "CAPSUL"
         groupbox_capsul = Qt.QGroupBox("CAPSUL")
         capsul_config_button = Qt.QPushButton(
@@ -2512,6 +2544,7 @@ class PopUpPreferences(QDialog):
         self.tab_pipeline_layout.addWidget(self.groupbox_fsl)
         self.tab_pipeline_layout.addWidget(self.groupbox_afni)
         self.tab_pipeline_layout.addWidget(self.groupbox_ants)
+        self.tab_pipeline_layout.addWidget(self.groupbox_freesurfer)
         self.tab_pipeline_layout.addWidget(groupbox_capsul)
 
         self.tab_pipeline_layout.addStretch(1)
@@ -2568,6 +2601,9 @@ class PopUpPreferences(QDialog):
 
         if config.get_use_ants():
             self.use_ants_checkbox.setChecked(True)
+
+        if config.get_use_freesurfer():
+            self.use_freesurfer_checkbox.setChecked(True)
 
         # The 'Appearance' tab
         self.tab_appearance = QtWidgets.QWidget()
@@ -2658,6 +2694,7 @@ class PopUpPreferences(QDialog):
         self.use_fsl_changed()
         self.use_afni_changed()
         self.use_ants_changed()
+        self.use_freesurfer_changed()
 
         # Signals
         self.use_matlab_checkbox.stateChanged.connect(self.use_matlab_changed)
@@ -2671,6 +2708,9 @@ class PopUpPreferences(QDialog):
         self.use_fsl_checkbox.stateChanged.connect(self.use_fsl_changed)
         self.use_afni_checkbox.stateChanged.connect(self.use_afni_changed)
         self.use_ants_checkbox.stateChanged.connect(self.use_ants_changed)
+        self.use_freesurfer_checkbox.stateChanged.connect(
+            self.use_freesurfer_changed
+        )
 
     def browse_fsl(self):
         """Called when fsl browse button is clicked."""
@@ -2698,6 +2738,15 @@ class PopUpPreferences(QDialog):
         )
         if fname:
             self.ants_choice.setText(fname)
+
+    def browse_freesurfer(self):
+        """Called when freesurfer browse button is clicked."""
+
+        fname = QFileDialog.getOpenFileName(
+            self, "Choose freesurfer env file", os.path.expanduser("~")
+        )[0]
+        if fname:
+            self.freesurfer_choice.setText(fname)
 
     def browse_matlab(self):
         """Called when matlab browse button is clicked."""
@@ -3048,6 +3097,17 @@ class PopUpPreferences(QDialog):
             use_ants = Qt.Qt.Checked if use_ants else Qt.Qt.Unchecked
             self.use_ants_checkbox.setCheckState(use_ants)
 
+            # freesurfer
+            use_freesurfer = config.get_use_freesurfer()
+
+            if use_freesurfer:
+                self.freesurfer_choice.setText(config.get_freesurfer_setup())
+
+            use_freesurfer = (
+                Qt.Qt.Checked if use_freesurfer else Qt.Qt.Unchecked
+            )
+            self.use_freesurfer_checkbox.setCheckState(use_freesurfer)
+
             # fsl
             use_fsl = config.get_use_fsl()
 
@@ -3119,6 +3179,16 @@ class PopUpPreferences(QDialog):
 
             else:
                 config.set_use_ants(False)
+
+            # Use freesurfer
+            freesurfer_setup = self.freesurfer_choice.text()
+            config.set_freesurfer_setup(freesurfer_setup)
+
+            if self.use_freesurfer_checkbox.isChecked():
+                config.set_use_freesurfer(True)
+
+            else:
+                config.set_use_freesurfer(False)
 
             # Use FSL
             fsl_conf = self.fsl_choice.text()
@@ -3308,6 +3378,47 @@ class PopUpPreferences(QDialog):
                     return False
             else:
                 config.set_use_ants(False)
+
+            # freesurfer config test
+            if self.use_freesurfer_checkbox.isChecked():
+                freesurfer_setup = self.freesurfer_choice.text()
+                freesurfer_dir = os.path.dirname(freesurfer_setup)
+                freesurfer_cmd = "recon-all"
+
+                if os.path.isdir(freesurfer_dir):
+                    freesurfer_cmd = os.path.join(
+                        freesurfer_dir, "bin", freesurfer_cmd
+                    )
+
+                else:
+                    self.wrong_path(freesurfer_dir, "freesurfer")
+                    QApplication.restoreOverrideCursor()
+                    return False
+
+                try:
+                    p = subprocess.Popen(
+                        [freesurfer_cmd, "--version"],
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                    )
+                    output, err = p.communicate()
+
+                    if err == b"":
+                        config.set_freesurfer_setup(freesurfer_setup)
+                        config.set_use_freesurfer(True)
+
+                    else:
+                        self.wrong_path(freesurfer_dir, "freesurfer")
+                        QApplication.restoreOverrideCursor()
+                        return False
+
+                except Exception:
+                    self.wrong_path(freesurfer_dir, "freesurfer")
+                    QApplication.restoreOverrideCursor()
+                    return False
+            else:
+                config.set_use_freesurfer(False)
 
             # FSL config test
             if self.use_fsl_checkbox.isChecked():
@@ -3819,6 +3930,28 @@ class PopUpPreferences(QDialog):
                 except KeyError:
                     pass
 
+            # freesurfer CapsulConfig
+            if not config.get_use_freesurfer():
+                # TODO: We only deal here with the global environment
+                cif = c_e.settings.config_id_field
+
+                with c_e.settings as settings:
+                    configants = settings.config("freesurfer", "global")
+
+                    if configants:
+                        settings.remove_config(
+                            "freesurfer", "global", getattr(configants, cif)
+                        )
+
+                # # TODO: We could use a generic method to deal with c_c?
+                # try:
+                #     del c_c["engine"]["global"]["capsul.engine.module.freesurfer"][
+                #         "freesurfer"
+                #     ]["directory"]
+
+                # except KeyError:
+                #     pass
+
             # FSL CapsulConfig
             if not config.get_use_fsl():
                 # TODO: We only deal here with the global environment
@@ -4164,6 +4297,17 @@ class PopUpPreferences(QDialog):
         else:
             self.ants_choice.setDisabled(False)
             self.ants_label.setDisabled(False)
+
+    def use_freesurfer_changed(self):
+        """Called when the use_freesurfer checkbox is changed."""
+
+        if not self.use_freesurfer_checkbox.isChecked():
+            self.freesurfer_choice.setDisabled(True)
+            self.freesurfer_label.setDisabled(True)
+
+        else:
+            self.freesurfer_choice.setDisabled(False)
+            self.freesurfer_label.setDisabled(False)
 
     def use_fsl_changed(self):
         """Called when the use_fsl checkbox is changed."""
