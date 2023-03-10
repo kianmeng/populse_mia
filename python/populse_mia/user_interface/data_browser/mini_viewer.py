@@ -694,7 +694,8 @@ class MiniViewer(QWidget):
 
                     except Exception as e:
                         print(
-                            "\nError while trying to display the {} image ...!\n"
+                            "\nError while trying to display the {} "
+                            "image ...!\n"
                             "Traceback:".format(os.path.abspath(file_path))
                         )
                         print(

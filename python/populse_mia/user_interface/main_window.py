@@ -618,8 +618,8 @@ class MainWindow(QMainWindow):
                     self.exPopup.get_filename(self.exPopup.selectedFiles())
                     file_name = self.exPopup.relative_path
 
-                    # Removing the old project from the list of currently opened
-                    # projects
+                    # Removing the old project from the list of
+                    # currently opened projects
                     config = Config()
                     opened_projects = config.get_opened_projects()
                     opened_projects.remove(self.project.folder)
@@ -807,10 +807,9 @@ class MainWindow(QMainWindow):
 
         else:
             print(
-                "\nmri_conv, did not work properly. Current absolute path to "
-                "MRIManager.jar defined in File > MIA Preferences:\n{0}\n".format(
-                    config.get_mri_conv_path()
-                )
+                "\nmri_conv, did not work properly. Current absolute"
+                "path to MRIManager.jar defined in File > MIA Preferences:"
+                "\n{0}\n".format(config.get_mri_conv_path())
             )
 
             if not os.path.isfile(config.get_mri_conv_path()):
@@ -1275,8 +1274,8 @@ class MainWindow(QMainWindow):
                 self.remove_raw_files_useless()
 
                 if reset_old_db:
-                    # We remove the Database with all the modifications saved in
-                    # the old project
+                    # We remove the Database with all the modifications saved
+                    # in the old project
                     os.remove(os.path.join(old_folder, "database", "mia.db"))
 
                     # We reput the Database without the last modifications
@@ -1322,7 +1321,8 @@ class MainWindow(QMainWindow):
                     msg.buttonClicked.connect(msg.close)
                     msg.exec()
 
-        # Update of the history and the brick table in the newly created project
+        # Update of the history and the brick table in the newly
+        # created project
         self.project.update_db_for_paths()
 
     def saveChoice(self):
@@ -1464,8 +1464,8 @@ class MainWindow(QMainWindow):
             # in ipython >= 1.2, app.start() blocks until a ctrl-c is issued in
             # the terminal. Seems to block in tornado.ioloop.PollIOLoop.start()
             #
-            # So, don't call app.start because it would begin a zmq/tornado loop
-            # instead we must just initialize its callback.
+            # So, don't call app.start because it would begin a zmq/tornado
+            # loop instead we must just initialize its callback.
             # if app.poller is not None:
             # app.poller.start()
             app.kernel.start()
@@ -1729,12 +1729,17 @@ class MainWindow(QMainWindow):
                 self.pipeline_manager.pipelineEditorTabs.scan_list = scans
             self.pipeline_manager.pipelineEditorTabs.update_scans_list()
             self.pipeline_manager.update_user_buttons_states()
+
+            # fmt: off
             if (
-                self.pipeline_manager.pipelineEditorTabs.get_current_editor().iterated_tag
+                self.pipeline_manager.pipelineEditorTabs.
+                    get_current_editor().iterated_tag
             ):
                 self.pipeline_manager.iterationTable.update_iterated_tag(
-                    self.pipeline_manager.pipelineEditorTabs.get_current_editor().iterated_tag
+                    self.pipeline_manager.pipelineEditorTabs.
+                    get_current_editor().iterated_tag
                 )
+            # fmt: on
 
             # Pipeline Manager
             # The pending modifications must be saved before

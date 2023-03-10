@@ -4707,7 +4707,8 @@ class TestMIAMainWindow(TestMIACase):
         init_file.write("raise ImportError('mock_import_error')")
         init_file.close()
 
-        # Make a 'test_unit_test_1.py' in the mock_proc_fldr with a real process
+        # Make a 'test_unit_test_1.py' in the mock_proc_fldr with a
+        # real process
         unit_test = open(os.path.join(mock_proc_fldr, "unit_test_1.py"), "w")
         unit_test.writelines(
             [
@@ -4715,18 +4716,23 @@ class TestMIAMainWindow(TestMIACase):
                 "import traits.api as traits\n",
                 "class Unit_test_1(Pipeline):\n",
                 "    def pipeline_definition(self):\n",
-                "        self.add_process('smooth_1', 'mia_processes.bricks.preprocess.spm."
-                "spatial_preprocessing.Smooth')\n",
-                "        self.export_parameter('smooth_1', 'in_files', is_optional=False)\n",
-                "        self.export_parameter('smooth_1', 'fwhm', is_optional=True)\n",
-                "        self.export_parameter('smooth_1', 'data_type', is_optional=True)\n",
-                "        self.export_parameter('smooth_1', 'implicit_masking', "
+                "        self.add_process('smooth_1', "
+                "'mia_processes.bricks.preprocess.spm.spatial_preprocessing."
+                "Smooth')\n",
+                "        self.export_parameter('smooth_1', 'in_files', "
+                "is_optional=False)\n",
+                "        self.export_parameter('smooth_1', 'fwhm', "
                 "is_optional=True)\n",
-                "        self.export_parameter('smooth_1', 'out_prefix', is_optional=True)\n",
+                "        self.export_parameter('smooth_1', 'data_type', "
+                "is_optional=True)\n",
+                "        self.export_parameter('smooth_1', 'implicit_masking',"
+                " is_optional=True)\n",
+                "        self.export_parameter('smooth_1', 'out_prefix', "
+                "is_optional=True)\n",
                 "        self.export_parameter('smooth_1', 'smoothed_files', "
                 "is_optional=False)\n",
-                "        self.reorder_traits(('in_files', 'fwhm', 'data_type', "
-                "'implicit_masking', 'out_prefix', 'smoothed_files'))\n",
+                "        self.reorder_traits(('in_files', 'fwhm', 'data_type',"
+                " 'implicit_masking', 'out_prefix', 'smoothed_files'))\n",
                 "        self.node_position = {\n",
                 "            'smooth_1': (-119.0, -73.0),\n",
                 "            'inputs': (-373.26518439966446, -73.0),\n",
@@ -5267,7 +5273,8 @@ class TestMIAMainWindow(TestMIACase):
         # Asserts that 'saved_projects.yml' no longer contains it
         # FIXME: Since the previous FIXME, and comment, the following line is
         #        also commented
-        # self.assertNotIn(del_prjct, savedProjects.loadSavedProjects()['paths'])
+        # self.assertNotIn(del_prjct,
+        #                  savedProjects.loadSavedProjects()['paths'])
 
     def test_popUpDeleteProject(self):
         """Creates a new project and deletes it.
@@ -5322,7 +5329,9 @@ class TestMIAMainWindow(TestMIACase):
         exPopup.ok_clicked()
 
     def test_see_all_projects(self):
-        """Creates 2 projects and tries to open them through the all projects pop-up.
+        """
+        Creates 2 projects and tries to open them through the
+        all projects pop-up.
 
         - Tests:
             - MainWindow.see_all_projects
@@ -5432,9 +5441,12 @@ class TestMIAMainWindow(TestMIACase):
 
         # Check that matlab MCR is selected
         main_wnd.software_preferences_pop_up()
+        # fmt: off
         self.assertTrue(
-            main_wnd.pop_up_preferences.use_matlab_standalone_checkbox.isChecked()
+            main_wnd.pop_up_preferences.use_matlab_standalone_checkbox.
+            isChecked()
         )
+        # fmt: on
         main_wnd.pop_up_preferences.close()
 
         # Enables Matlab
@@ -5445,9 +5457,12 @@ class TestMIAMainWindow(TestMIACase):
         self.assertTrue(
             main_wnd.pop_up_preferences.use_matlab_checkbox.isChecked()
         )
+        # fmt: off
         self.assertFalse(
-            main_wnd.pop_up_preferences.use_matlab_standalone_checkbox.isChecked()
+            main_wnd.pop_up_preferences.use_matlab_standalone_checkbox.
+            isChecked()
         )
+        # fmt: on
         main_wnd.pop_up_preferences.close()
 
         # Enables SPM
@@ -5470,12 +5485,16 @@ class TestMIAMainWindow(TestMIACase):
         # SPM and matlab not
         main_wnd.software_preferences_pop_up()
         if "Windows" not in platform.architecture()[1]:
+            # fmt: off
             self.assertTrue(
-                main_wnd.pop_up_preferences.use_matlab_standalone_checkbox.isChecked()
+                main_wnd.pop_up_preferences.use_matlab_standalone_checkbox.
+                isChecked()
             )
             self.assertTrue(
-                main_wnd.pop_up_preferences.use_spm_standalone_checkbox.isChecked()
+                main_wnd.pop_up_preferences.use_spm_standalone_checkbox.
+                isChecked()
             )
+            # fmt: on
             self.assertFalse(
                 main_wnd.pop_up_preferences.use_matlab_checkbox.isChecked()
             )
@@ -5629,7 +5648,8 @@ class TestMIAMainWindow(TestMIACase):
 
         # Mocks an exception in the 'set_capsul_config' call
         # QDialog.exec = lambda x: True
-        # exc_2 = lambda x, y: (_ for _ in ()).throw(Exception('mock exception'))
+        # exc_2 = lambda x, y: (_ for _ in ()).throw(Exception(
+        #                                            'mock exception'))
         # Config.set_capsul_config = exc_2
         # main_wnd.pop_up_preferences.edit_capsul_config()
         # FIXME: failing in MacOS build
@@ -5698,8 +5718,9 @@ class TestMIAMainWindow(TestMIACase):
         QDialog.exec = lambda x: True
         main_wnd.pop_up_preferences.edit_capsul_config()
 
-        mock_exc = lambda x, y: (_ for _ in ()).throw(Exception("mock_except"))
-        Config.set_capsul_config = mock_exc
+        Config.set_capsul_config = lambda x, y: (_ for _ in ()).throw(
+            Exception("mock_except")
+        )
         main_wnd.pop_up_preferences.edit_capsul_config()
 
         QDialog.exec = lambda x: (_ for _ in ()).throw(
@@ -5991,11 +6012,12 @@ class TestMIAMainWindow(TestMIACase):
 
             # Sets the projects folder for the preferences window to close
             # when pressing on 'OK'
+            # fmt: off
             (
-                main_wnd.pop_up_preferences.projects_save_path_line_edit.setText(
-                    tmp_path
-                )
+                main_wnd.pop_up_preferences.projects_save_path_line_edit.
+                setText(tmp_path)
             )
+            # fmt: on
 
             # Enables MATLAB
             main_wnd.pop_up_preferences.use_matlab_checkbox.setChecked(True)
@@ -6065,18 +6087,20 @@ class TestMIAMainWindow(TestMIACase):
 
             # Sets the projects folder for the preferences window to close
             # when pressing on 'OK'
+            # fmt: off
             (
-                main_wnd.pop_up_preferences.projects_save_path_line_edit.setText(
-                    tmp_path
-                )
+                main_wnd.pop_up_preferences.projects_save_path_line_edit.
+                setText(tmp_path)
             )
+            # fmt: on
 
             # Enables SPM standalone
+            # fmt: off
             (
-                main_wnd.pop_up_preferences.use_spm_standalone_checkbox.setChecked(
-                    True
-                )
+                main_wnd.pop_up_preferences.use_spm_standalone_checkbox.
+                setChecked(True)
             )
+            # fmt: on
 
             # Failing configurations for SPM standalone + MATLAB MCR
 
@@ -6165,12 +6189,12 @@ class TestMIAMainWindow(TestMIACase):
             config.set_use_matlab_standalone(False)
 
             main_wnd.software_preferences_pop_up()  # Opens the window
-
+            # fmt: off
             (
-                main_wnd.pop_up_preferences.use_spm_standalone_checkbox.setChecked(
-                    True
-                )
+                main_wnd.pop_up_preferences.use_spm_standalone_checkbox.
+                setChecked(True)
             )
+            # fmt: on
             main_wnd.pop_up_preferences.spm_standalone_choice.setText(tmp_path)
 
             mock_executable(tmp_path, "run_spm.sh")
@@ -6188,11 +6212,12 @@ class TestMIAMainWindow(TestMIACase):
             config.set_use_matlab_standalone(False)
 
             main_wnd.software_preferences_pop_up()  # Opens the window
+            # fmt: off
             (
-                main_wnd.pop_up_preferences.use_spm_standalone_checkbox.setChecked(
-                    True
-                )
+                main_wnd.pop_up_preferences.use_spm_standalone_checkbox.
+                setChecked(True)
             )
+            # fmt: on
 
             # The same MATLAB directory is already the same on both the
             # preferences window and 'config' object, same for SPM
@@ -6387,7 +6412,8 @@ class TestMIAMainWindow(TestMIACase):
         config.set_opened_projects([])
 
         # Deletes the 'COLLECTION_CURRENT' equivalent in 'mia.db'
-        # con = sqlite3.connect(os.path.join(test_proj_path,'database','mia.db'))
+        # con = sqlite3.connect(os.path.join(test_proj_path,
+        #                                    'database','mia.db'))
         # cursor = con.cursor()
         # query = "DELETE FROM '_collection' WHERE collection_name = 'current'"
         # cursor.execute(query)
@@ -6511,7 +6537,8 @@ class TestMIANodeController(TestMIACase):
         attributes_filter.ok_clicked()
 
     def test_capsul_node_controller(self):
-        """Adds, changes and deletes processes using the capsul node controller.
+        """
+        Adds, changes and deletes processes using the capsul node controller.
 
         Displays the attributes filter.
 
@@ -6744,7 +6771,8 @@ class TestMIANodeController(TestMIACase):
         input_filter.search_str(DOCUMENT_2)
         self.assertTrue(input_filter.table_data.isRowHidden(index_DOCUMENT_1))
 
-        # Resets the search bar and assert that none of the documents are hidden
+        # Resets the search bar and assert that none of the documents
+        # are hidden
         input_filter.reset_search_bar()
 
         # Test "DOCUMENT_1" is not hidden
@@ -7505,7 +7533,8 @@ class TestMIAPipelineEditor(TestMIACase):
 
         # Mocks 'export_parameter' to throw a 'TraitError'
         # from traits.api import TraitError
-        # ppl_edt.scene.pipeline.export_parameter = Mock(side_effect=TraitError())
+        # ppl_edt.scene.pipeline.export_parameter = Mock(
+        #    side_effect=TraitError())
 
         # Tries to export the same plug value, denies overwriting it
         res = ppl_edt._export_plug(
@@ -7567,12 +7596,16 @@ class TestMIAPipelineEditor(TestMIACase):
 
         # Exports the input and output plugs
         ppl_edt_tabs.get_current_editor().current_node_name = "smooth_1"
+        # fmt: off
         (
-            ppl_edt_tabs.get_current_editor().export_node_unconnected_mandatory_plugs()
+            ppl_edt_tabs.get_current_editor().
+            export_node_unconnected_mandatory_plugs()
         )
         (
-            ppl_edt_tabs.get_current_editor().export_node_all_unconnected_outputs()
+            ppl_edt_tabs.get_current_editor().
+            export_node_all_unconnected_outputs()
         )
+        # fmt: on
 
         # Mocks the execution of a dialog box
         QMessageBox.exec = lambda *args: None
@@ -8140,14 +8173,15 @@ class TestMIAPipelineManagerTab(TestMIACase):
               value to the database
             - test_add_plug_value_to_database_non_list_type: adds a non list
               type plug value to the database
-            - test_add_plug_value_to_database_several_inputs: exports a non list
-              type input plug and with several possible inputs
+            - test_add_plug_value_to_database_several_inputs: exports a non
+              list type input plug and with several possible inputs
             - test_ask_iterated_pipeline_plugs: test the iteration
               dialog for each plug of a Rename process
             - test_build_iterated_pipeline: mocks methods and builds an
               iterated pipeline
             - test_check_requirements: checks the requirements for a given node
-            - test_cleanup_older_init: tests the cleaning of old initialisations
+            - test_cleanup_older_init: tests the cleaning of old
+              initialisations
             - test_complete_pipeline_parameters: test the pipeline
               parameters completion
             - test_delete_processes: deletes a process and makes the undo/redo
@@ -8864,14 +8898,16 @@ class TestMIAPipelineManagerTab(TestMIACase):
         ppl_manager.cleanup_older_init()
 
         # Asserts that the mock methods were called as expected
+        # fmt: off
         (
-            ppl_manager.main_window.data_browser.table_data.delete_from_brick.assert_called_once_with(
-                brick_id
-            )
+            ppl_manager.main_window.data_browser.table_data.delete_from_brick.
+            assert_called_once_with(brick_id)
         )
         (
-            ppl_manager.project.cleanup_orphan_nonexisting_files.assert_called_once_with()
+            ppl_manager.project.cleanup_orphan_nonexisting_files.
+            assert_called_once_with()
         )
+        # fmt: on
 
         # Asserts that both 'brick_list' and 'node_list' were cleaned
         self.assertTrue(len(ppl_manager.brick_list) == 0)
@@ -9091,13 +9127,19 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         # Asserts that the mocked methods were called as expected
         ppl_manager.postprocess_pipeline_execution.assert_called_once_with()
+        # fmt: off
         (
-            ppl_manager.project.cleanup_orphan_nonexisting_files.assert_called_once_with()
+            ppl_manager.project.cleanup_orphan_nonexisting_files.
+            assert_called_once_with()
         )
+        # fmt: on
         ppl_manager.project.cleanup_orphan_history.assert_called_once_with()
+        # fmt:off
         (
-            ppl_manager.main_window.data_browser.table_data.update_table.assert_called_once_with()
+            ppl_manager.main_window.data_browser.table_data.update_table.
+            assert_called_once_with()
         )
+        # fmt:on
         ppl_manager.update_user_buttons_states.assert_called_once_with()
 
     def test_get_capsul_engine(self):
@@ -9124,12 +9166,16 @@ class TestMIAPipelineManagerTab(TestMIACase):
         _ = ppl_manager.get_capsul_engine()
 
         # Asserts that the mocked method was called as expected
+        # fmt: off
         (
-            ppl_manager.pipelineEditorTabs.get_capsul_engine.assert_called_once_with()
+            ppl_manager.pipelineEditorTabs.get_capsul_engine.
+            assert_called_once_with()
         )
+        # fmt: on
 
     def test_get_missing_mandatory_parameters(self):
-        """Adds a process, exports input and output plugs and tries to initialize
+        """
+        Adds a process, exports input and output plugs and tries to initialize
         the pipeline with missing mandatory parameters.
 
         -Tests: PipelineManagerTab.get_missing_mandatory_parameters

@@ -785,7 +785,10 @@ class DateFormatDelegate(QItemDelegate):
         QItemDelegate.__init__(self, parent)
 
     def createEditor(self, parent, option, index):
-        """Override of the createEditor method, called to generate the widget."""
+        """
+        Override of the createEditor method, called to generate the widget.
+        """
+
         editor = QDateEdit(parent)
         editor.setDisplayFormat("dd/MM/yyyy")
         return editor
@@ -798,7 +801,10 @@ class DateTimeFormatDelegate(QItemDelegate):
         QItemDelegate.__init__(self, parent)
 
     def createEditor(self, parent, option, index):
-        """Override of the createEditor method, called to generate the widget."""
+        """
+        Override of the createEditor method, called to generate the widget.
+        """
+
         editor = QDateTimeEdit(parent)
         editor.setDisplayFormat("dd/MM/yyyy hh:mm:ss.zzz")
         return editor
@@ -811,7 +817,10 @@ class NumberFormatDelegate(QItemDelegate):
         QItemDelegate.__init__(self, parent)
 
     def createEditor(self, parent, option, index):
-        """Override of the createEditor method, called to generate the widget."""
+        """
+        Override of the createEditor method, called to generate the widget.
+        """
+
         editor = QDoubleSpinBox(parent)
         data = index.data(Qt.EditRole)
         decimals_number = str(data)[::-1].find(".")
@@ -1090,8 +1099,8 @@ class TableDataBrowser(QTableWidget):
                     tag_name = self.horizontalHeaderItem(column).text()
 
                     if (
-                        not tag_name
-                        in self.project.session.get_fields_names(
+                        tag_name
+                        not in self.project.session.get_fields_names(
                             COLLECTION_CURRENT
                         )
                         and tag_name != TAG_FILENAME
@@ -2857,7 +2866,7 @@ class TableDataBrowser(QTableWidget):
 
         # Tags that are not visible anymore are hidden
         for tag in old_tags:
-            if not tag in showed:
+            if tag not in showed:
                 self.setColumnHidden(self.get_tag_column(tag), True)
 
         # Tags that became visible must be visible
@@ -2872,13 +2881,14 @@ class TableDataBrowser(QTableWidget):
             for row in self.data_browser.advanced_search.rows:
                 fields = row[2]
                 fields.clear()
+
                 for visible_tag in showed:
                     fields.addItem(visible_tag)
+
                 fields.model().sort(0)
                 fields.addItem("All visualized tags")
 
         self.resizeColumnsToContents()
-
         self.update_colors()
 
         # Selection updated

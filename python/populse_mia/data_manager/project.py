@@ -1391,7 +1391,7 @@ class Project:
 
         # We save the filter only if we have a filter name from
         # populse_mia.e popup
-        if filter_name != None:
+        if filter_name is not None:
             file_path = os.path.join(filters_path, filter_name + ".json")
 
             if os.path.exists(file_path):

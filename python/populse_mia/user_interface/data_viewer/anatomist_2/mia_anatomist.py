@@ -45,8 +45,10 @@ not_defined_value = "*Not Defined*"
 
 class MiaViewer(Qt.QWidget, DataViewer):
     """
-    :class:`MIA data viewer <populse_mia.user_interface.data_viewer.data_viewer.DataViewer>`
-    implementation based on `PyAnatomist <http://brainvisa.info/pyanatomist/sphinx/index.html>`_
+    :class:`MIA data viewer
+           <populse_mia.user_interface.data_viewer.data_viewer.DataViewer>`
+           implementation based on
+           `PyAnatomist <http://brainvisa.info/pyanatomist/sphinx/index.html>`_
 
     .. Methods:
         - close: Exit
@@ -73,10 +75,10 @@ class MiaViewer(Qt.QWidget, DataViewer):
             DataViewer.mia_viewers = 0
         DataViewer.mia_viewers += 1
 
-        findChild = lambda x, y: Qt.QObject.findChild(x, Qt.QObject, y)
+        def findChild(x, y):
+            return Qt.QObject.findChild(x, Qt.QObject, y)
 
         awidget = self.anaviewer.awidget
-
         filter_action = findChild(awidget, "filterAction")
         preferences_action = findChild(awidget, "actionPreferences")
         screenshot_action = findChild(awidget, "actionprint_view")

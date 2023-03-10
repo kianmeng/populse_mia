@@ -267,8 +267,8 @@ class PipelineEditor(PipelineDeveloperView):
                             plug_name = new_name
 
                             if (
-                                not plug_name
-                                in self.scene.pipeline.pipeline_node.plugs
+                                plug_name
+                                not in self.scene.pipeline.pipeline_node.plugs
                             ):
                                 check_plug = False
 
@@ -1993,7 +1993,7 @@ class PipelineEditorTabs(QtWidgets.QTabWidget):
                     ]
                 )
 
-            except:
+            except Exception:
                 posdict = dict(
                     [
                         (key, (value[0], value[1]))

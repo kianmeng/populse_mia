@@ -3604,7 +3604,7 @@ class PopUpPreferences(QDialog):
                 matlab_input != "" and spm_input != ""
             ) or self.use_spm_standalone_checkbox.isChecked():
                 if (not os.path.isdir(matlab_input)) and (
-                    not "Windows" in archi[1]
+                    "Windows" not in archi[1]
                 ):
                     self.wrong_path(matlab_input, "Matlab standalone")
                     QApplication.restoreOverrideCursor()
@@ -3943,12 +3943,13 @@ class PopUpPreferences(QDialog):
                             "freesurfer", "global", getattr(configants, cif)
                         )
 
-                # # TODO: We could use a generic method to deal with c_c?
+                # TODO: We could use a generic method to deal with c_c?
                 # try:
-                #     del c_c["engine"]["global"]["capsul.engine.module.freesurfer"][
-                #         "freesurfer"
-                #     ]["directory"]
-
+                #     del c_c["engine"]["global"][
+                #         "capsul.engine.module.freesurfer"
+                #         ]["freesurfer"
+                #          ]["directory"]
+                #
                 # except KeyError:
                 #     pass
 
@@ -4342,14 +4343,17 @@ class PopUpPreferences(QDialog):
 
         if not self.use_matlab_standalone_checkbox.isChecked():
             archi = platform.architecture()
-            if not "Windows" in archi[1]:
+
+            if "Windows" not in archi[1]:
                 self.spm_standalone_choice.setDisabled(True)
                 self.use_spm_standalone_checkbox.setChecked(False)
                 self.spm_standalone_label.setDisabled(True)
                 self.spm_standalone_browse.setDisabled(True)
+
             self.matlab_standalone_choice.setDisabled(True)
             self.matlab_standalone_label.setDisabled(True)
             self.matlab_standalone_browse.setDisabled(True)
+
         else:
             self.matlab_standalone_choice.setDisabled(False)
             self.matlab_standalone_label.setDisabled(False)
@@ -4382,10 +4386,13 @@ class PopUpPreferences(QDialog):
             self.spm_standalone_choice.setDisabled(True)
             self.spm_standalone_label.setDisabled(True)
             self.spm_standalone_browse.setDisabled(True)
+
         else:
             archi = platform.architecture()
-            if not "Windows" in archi[1]:
+
+            if "Windows" not in archi[1]:
                 self.use_matlab_standalone_checkbox.setChecked(True)
+
             self.spm_standalone_choice.setDisabled(False)
             self.spm_standalone_label.setDisabled(False)
             self.spm_standalone_browse.setDisabled(False)

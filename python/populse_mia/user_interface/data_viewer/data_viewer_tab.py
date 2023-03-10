@@ -18,10 +18,12 @@ from soma.qt_gui.qt_backend import Qt
 class DataViewerTab(Qt.QWidget):
     """
     DataViewerTab is the widget in the data viewer tab of Populse-MIA GUI.
+
     A combobox containing the available viewers will always appear.
     If import of viewers fails, it won't impact the work of Mia itself.
     Viewers are put in Qt.QStackedLayout in order to share a same project.
-    A new viewer can be added simply by placing it in the data_viewer directory.
+    A new viewer can be added simply by placing it in the
+    data_viewer directory.
     """
 
     def __init__(self, main_window):

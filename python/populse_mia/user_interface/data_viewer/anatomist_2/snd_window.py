@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+
+###############################################################################
+# Populse_mia - Copyright (C) IRMaGe/CEA, 2018
+# Distributed under the terms of the CeCILL license, as published by
+# the CEA-CNRS-INRIA. Refer to the LICENSE file or to
+# http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
+# for details.
+###############################################################################
+
 import os
 
 try:
@@ -16,9 +25,9 @@ from soma.qt_gui.qt_backend.uic import loadUi
 
 class NewWindowViewer(QtGui.QMainWindow):
     """
-    Class defined to open a new window for a selected object with only one view possible
-    The user will be able to choose which view he wants to display (axial,
-    sagittal, coronal view or 3D view)
+    Class defined to open a new window for a selected object with only one
+    view possible. The user will be able to choose which view he wants to
+    display (axial, sagittal, coronal view or 3D view)
     """
 
     def __init__(self):

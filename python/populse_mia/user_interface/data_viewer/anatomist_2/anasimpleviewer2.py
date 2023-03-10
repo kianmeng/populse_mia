@@ -191,7 +191,8 @@ class AnaSimpleViewer2(Qt.QObject):
             """blabla"""
             return Qt.QObject.findChild(x, QtCore.QObject, y)
 
-        # findChild(awin, 'actionprint_view').triggered.connect(self.addNewView)
+        # findChild(awin,
+        #           'actionprint_view').triggered.connect(self.addNewView)
         findChild(awin, "actionTimeRunning").triggered.connect(
             self.automaticRunning
         )
@@ -321,25 +322,31 @@ class AnaSimpleViewer2(Qt.QObject):
 
     def setComboBox(self):
         """
-        Inserts a drop down menu in the toolbar. This menu contains defined available color palettes
-        The default color palettes are in self.available_palettes
+        Inserts a drop down menu in the toolbar. This menu contains defined
+        available color palettes. The default color palettes are in
+        self.available_palettes.
         """
+
         toolBar = Qt.QObject.findChild(self.awidget, QtCore.QObject, "toolBar")
         actionAutoRunning = Qt.QObject.findChild(
             self.awidget, QtCore.QObject, "actionTimeRunning"
         )
         label = QLabel("Palette: ")
         label.setToolTip("Change color palette of selected object")
+
         for palette in self.available_palettes:
             self.combobox.addItem(palette)
+
         toolBar.insertWidget(actionAutoRunning, label)
         toolBar.insertWidget(actionAutoRunning, self.combobox)
         sources_images_dir = Config().getSourceImageDir()
+
         for i in range(len(self.available_palettes)):
             icon = QIcon(
                 os.path.join(sources_images_dir, self.available_palettes[i])
             )
             self.combobox.setItemIcon(i, icon)
+
         size = PyQt5.QtCore.QSize(200, 15)
         self.combobox.setIconSize(size)
 
@@ -348,6 +355,7 @@ class AnaSimpleViewer2(Qt.QObject):
         Inserts opacity slider in the toolbar
         Minimum returned value is 0 and maximum value is 100
         """
+
         toolBar = Qt.QObject.findChild(self.awidget, QtCore.QObject, "toolBar")
         actionAutoRunning = Qt.QObject.findChild(
             self.awidget, QtCore.QObject, "actionTimeRunning"
@@ -406,7 +414,8 @@ class AnaSimpleViewer2(Qt.QObject):
 
     def newPalette(self):
         """
-        Sets chosen color palette in the toolbar drop down menu to selected object
+        Sets chosen color palette in the toolbar drop down menu to
+        selected object.
         """
         color = self.combobox.currentText()
         if self.selectedObjects():
@@ -414,18 +423,23 @@ class AnaSimpleViewer2(Qt.QObject):
 
     def setColorPalette(self):
         """
-        Checks color palette of a selected object, displays it in the toolbar drop-down menu and adds it if it isn't already stored in
-        self.available_palettes
-        If corresponding palette image exists it is added, otherwise only the name of the palette appears
+        Checks color palette of a selected object, displays it in the toolbar
+        drop-down menu and adds it if it isn't already stored in
+        self.available_palettes. If corresponding palette image exists it is
+        added, otherwise only the name of the palette appears.
         """
+
         color = self.combobox.currentText()
+
         if self.selectedObjects():
             actual_pal = self.selectedObjects()[0].getInfo()["palette"][
                 "palette"
             ]
+
             if actual_pal != color:
                 if actual_pal in self.available_palettes:
                     self.combobox.setCurrentText(actual_pal)
+
                 else:
                     self.combobox.addItem(actual_pal)
                     self.combobox.setCurrentText(actual_pal)
@@ -668,11 +682,15 @@ class AnaSimpleViewer2(Qt.QObject):
 
     def createTotalWindow(self, views):
         """
-        Create the windows which will contain the views
-        views : array containing strings "axial", "sagittal", "coronal" and/or "3D"
+        Create the windows which will contain the views.
+
+        views : array containing strings "axial", "sagittal", "coronal"
+                and/or "3D"
         """
+
         for i in views:
             self.createWindow(str(i))
+
             if i == "3D":
                 # set a cool angle of view for 3D
                 a = ana.Anatomist("-b")
@@ -681,9 +699,11 @@ class AnaSimpleViewer2(Qt.QObject):
                     windows=[self.awindows[-1]],
                     view_quaternion=[0.404603, 0.143829, 0.316813, 0.845718],
                 )
+
         # Sets view buttons checked for first display
         if views == ["Axial", "Sagittal", "Coronal"]:
             counter = 0
+
             for i in views:
                 self.viewButtons[counter].setChecked(True)
                 counter += 1
@@ -918,7 +938,7 @@ class AnaSimpleViewer2(Qt.QObject):
 
         # create the 4 windows if they don't exist
         if len(self.awindows) == 0:
-            if views == None:
+            if views is None:
                 self.createTotalWindow(["Axial", "Sagittal", "Coronal"])
 
             else:
@@ -1178,7 +1198,10 @@ class AnaSimpleViewer2(Qt.QObject):
                 item.setBackground(QColor("transparent"))
 
     def changeIcon(self, item, i, icon=None):
-        """adds empty icon if object is not displayed and check icon if displayed"""
+        """
+        Adds empty icon if object is not displayed and check icon if displayed.
+        """
+
         objectlist = Qt.QObject.findChild(
             self.awidget, QtCore.QObject, "objectslist"
         )
@@ -1315,19 +1338,24 @@ class AnaSimpleViewer2(Qt.QObject):
 
     def closeAll(self, close_ana=True):
         """Exit"""
+
         print("Exiting Ana2")
         self.newWindow.close()
         a = ana.Anatomist("-b")
         # remove windows from their parent to prevent them to be brutally
         # deleted by Qt.
         w = None
+
         for w in self.awindows:
             try:
                 w.hide()
-            except:
+
+            except Exception:
                 continue  # window closed by Qt ?
+
             self.viewgridlay.removeWidget(w.internalRep._get())
             w.setParent(None)
+
         del w
         self.awindows = []
         self.displayedObjects = []
@@ -1339,22 +1367,29 @@ class AnaSimpleViewer2(Qt.QObject):
         self.awidget.close()
         self.awidget = None
         del self.fdialog
+
         if close_ana:
             a = ana.Anatomist()
             a.close()
 
     def stopVolumeRendering(self):
         """Disable volume rendering: show a slice instead"""
+
         a = ana.Anatomist("-b")
+
         if not self.volrender:
             return
+
         a.deleteObjects(self.volrender)
         self.volrender = None
+
         if len(self.fusion2d) != 0:
             if self.fusion2d[0] is not None:
                 obj = self.fusion2d[0]
+
             else:
                 obj = self.fusion2d[1]
+
         wins = [w for w in self.awindows if w.subtype() == 0]
         a.addObjects(obj, wins)
         self.control_3d_type = "LeftSimple3DControl"

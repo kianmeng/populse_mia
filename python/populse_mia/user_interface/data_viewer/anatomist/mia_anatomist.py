@@ -38,17 +38,19 @@ class MiaViewer(Qt.QWidget, DataViewer):
 
     def __init__(self, init_global_handlers=None):
         """blabla"""
-        super(MiaViewer, self).__init__()
 
+        super(MiaViewer, self).__init__()
         self.anaviewer = AnaSimpleViewer(init_global_handlers)
 
         # count global number of viewers using anatomist, in order to close it
         # nicely
         if not hasattr(DataViewer, "mia_viewers"):
             DataViewer.mia_viewers = 0
+
         DataViewer.mia_viewers += 1
 
-        findChild = lambda x, y: Qt.QObject.findChild(x, Qt.QObject, y)
+        def findChild(x, y):
+            return Qt.QObject.findChild(x, Qt.QObject, y)
 
         awidget = self.anaviewer.awidget
         toolbar = findChild(awidget, "toolBar")

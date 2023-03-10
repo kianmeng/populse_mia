@@ -51,17 +51,18 @@ class IterationTable(QWidget):
     .. Methods:
         - add_tag: adds a tag to visualize in the iteration table
         - emit_iteration_table_updated: emits a signal when the iteration
-           scans have been updated
+                                        scans have been updated
         - fill_values: fill values_list depending on the visualized tags
         - refresh_layout: updates the layout of the widget
         - remove_tag: removes a tag to visualize in the iteration table
         - select_iterated_tag: opens a pop-up to let the user select on which
-           tag to iterate
+                               tag to iterate
         - select_visualized_tag: opens a pop-up to let the user select which
-           tag to visualize in the iteration table
+                                 tag to visualize in the iteration table
         - update_iterated_tag: updates the widget
         - update_table: updates the iteration table
-        - update_selected_tag: updates the selected tag for current pipeline manager tab
+        - update_selected_tag: updates the selected tag for current pipeline
+                               manager tab
 
     """
 
@@ -284,11 +285,14 @@ class IterationTable(QWidget):
     def select_iteration_tag(self):
         """Open a pop-up to let the user select on which tag to iterate."""
 
+        # fmt: off
         ui_select = PopUpSelectTagCountTable(
             self.project,
             self.project.session.get_fields_names(COLLECTION_CURRENT),
-            self.main_window.pipeline_manager.pipelineEditorTabs.get_current_editor().iterated_tag,
+            self.main_window.pipeline_manager.pipelineEditorTabs.
+            get_current_editor().iterated_tag,
         )
+        # fmt: on
 
         if ui_select.exec_():
             # fmt: off
