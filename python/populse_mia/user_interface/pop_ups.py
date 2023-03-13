@@ -3383,6 +3383,8 @@ class PopUpPreferences(QDialog):
             if self.use_freesurfer_checkbox.isChecked():
                 freesurfer_setup = self.freesurfer_choice.text()
                 freesurfer_dir = os.path.dirname(freesurfer_setup)
+                if not 'FREESURFER_HOME' in os.environ:
+                    os.environ['FREESURFER_HOME'] = freesurfer_dir
                 freesurfer_cmd = "recon-all"
 
                 if os.path.isdir(freesurfer_dir):
