@@ -600,12 +600,19 @@ def is_data_entry(filename, project, allow_temp=True):
 
     if allow_temp and filename == "<temp>":
         return filename
+
     proj_dir = osp.join(osp.abspath(osp.normpath(project.folder)), "")
+
     if not filename.startswith(proj_dir):
         return None
-    filename = filename[len(proj_dir) :]
+
+    # fmt: off
+    filename = filename[len(proj_dir):]
+    # fmt: on
+
     if project.session.has_document(COLLECTION_CURRENT, filename):
         return filename
+
     return None
 
 

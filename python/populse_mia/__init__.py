@@ -45,6 +45,4 @@ role in an analysis project: “the scan type”, “the subject being scanned�
 # for details.
 ###############################################################################
 
-from .info import __version__
-
-# flake8 ignore F401
+from .info import __version__  # noqa: F401

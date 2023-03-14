@@ -363,21 +363,21 @@ if len(pkg_error) > 0:
 # Now that populse projects paths have been, if necessary, added
 # to sys.path, we can import these projects:
 
-import capsul.api as capsul_api
-
 # capsul imports
-from capsul.api import get_process_instance
+import capsul.api as capsul_api  # noqa E402
+from capsul.api import get_process_instance  # noqa E402
 
 # soma-base imports
-from soma.qt_gui.qtThread import QtThreadCall
-
-from populse_mia.data_manager.project import Project
-from populse_mia.data_manager.project_properties import SavedProjects
-from populse_mia.software_properties import Config
+from soma.qt_gui.qtThread import QtThreadCall  # noqa E402
 
 # populse_mia imports
-from populse_mia.user_interface.main_window import MainWindow
-from populse_mia.utils.utils import check_python_version
+from populse_mia.data_manager.project import Project  # noqa E402
+from populse_mia.data_manager.project_properties import (  # noqa E402
+    SavedProjects,
+)
+from populse_mia.software_properties import Config  # noqa E402
+from populse_mia.user_interface.main_window import MainWindow  # noqa E402
+from populse_mia.utils.utils import check_python_version  # noqa E402
 
 main_window = None
 
@@ -616,9 +616,7 @@ def launch_mia():
     try:
         # QtWebEngineWidgets need to be imported before QCoreApplication
         # instance is created (used later)
-        from soma.qt_gui.qt_backend import QtWebEngineWidgets
-
-        # flake8 ignore F401
+        from soma.qt_gui.qt_backend import QtWebEngineWidgets  # noqa: F401
 
     except ImportError:
         pass  # QtWebEngineWidgets is not installed

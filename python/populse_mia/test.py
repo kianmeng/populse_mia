@@ -175,20 +175,29 @@ if (
 # developer configuration:
 
 # Capsul import
-from capsul.api import PipelineNode, ProcessNode, Switch, get_process_instance
-from capsul.attributes.completion_engine import ProcessCompletionEngine
-from capsul.engine import CapsulEngine, WorkflowExecutionError
-from capsul.pipeline.pipeline import Pipeline
-from capsul.pipeline.pipeline_workflow import workflow_from_pipeline
-from capsul.pipeline.process_iteration import ProcessIteration
-from capsul.process.process import NipypeProcess
-from capsul.qt_gui.widgets.settings_editor import SettingsEditor
+from capsul.api import (  # noqa: E402
+    PipelineNode,
+    ProcessNode,
+    Switch,
+    get_process_instance,
+)
+from capsul.attributes.completion_engine import (  # noqa: E402
+    ProcessCompletionEngine,
+)
+from capsul.engine import CapsulEngine, WorkflowExecutionError  # noqa: E402
+from capsul.pipeline.pipeline import Pipeline  # noqa: E402
+from capsul.pipeline.pipeline_workflow import (  # noqa: E402
+    workflow_from_pipeline,
+)
+from capsul.pipeline.process_iteration import ProcessIteration  # noqa: E402
+from capsul.process.process import NipypeProcess  # noqa: E402
+from capsul.qt_gui.widgets.settings_editor import SettingsEditor  # noqa: E402
 
 # Mia_processes import
-from mia_processes.bricks.tools import Input_Filter
+from mia_processes.bricks.tools import Input_Filter  # noqa: E402
 
 # Populse_db import
-from populse_db.database import (
+from populse_db.database import (  # noqa: E402
     FIELD_TYPE_BOOLEAN,
     FIELD_TYPE_DATE,
     FIELD_TYPE_DATETIME,
@@ -205,14 +214,19 @@ from populse_db.database import (
     FIELD_TYPE_TIME,
 )
 
-# Soma import
 # soma import
-from soma.qt_gui.qt_backend.Qt import QItemSelectionModel, QTreeView
-from soma.qt_gui.qt_backend.QtWidgets import QMenu
+from soma.qt_gui.qt_backend.Qt import (  # noqa: E402
+    QItemSelectionModel,
+    QTreeView,
+)
+from soma.qt_gui.qt_backend.QtWidgets import QMenu  # noqa: E402
 
 # Populse_mia import
-from populse_mia.data_manager.data_loader import ImportProgress, ImportWorker
-from populse_mia.data_manager.project import (
+from populse_mia.data_manager.data_loader import (  # noqa: E402
+    ImportProgress,
+    ImportWorker,
+)
+from populse_mia.data_manager.project import (  # noqa: E402
     COLLECTION_BRICK,
     COLLECTION_CURRENT,
     COLLECTION_HISTORY,
@@ -227,21 +241,25 @@ from populse_mia.data_manager.project import (
     TYPE_NII,
     Project,
 )
-from populse_mia.data_manager.project_properties import SavedProjects
-from populse_mia.software_properties import Config
-from populse_mia.user_interface.data_browser.modify_table import ModifyTable
-from populse_mia.user_interface.main_window import MainWindow
-from populse_mia.user_interface.pipeline_manager.pipeline_editor import (
+from populse_mia.data_manager.project_properties import (  # noqa: E402
+    SavedProjects,
+)
+from populse_mia.software_properties import Config  # noqa: E402
+from populse_mia.user_interface.data_browser.modify_table import (  # noqa: E402, E501
+    ModifyTable,
+)
+from populse_mia.user_interface.main_window import MainWindow  # noqa: E402
+from populse_mia.user_interface.pipeline_manager.pipeline_editor import (  # noqa: E402, E501
     PipelineEditor,
     save_pipeline,
 )
-from populse_mia.user_interface.pipeline_manager.pipeline_manager_tab import (
+from populse_mia.user_interface.pipeline_manager.pipeline_manager_tab import (  # noqa: E402, E501
     RunProgress,
 )
-from populse_mia.user_interface.pipeline_manager.process_library import (
+from populse_mia.user_interface.pipeline_manager.process_library import (  # noqa: E402, E501
     PackageLibraryDialog,
 )
-from populse_mia.user_interface.pop_ups import (
+from populse_mia.user_interface.pop_ups import (  # noqa: E402
     DefaultValueListCreation,
     PopUpAddPath,
     PopUpAddTag,
@@ -257,7 +275,10 @@ from populse_mia.user_interface.pop_ups import (
     PopUpSelectTag,
     PopUpSelectTagCountTable,
 )
-from populse_mia.utils.utils import check_value_type, table_to_database
+from populse_mia.utils.utils import (  # noqa: E402
+    check_value_type,
+    table_to_database,
+)
 
 # Working from the scripts directory
 os.chdir(os.path.dirname(os.path.realpath(__file__)))

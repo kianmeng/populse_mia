@@ -1376,21 +1376,23 @@ class MainWindow(QMainWindow):
         """Open a Qt console shell with an IPython kernel seeing the program
         internals
         """
+
         from soma.qt_gui import qt_backend
 
         ipfunc = None
         mode = "qtconsole"
         print("startShell")
-        try:
-            import jupyter_core.application
-            import qtconsole  # to check it is installed
 
-            # flake8 ignore F401
+        try:
+            # to check it is installed
+            import jupyter_core.application  # noqa: F401
+            import qtconsole  # noqa: F401
 
             ipfunc = (
                 "from jupyter_core import application; "
                 "app = application.JupyterApp(); app.initialize(); app.start()"
             )
+
         except ImportError:
             print("failed to run Qt console")
             return
@@ -1399,9 +1401,9 @@ class MainWindow(QMainWindow):
             import soma.subprocess
 
             ipConsole = self.run_ipconsole_kernel(mode)
+
             if ipConsole:
                 global _ipsubprocs
-
                 qt_api = qt_backend.get_qt_backend()
                 qt_apis = {
                     "PyQt4": "pyqt",
@@ -1438,7 +1440,7 @@ class MainWindow(QMainWindow):
         """blabla"""
 
         print("run_ipconsole_kernel:", mode)
-        import IPython
+        import IPython  # noqa: F401
         from IPython.lib import guisupport
         from soma.qt_gui.qt_backend import Qt
 

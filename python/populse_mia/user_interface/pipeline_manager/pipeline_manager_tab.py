@@ -663,9 +663,10 @@ class PipelineManagerTab(QWidget):
         # get all tags values for inputs
         for param, parent_file in parent_files.items():
             # database_parent_file = None
-            relfile = os.path.abspath(os.path.normpath(parent_file))[
-                len(db_dir) :
-            ]
+            # fmt: off
+            relfile = os.path.abspath(os.path.normpath(parent_file)
+                                      )[len(db_dir):]
+            # fmt: on
 
             if relfile == p_value:
                 # output is one of the inputs: OK nothing to be done.
@@ -1021,8 +1022,6 @@ class PipelineManagerTab(QWidget):
         Build a new pipeline with an iteration node, iterating over the current
         pipeline
         """
-
-        from capsul.attributes.completion_engine import ProcessCompletionEngine
 
         pipeline = self.get_pipeline_or_process()
         engine = self.get_capsul_engine()

@@ -2033,17 +2033,19 @@ class PackageLibraryDialog(QDialog):
                                 path, os.path.split(path)[-1]
                             )
                         )
+                        # fmt: off
                         print(
                             "\nDeleting {0} "
                             "...".format(
                                 ".".join(
                                     path.split(os.sep)[
                                         path.split(os.sep).index("processes")
-                                        + 1 :
+                                        + 1:
                                     ]
                                 )
                             )
                         )
+                        # fmt: on
 
                         if index > 0 and remove:
                             self.remove_package_with_text(
@@ -2171,12 +2173,14 @@ class PackageLibraryDialog(QDialog):
                                     file2del = os.path.join(dir_init, filename)
 
                                     if os.path.isfile(file2del):
+                                        # fmt: off
                                         name = file2del.split(os.sep)[
                                             file2del.split(os.sep).index(
                                                 "processes"
                                             )
-                                            + 1 : -1
+                                            + 1:-1
                                         ]
+                                        # fmt: on
                                         name = ".".join(name)
 
                                         for pkg in imports_in_init[key]:

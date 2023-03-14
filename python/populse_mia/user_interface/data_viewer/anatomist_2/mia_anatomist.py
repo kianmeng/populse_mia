@@ -31,10 +31,10 @@ from populse_mia.user_interface.data_browser.data_browser import (
     TableDataBrowser,
 )
 from populse_mia.user_interface.data_browser.rapid_search import RapidSearch
-from populse_mia.user_interface.data_viewer.anatomist_2 import resources
-
-# flake8 ignore F401
-from populse_mia.user_interface.data_viewer.anatomist_2.anasimpleviewer2 import (
+from populse_mia.user_interface.data_viewer.anatomist_2 import (  # noqa: F401
+    resources,
+)
+from populse_mia.user_interface.data_viewer.anatomist_2.anasimpleviewer2 import (  # noqa: E501
     AnaSimpleViewer2,
 )
 
