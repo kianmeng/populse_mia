@@ -1769,6 +1769,7 @@ class TestMIADataBrowser(TestMIACase):
 
         # Mocks the execution of 'PopUpSelectTagCountTable'
         def mock_select_tags(self):
+            """blabla"""
             self.selected_tag = "Exp Type"
             return True
 
@@ -5708,6 +5709,7 @@ class TestMIAMainWindow(TestMIACase):
 
         # Mocks the execution to change 'user_mode' from 'false' to 'true'
         def mock_exec(x):
+            """blabla"""
             config_file = (
                 main_wnd.pop_up_preferences.editConf.txt.toPlainText()
             )
@@ -8623,6 +8625,8 @@ class TestMIAPipelineManagerTab(TestMIACase):
         """
 
         def mock_get_document(collection, relfile):
+            """Blabla"""
+
             SCAN_1_ = SCAN_1
 
             if relfile == "mock_val_1":
@@ -8636,10 +8640,14 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         # Those methods are called prior to adding a plug to the database
         def reset_inheritance_dicts():
+            """Blabla"""
+
             job.inheritance_dict = {DOCUMENT_1: None}
             job.auto_inheritance_dict = {DOCUMENT_1: parent_files}
 
         def reset_collections():
+            """Blabla"""
+
             if session.has_document(COLLECTION_CURRENT, P_VALUE):
                 session.remove_document(COLLECTION_CURRENT, P_VALUE)
             if session.has_document(COLLECTION_CURRENT, DOCUMENT_1):
@@ -9612,6 +9620,8 @@ class TestMIAPipelineManagerTab(TestMIACase):
         """
 
         def click_yes(self_):
+            """Blabla"""
+
             close_button = self_.button(QMessageBox.Yes)
             QTest.mouseClick(close_button, Qt.LeftButton)
 

@@ -85,11 +85,15 @@ if sys.version_info[0] >= 3:
     unicode = str
 
     def values(d):
+        """blabla"""
+
         return list(d.values())
 
 else:
 
     def values(d):
+        """blabla"""
+
         return d.values()
 
 
@@ -717,6 +721,8 @@ class CapsulNodeController(QWidget):
             )
 
     def rename_subprocesses(self, node, parent_node_name):
+        """blabla"""
+
         if node.process.context_name.split(".")[0] == "Pipeline":
             if len(node.process.context_name.split(".")) >= 3:
                 node.process.context_name = (
@@ -1416,6 +1422,8 @@ class NodeController(QWidget):
             )
 
     def rename_subprocesses(self, node, parent_node_name):
+        """blabla"""
+
         if node.process.context_name.split(".")[0] == "Pipeline":
             if len(node.process.context_name.split(".")) >= 3:
                 node.process.context_name = (

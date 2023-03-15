@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
+"""Resource object code."""
 
-# Resource object code
-#
 # Created by: The Resource Compiler for PyQt5 (Qt v5.9.5)
 #
 # WARNING! All changes made in this file will be lost!
@@ -37813,12 +37812,16 @@ else:
 
 
 def qInitResources():
+    """Blabla"""
+
     QtCore.qRegisterResourceData(
         rcc_version, qt_resource_struct, qt_resource_name, qt_resource_data
     )
 
 
 def qCleanupResources():
+    """Blabla"""
+
     QtCore.qUnregisterResourceData(
         rcc_version, qt_resource_struct, qt_resource_name, qt_resource_data
     )

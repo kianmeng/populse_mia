@@ -105,6 +105,8 @@ class _ProcDeleter(threading.Thread):
         self.o = o
 
     def __del__(self):
+        """Blabla"""
+
         try:
             self.o.kill()
         except Exception:
@@ -114,6 +116,8 @@ class _ProcDeleter(threading.Thread):
             console_shell_running = False
 
     def run(self):
+        """Blabla"""
+
         try:
             self.o.communicate()
         except Exception as e:
@@ -288,9 +292,13 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def last_window_closed():
-        # if the ipython console has been run, something prevents Qt from
-        # quitting after the window is closed. The cause is not known yet.
-        # so: force exit the event loop.
+        """Force exit the event loop after ipython console is closed.
+
+        If the ipython console has been run, something prevents Qt from
+        quitting after the window is closed. The cause is not known yet.
+        So: force exit the event loop.
+        """
+
         from soma.qt_gui.qt_backend import Qt
 
         Qt.QTimer.singleShot(10, Qt.qApp.exit)
@@ -1480,7 +1488,10 @@ class MainWindow(QMainWindow):
             if tornado.version_info >= (4, 5):
                 # tornado 5 is using a decque for _callbacks, not a
                 # list + explicit locking
+
                 def my_start_ioloop_callbacks(self):
+                    """Blabla"""
+
                     if hasattr(self, "_callbacks"):
                         ncallbacks = len(self._callbacks)
                         for i in range(ncallbacks):
@@ -1489,13 +1500,17 @@ class MainWindow(QMainWindow):
             else:
 
                 def my_start_ioloop_callbacks(self):
+                    """Blabla"""
+
                     with self._callback_lock:
                         callbacks = self._callbacks
                         self._callbacks = []
+
                     for callback in callbacks:
                         self._run_callback(callback)
 
             my_start_ioloop_callbacks(ioloop.IOLoop.instance())
+
         return app
 
     def switch_project(self, file_path, name):

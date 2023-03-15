@@ -703,6 +703,8 @@ class Project:
         }
 
         def updated(d1, d2):
+            """Blabla"""
+
             d1.update(d2)
             return d1
 

@@ -1,5 +1,26 @@
 # -*- coding: utf-8 -*-
-# Define the logger
+"""
+Define the Mia logger.
+
+The soma control classes are overloaded for the needs of Mia.
+
+:Contains:
+    :Class:
+        - PopulseFileControlWidget
+        - PopulseDirectoryControlWidget
+        - PopulseOffscreenListFileControlWidget
+        - PopulseUndefinedControlWidget
+
+"""
+
+###############################################################################
+# Populse_mia - Copyright (C) IRMaGe/CEA, 2018
+# Distributed under the terms of the CeCILL license, as published by
+# the CEA-CNRS-INRIA. Refer to the LICENSE file or to
+# http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
+# for details.
+###############################################################################
+
 import logging
 import os
 from functools import partial
@@ -18,6 +39,16 @@ logger = logging.getLogger(__name__)
 
 
 class PopulseFileControlWidget(FileControlWidget):
+    """Control to enter a file.
+
+    :Contains:
+        :Method:
+            - create_widget: method to create the file widget
+            - filter_clicked: display a filter widget
+            - update_plug_value_from_filter: update the plug value from
+            a filter result
+    """
+
     @staticmethod
     def create_widget(
         parent,
@@ -71,9 +102,23 @@ class PopulseFileControlWidget(FileControlWidget):
         connected_inputs = user_data.get("connected_inputs", set())
 
         def is_number(x):
+            """Check if x is a number.
+
+            Parameters
+            ----------
+            x: the name of the control we want to create (str)
+
+            Returns
+            -------
+            out: bool
+            True if the control name is a number,
+            False otherwise
+            """
+
             try:
                 int(x)
                 return True
+
             except ValueError:
                 return False
 
@@ -184,6 +229,17 @@ class PopulseFileControlWidget(FileControlWidget):
 
 
 class PopulseDirectoryControlWidget(DirectoryControlWidget):
+    """Control to enter a Directory.
+
+    :Contains:
+        :Method:
+            - create_widget: method to create the file widget
+            - filter_clicked: display a filter widget
+            - update_plug_value_from_filter: update the plug value from
+            a filter result
+
+    """
+
     @staticmethod
     def create_widget(
         parent,
@@ -193,6 +249,8 @@ class PopulseDirectoryControlWidget(DirectoryControlWidget):
         label_class=None,
         user_data=None,
     ):
+        """Method to create the directory widget."""
+
         return PopulseFileControlWidget.create_widget(
             parent,
             control_name,
@@ -262,6 +320,17 @@ class PopulseDirectoryControlWidget(DirectoryControlWidget):
 
 
 class PopulseOffscreenListFileControlWidget(OffscreenListFileControlWidget):
+    """Control to enter a list of files.
+
+    :Contains:
+        :Method:
+            - create_widget: method to create the list of files widget
+            - filter_clicked: display a filter widget
+            - update_plug_value_from_filter: update the plug value from
+            a filter result
+
+    """
+
     @staticmethod
     def create_widget(
         parent,
@@ -271,7 +340,7 @@ class PopulseOffscreenListFileControlWidget(OffscreenListFileControlWidget):
         label_class=None,
         user_data=None,
     ):
-        """Method to create the list widget.
+        """Method to create the list of files widget.
 
         Parameters
         ----------

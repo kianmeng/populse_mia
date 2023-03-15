@@ -1086,9 +1086,13 @@ class Node(object):
         """
 
         def fget(self):
+            """Get the name of the object."""
+
             return self._name
 
         def fset(self, value):
+            """Set tye name of the object."""
+
             self._name = value
 
         return locals()
@@ -1165,9 +1169,13 @@ class Node(object):
         """
 
         def fget(self):
+            """Get the value of the object."""
+
             return self._value
 
         def fset(self, value):
+            """Set tye value of the object."""
+
             self._value = value
 
         return locals()

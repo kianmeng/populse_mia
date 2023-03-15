@@ -369,17 +369,22 @@ class PipelineManagerTab(QWidget):
         """bla bla bla"""
 
         def _serialize_tmp(item):
+            """blabla"""
+
             import soma_workflow.client as swc
 
             if item in (Undefined, [Undefined]):
-                # return '<undefined'
                 return "<undefined>"
+
             if isinstance(item, swc.TemporaryPath):
                 return "<temp>"
+
             if isinstance(item, datetime.datetime):
                 return item.__str__()
+
             if isinstance(item, set):
                 return list(item)
+
             raise TypeError
 
         if isinstance(node, (PipelineNode, Pipeline)):
@@ -903,14 +908,20 @@ class PipelineManagerTab(QWidget):
         """
 
         def check_db_compat(process, plug):
+            """blabla"""
+
             trait = process.trait(plug)
             return is_file_trait(trait)
 
         def iter_clicked(param_btns, p, state):
+            """blabla"""
+
             if not state and param_btns[p][2] is not None:
                 param_btns[p][2].setChecked(False)
 
         def db_clicked(param_btns, p, state):
+            """blabla"""
+
             if state:
                 param_btns[p][1].setChecked(True)
 
@@ -1160,6 +1171,8 @@ class PipelineManagerTab(QWidget):
         return it_pipeline
 
     def check_requirements(self, environment="global", message_list=None):
+        """blabla"""
+
         config = {}
         for node in self.node_list:
             config.update(node.check_requirements(environment, message_list))
@@ -1167,6 +1180,8 @@ class PipelineManagerTab(QWidget):
         return config
 
     def cleanup_older_init(self):
+        """Remove non-existent entries from the databrowser."""
+
         for brick in self.brick_list:
             print("cleanup brick", brick)
             self.main_window.data_browser.table_data.delete_from_brick(brick)
@@ -1380,6 +1395,8 @@ class PipelineManagerTab(QWidget):
         self.garbage_collect_action.setDisabled(False)
 
     def remove_progress(self):
+        """blabla"""
+
         self.progress.cleanup()
         # self.hLayout.removeWidget(self.progress)
         self.progress.close()
@@ -3048,6 +3065,8 @@ class PipelineManagerTab(QWidget):
             #       node.name, ':', auto_inheritance_dict)
 
     def update_inheritance(self, job, node):
+        """Update the inheritance dictionary"""
+
         if node.context_name.split(".")[0] == "Pipeline":
             node_name = ".".join(node.context_name.split(".")[1:])
 
@@ -3055,11 +3074,13 @@ class PipelineManagerTab(QWidget):
             node_name = node.context_name
 
         new_inheritance_dict = {}
+
         if node_name in self.project.node_inheritance_history:
             for inherit_dict in self.project.node_inheritance_history[
                 node_name
             ]:
                 dict_found = False
+
                 for inheritance_dict_key in inherit_dict.keys():
                     for param_key, param_value in job.param_dict.items():
                         if (
@@ -3068,11 +3089,14 @@ class PipelineManagerTab(QWidget):
                         ):
                             new_inheritance_dict.update(inherit_dict)
                             dict_found = True
+
         if not new_inheritance_dict:
             process = node
+
             if isinstance(process, ProcessNode):
                 process = process.process
             job.inheritance_dict = getattr(process, "inheritance_dict", {})
+
         else:
             job.inheritance_dict = new_inheritance_dict
 
@@ -3344,6 +3368,8 @@ class RunProgress(QWidget):
     # self.cleanup()
 
     def cleanup(self):
+        """blabla"""
+
         self.worker.wait()
         self.worker.finished.disconnect()  # self.end_progress)
         del self.worker
@@ -3386,10 +3412,14 @@ class RunProgress(QWidget):
         mbox.exec()
 
     def start(self):
+        """blabla"""
+
         self.worker.start()
         # self.progressbar.setValue(20)
 
     def stop_execution(self):
+        """blabla"""
+
         print("*** CANCEL ***")
         with self.worker.lock:
             self.worker.interrupt_request = True
@@ -3410,7 +3440,11 @@ class RunWorker(QThread):
         self.interrupt_request = False
 
     def run(self):
+        """blabla"""
+
         def _check_nipype_processes(pplne):
+            """blabla"""
+
             if isinstance(pplne, Pipeline):
                 for node_name, node in pplne.nodes.items():
                     if not hasattr(node, "process"):
@@ -3548,6 +3582,8 @@ class StatusWidget(QWidget):
         self.setWindowTitle("Execution status")
 
     def toggle_soma_workflow(self, checked):
+        """blabla"""
+
         if self.swf_widget is not None:
             self.swf_widget.setVisible(checked)
             if not checked:

@@ -41,6 +41,7 @@ class DataViewer(object):
         """
         Display the selected document files
         """
+
         raise NotImplementedError(
             "display_files is abstract and should be overloaded in data "
             "viewer implementations"
@@ -50,6 +51,7 @@ class DataViewer(object):
         """
         Hide / unload all displayed documents
         """
+
         self.remove_files(self.displayed_files())
 
     def displayed_files(self):
@@ -65,6 +67,7 @@ class DataViewer(object):
         """
         Remove documents from the displayed ones (hide, unload...)
         """
+
         raise NotImplementedError(
             "remove_files is abstract and should be overloaded in data "
             "viewer implementations"
@@ -74,10 +77,13 @@ class DataViewer(object):
         """
         Sets the project and list of possible documents
         """
+
         raise NotImplementedError(
             "set_documents is abstract and should be overloaded in data "
             "viewer implementations"
         )
 
     def close(self):
+        """Blabla"""
+
         self.clear()

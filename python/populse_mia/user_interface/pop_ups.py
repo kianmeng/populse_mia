@@ -4277,6 +4277,8 @@ class PopUpPreferences(QDialog):
         return True
 
     def ok_clicked(self):
+        """Blabla"""
+
         if self.validate_and_save(OK_clicked=True):
             self.accept()
             self.close()
@@ -4441,6 +4443,8 @@ class PopUpPreferences(QDialog):
             self.edit_config.setVisible(False)
 
     def wrong_path(self, path, tool, extra_mess=""):
+        """Blabla"""
+
         QApplication.restoreOverrideCursor()
         self.status_label.setText("")
         self.msg = QMessageBox()
@@ -4459,6 +4463,8 @@ class PopUpPreferences(QDialog):
         self.msg.show()
 
     def use_current_mainwindow_size(self, main_window):
+        """Blabla"""
+
         self.mainwindow_size_x_spinbox.setValue(main_window.width())
         self.mainwindow_size_y_spinbox.setValue(main_window.height())
 
@@ -4705,21 +4711,29 @@ class PopUpRemoveScan(QDialog):
             push_button_no_all.clicked.connect(self.no_all_clicked)
 
     def cancel_clicked(self):
+        """Blabla"""
+
         self.stop = True
         self.repeat = False
         self.close()
 
     def no_all_clicked(self):
+        """Blabla"""
+
         self.stop = True
         self.repeat = True
         self.close()
 
     def yes_all_clicked(self):
+        """Blabla"""
+
         self.stop = False
         self.repeat = True
         self.close()
 
     def yes_clicked(self):
+        """Blabla"""
+
         self.stop = False
         self.repeat = False
         self.close()
@@ -5638,6 +5652,8 @@ class PopUpShowHistory(QDialog):
         self.close()
 
     def find_associated_bricks(self, node_name):
+        """Blabla"""
+
         bricks = {}
         for uuid in self.brick_list:
             full_brick_name = self.project.session.get_value(
@@ -5656,6 +5672,8 @@ class PopUpShowHistory(QDialog):
         return bricks
 
     def find_process_from_plug(self, plug):
+        """Blabla"""
+
         process_name = ""
         plug_name = ""
         if plug.output:
@@ -5775,7 +5793,8 @@ class PopUpShowHistory(QDialog):
         exec="",
         exec_time=None,
     ):
-        # Filling the table
+        """Filling the table."""
+
         self.table.removeRow(0)
         self.table.setRowCount(1)
         nbColumn = 1
@@ -6113,4 +6132,6 @@ class QLabel_clickable(QLabel):
         QLabel.__init__(self, parent)
 
     def mousePressEvent(self, ev):
+        """Blabla"""
+
         self.clicked.emit()

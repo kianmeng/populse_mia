@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""AnaSimpleViewer2"""
+
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
 #      CEA/NeuroSpin, Batiment 145,
@@ -473,6 +475,8 @@ class AnaSimpleViewer2(Qt.QObject):
         self.loadObject(self.files, config_changed=True)
 
     def findChild(x, y):
+        """Blabla"""
+
         return Qt.QObject.findChild(x, QtCore.QObject, y)
 
     def clickHandler(self, eventName, params):
@@ -493,6 +497,7 @@ class AnaSimpleViewer2(Qt.QObject):
             pos2 = pos
 
         def findChild(x, y):
+            """Blabla"""
             return Qt.QObject.findChild(x, QtCore.QObject, y)
 
         x = findChild(self.awidget, "coordXEdit")
@@ -566,12 +571,15 @@ class AnaSimpleViewer2(Qt.QObject):
         Enable automatic running of functionnal images
         frame rate can be changed in preferences by the user
         """
+
         a = ana.Anatomist("-b")
         objects = []
         im_sec = float(Config().getViewerFramerate())
         frame_rate = 1 / im_sec
 
         def findChild(x, y):
+            """Blabla"""
+
             return Qt.QObject.findChild(x, QtCore.QObject, y)
 
         t = findChild(self.awidget, "coordTEdit")
@@ -892,6 +900,8 @@ class AnaSimpleViewer2(Qt.QObject):
 
     @QtCore.Slot("anatomist::AObject *", "const std::string &")
     def objectLoaded(self, obj, filename):
+        """Blabla"""
+
         a = ana.Anatomist("-b")
         if not obj:
             return
@@ -1088,6 +1098,8 @@ class AnaSimpleViewer2(Qt.QObject):
             self._displayVolume(obj, opts)
 
     def get_new_mesh2d_color(self):
+        """Blabla"""
+
         colors = [
             (1.0, 0.3, 0.3, 1.0),
             (0.3, 1.0, 0.3, 1.0),
@@ -1116,6 +1128,8 @@ class AnaSimpleViewer2(Qt.QObject):
         return len(self.meshes2d) % len(colors)
 
     def addMesh(self, obj, opts):
+        """Blabla"""
+
         a = ana.Anatomist("-b")
         mesh2d = a.fusionObjects(
             [obj.getInternalRep()], method="Fusion2DMeshMethod"
@@ -1135,6 +1149,8 @@ class AnaSimpleViewer2(Qt.QObject):
         a.addObjects(obj, windows_3d)
 
     def removeMesh(self, obj):
+        """Blabla"""
+
         a = ana.Anatomist("-b")
         mesh2d, col = self.meshes2d[obj.getInternalRep()]
         a.removeObjects([obj, mesh2d], self.awindows)
@@ -1426,6 +1442,8 @@ class AnaSimpleViewer2(Qt.QObject):
             self.stopVolumeRendering()
 
     def open_anatomist_main_window(self):
+        """Blabla"""
+
         a = ana.Anatomist()
         cw = a.getControlWindow()
         a.execute("CreateControlWindow")
@@ -1441,6 +1459,8 @@ class AnaSimpleViewer2(Qt.QObject):
             return
 
         def findChild(x, y):
+            """Blabla"""
+
             return Qt.QObject.findChild(x, QtCore.QObject, y)
 
         pos = [
@@ -1460,6 +1480,8 @@ class AnaSimpleViewer2(Qt.QObject):
         )
 
     def dragEnterEvent(self, win, event):
+        """Blabla"""
+
         x = ana.cpp.QAObjectDrag.canDecode(
             event
         ) or ana.cpp.QAObjectDrag.canDecodeURI(event)
@@ -1469,6 +1491,8 @@ class AnaSimpleViewer2(Qt.QObject):
             event.reject()
 
     def dropEvent(self, win, event):
+        """Blabla"""
+
         a = ana.Anatomist("-b")
         o = ana.cpp.set_AObjectPtr()
         if ana.cpp.QAObjectDrag.decode(event, o):

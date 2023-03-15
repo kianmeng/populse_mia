@@ -77,9 +77,38 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
     The MIA project will keep track of completed processes, in the correct
     completion order, so that other operations can be performed following the
     same order later after completion.
+
+    :Contains:
+        :Method:
+            - __init__: constructor
+            - complete_attributes_with_database:  augments the Capsul
+            completion system attributes associated with a process
+            - complete_nipype_common: set Nipype parameters for SPM
+            - complete_parameters: completes file parameters from
+            given inputs parameters
+            - complete_parameters_mia: Completion for :class:`ProcessMIA`
+            instances
+            - get_attribute_values: re-route to underlying fallback engine
+            - get_path_completion_engine: re-route to underlying fallback
+            engine
+            - get_project: get the project associated with the process
+            - path_attributes: re-route to underlying fallback engine
+            - remove_switch_observe: reimplemented since it is expectes
+            in switches completion engine
+
     """
 
     def __init__(self, process, name, fallback_engine):
+        """Constructor.
+
+        Parameters
+        ----------
+        process: a process
+        name: the name of the process
+        fallback_engine: the fallback engine for the process
+
+        """
+
         super(MIAProcessCompletionEngine, self).__init__(process, name)
 
         self.fallback_engine = fallback_engine
@@ -91,6 +120,12 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
         Augments the Capsul completion system attributes associated with a
         process. Attributes from the database are queried for input parameters,
         and added to the completion attributes values, if they match.
+
+        Parameters
+        ----------
+        process_inputs: dict (optional)
+            parameters to be set on the process.
+
         """
 
         # re-route to underlying fallback engine
@@ -178,6 +213,11 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
         Set Nipype parameters for SPM. This is used both on
         :class:`NipypeProcess` and :class:`ProcessMIA` instances which have the
         appropriate parameters.
+
+        Parameters
+        ----------
+        process: a process
+
         """
 
         # Test for matlab launch
@@ -270,6 +310,24 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
                 process.mfile = True
 
     def complete_parameters(self, process_inputs={}, complete_iterations=True):
+        """Completes file parameters from given inputs parameters.
+
+        Parameters
+        ----------
+        process_inputs: dict (optional)
+            parameters to be set on the process. It may include "regular"
+            process parameters, and attributes used for completion. Attributes
+            should be in a sub-dictionary under the key "capsul_attributes".
+        complete_iterations: bool (optional)
+            if False, iteration nodes inside the pipeline will not run their
+            own completion. Thus parameters for the iterations will not be
+            correctly completed. However this has 2 advantages: 1. it prevents
+            modification of the input pipeline, 2. it will not do iterations
+            completion which will anyway be done (again) when building a
+            workflow in
+            `~capsul.pipeline.pipeline_workflow.workflow_from_pipeline`.
+        """
+
         self.completion_progress = self.fallback_engine.completion_progress
         self.completion_progress_total = (
             self.fallback_engine.completion_progress_total
@@ -393,6 +451,12 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
         :meth: `ProcessMIA.list_outputs` method, which fills in output
         parameters from input values, and sets the internal `inheritance_dict`
         used after completion for data indexation in MIA.
+
+        Parameters
+        ----------
+        process_inputs: dict (optional)
+            parameters to be set on the process.
+
         """
         self.set_parameters(process_inputs)
         verbose = False
@@ -444,29 +508,69 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
         MIAProcessCompletionEngine.complete_nipype_common(process)
 
     def get_attribute_values(self):
-        # re-route to underlying fallback engine
+        """Re-route to underlying fallback engine."""
+
         return self.fallback_engine.get_attribute_values()
 
     def get_path_completion_engine(self):
-        # re-route to underlying fallback engine
+        """Re-route to underlying fallback engine."""
+
         return self.fallback_engine.get_path_completion_engine()
 
     @staticmethod
     def get_project(process):
+        """Get the project associated with the process.
+
+        Parameters
+        ----------
+        process: a process
+
+        Returns
+        -------
+        project: the project associated with the process
+
+        """
+
         project = None
+
         if isinstance(process, ProcessNode):
             process = process.process
+
         if hasattr(process, "get_study_config"):
             study_config = process.get_study_config()
             project = getattr(study_config, "project", None)
+
         return project
 
     def path_attributes(self, filename, parameter=None):
-        # re-route to underlying fallback engine
+        """Re-route to underlying fallback engine.
+
+        Parameters
+        ----------
+        filename:
+        parameter:
+
+        Returns
+        -------
+        out: the path attributes
+
+        """
+
         return self.fallback_engine.path_attributes(filename, parameter)
 
     def remove_switch_observer(self, observer=None):
-        # reimplemented since it is expectes in switches completion engine
+        """Reimplemented since it is expectes in switches completion engine.
+
+        Parameters
+        ----------
+        observer:
+
+        Returns
+        -------
+        out:
+
+        """
+
         return self.fallback_engine.remove_switch_observer(observer)
 
 
@@ -488,11 +592,30 @@ class MIAProcessCompletionEngineFactory(ProcessCompletionEngineFactory):
     processes, and use differently all MIA processes and nipype processes. For
     regular processes, additional database operations will be performed, then
     the underlying completion system will be called (FOM or other).
+
+    :Contains:
+        :Method:
+            - get_completion_engine: get a ProcessCompletionEngine instance for
+             a given process/node
+            -
     """
 
     factory_id = "mia_completion"
 
     def get_completion_engine(self, process, name=None):
+        """Get a ProcessCompletionEngine instance for a given process/node.
+
+        Parameters
+        ----------
+        process: Node or Process instance
+        name: str
+
+        Returns
+        -------
+        out: ProcessCompletionEngine instance
+
+        """
+
         if hasattr(process, "completion_engine"):
             return process.completion_engine
 
@@ -507,8 +630,10 @@ class MIAProcessCompletionEngineFactory(ProcessCompletionEngineFactory):
                     engine_factory = engine._modules_data["attributes"][
                         "attributes_factory"
                     ].get("process_completion", former_factory)
+
                 except ValueError:
                     pass  # not found
+
         if engine_factory is None:
             engine_factory = BuiltinProcessCompletionEngineFactory()
 
@@ -516,8 +641,10 @@ class MIAProcessCompletionEngineFactory(ProcessCompletionEngineFactory):
 
         # iteration
         in_process = process
+
         if isinstance(process, ProcessNode):
             in_process = process.process
+
         if isinstance(in_process, ProcessIteration):
             # iteration nodes must follow their own way
             return fallback
@@ -532,23 +659,24 @@ class ProcessMIA(Process):
     This class is mainly used by MIA bricks.
 
      .. Methods:
-
-         - _after_run_process: Try to recover the output values, when the
+         - _after_run_process: try to recover the output values, when the
                                calculation has been delegated to a process in
                                ProcessMIA
-         - _run_processes: Call the run_process_mia method in the
+         - _run_processes: call the run_process_mia method in the
                            ProcessMIA subclass
-         - init_default_traits: Automatically initialise necessary parameters
+         - init_default_traits: automatically initialise necessary parameters
                                 for nipype or capsul
-         - list_outputs: Override the outputs of the process
-         - make_initResult: Make the final dictionary for outputs,
+         - init_process: instantiation of the process attribute given a
+           process identifier
+         - list_outputs: override the outputs of the process
+         - make_initResult: make the final dictionary for outputs,
                             inheritance and requirement from the
                             initialisation of a brick
-         - relax_nipype_exists_constraints: Relax the exists constraint of
+         - relax_nipype_exists_constraints: relax the exists constraint of
                                             the process.inputs traits
          - requirements: Capsul Process.requirements() implementation using
                          MIA's ProcessMIA.requirement attribute
-         - run_process_mia: Implements specific runs for ProcessMia
+         - run_process_mia: implements specific runs for ProcessMia
                             subclasses
 
     """

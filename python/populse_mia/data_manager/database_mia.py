@@ -86,6 +86,8 @@ class DatabaseSessionMIA(DatabaseSession):
         )
 
     def add_field_attributes_collection(self):
+        """Blabla"""
+
         if not self.engine.has_collection(FIELD_ATTRIBUTES_COLLECTION):
             super(DatabaseSessionMIA, self).add_collection(
                 FIELD_ATTRIBUTES_COLLECTION
@@ -192,6 +194,8 @@ class DatabaseSessionMIA(DatabaseSession):
             )
 
     def get_field(self, collection, name):
+        """Blabla"""
+
         field = super(DatabaseSessionMIA, self).get_field(collection, name)
         if field is not None:
             index = "%s|%s" % (collection, name)
@@ -201,6 +205,8 @@ class DatabaseSessionMIA(DatabaseSession):
         return field
 
     def get_fields(self, collection):
+        """Blabla"""
+
         fields = super(DatabaseSessionMIA, self).get_fields(collection)
         for field in fields:
             name = field.field_name

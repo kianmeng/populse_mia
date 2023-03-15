@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-"""
+"""This module is dedicated to pipeline history."""
 
 import os.path as osp
 
@@ -457,6 +456,8 @@ def get_proc_ancestors_via_tmp(proc, project, procs):
     tmp_filename = "<temp>"
 
     def _get_tmp_param(proc):
+        """Blabla"""
+
         for param, value in proc.brick[BRICK_INPUTS].items():
             if data_in_value(value, tmp_filename, project):
                 return (proc, param)
