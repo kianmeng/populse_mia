@@ -2713,7 +2713,15 @@ class PopUpPreferences(QDialog):
         self.appearance_layout.addStretch(1)
         self.tab_appearance.setLayout(self.appearance_layout)
 
-        self.setLayout(vbox)
+        # Global layout - scrollable global window
+        self.scroll = QScrollArea()
+        self.scroll.setWidgetResizable(True)
+        self.widget = QtWidgets.QWidget()
+        self.widget.setLayout(vbox)
+        self.scroll.setWidget(self.widget)
+        self.final_layout = QVBoxLayout()
+        self.final_layout.addWidget(self.scroll)
+        self.setLayout(self.final_layout)
 
         # Disabling widgets
         self.use_spm_changed()
