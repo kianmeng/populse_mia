@@ -477,119 +477,148 @@ class PopUpAddPath(QDialog):
     def file_to_choose(self):
         """Lets the user choose a file to import."""
 
-        fname = QFileDialog.getOpenFileName(
+        fname, _ = QFileDialog.getOpenFileNames(
             self, "Choose a document to import", os.path.expanduser("~")
         )
 
-        if fname[0]:
-            self.file_line_edit.setText(fname[0])
+        if fname != []:
+            self.file_line_edit.setText(str(fname))
 
     def find_type(self):
         """Tries to find the document type when the document is changed."""
 
         new_file = self.file_line_edit.text()
-        filename, file_extension = os.path.splitext(new_file)
-        if file_extension == ".nii":
-            self.type_line_edit.setText(TYPE_NII)
-        elif file_extension == ".mat":
-            self.type_line_edit.setText(TYPE_MAT)
-        elif file_extension == ".txt":
-            self.type_line_edit.setText(TYPE_TXT)
-        else:
-            self.type_line_edit.setText(TYPE_UNKNOWN)
+        new_file = ast.literal_eval(new_file)
+        new_type = []
+
+        for elmt in new_file:
+            filename, file_extension = os.path.splitext(elmt)
+
+            if file_extension == ".nii":
+                new_type.append(TYPE_NII)
+
+            elif file_extension == ".mat":
+                new_type.append(TYPE_MAT)
+
+            elif file_extension == ".txt":
+                new_type.append(TYPE_TXT)
+
+            else:
+                new_type.append(TYPE_UNKNOWN)
+
+        self.type_line_edit.setText(str(new_type))
 
     def save_path(self):
         """Adds the path to the database and the data browser."""
 
-        path = self.file_line_edit.text()
-        path_type = self.type_line_edit.text()
-        docInDb = [
-            os.path.basename(i)
-            for i in self.project.session.get_documents_names(
-                COLLECTION_CURRENT
-            )
-        ]
-        self.project.unsavedModifications = True
+        path_list = self.file_line_edit.text()
 
-        if os.path.basename(path) in docInDb:
-            self.msg = QMessageBox()
-            self.msg.setIcon(QMessageBox.Warning)
-            self.msg.setText("- {0} -".format(os.path.basename(path)))
-            self.msg.setInformativeText(
-                "The document '{0}' \n "
-                "already exists in the Data Browser!".format(path)
-            )
-            self.msg.setWindowTitle("Warning: existing data!")
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.buttonClicked.connect(self.msg.close)
-            self.msg.show()
+        if path_list != "":
+            path_list = ast.literal_eval(path_list)
 
-        elif path != "" and os.path.exists(path) and path_type != "":
-            # For history
-            history_maker = []
-            history_maker.append("add_scans")
-
-            path = os.path.relpath(path)
-            filename = os.path.basename(path)
-            copy_path = os.path.join(
-                self.project.folder, "data", "downloaded_data", filename
-            )
-            shutil.copy(path, copy_path)
-            with open(path, "rb") as scan_file:
-                data = scan_file.read()
-                checksum = hashlib.md5(data).hexdigest()
-            path = os.path.join("data", "downloaded_data", filename)
-            self.project.session.add_document(COLLECTION_CURRENT, path)
-            self.project.session.add_document(COLLECTION_INITIAL, path)
-            values_added = []
-            self.project.session.add_value(
-                COLLECTION_INITIAL, path, TAG_TYPE, path_type
-            )
-            self.project.session.add_value(
-                COLLECTION_CURRENT, path, TAG_TYPE, path_type
-            )
-            values_added.append([path, TAG_TYPE, path_type, path_type])
-            self.project.session.add_value(
-                COLLECTION_INITIAL, path, TAG_CHECKSUM, checksum
-            )
-            self.project.session.add_value(
-                COLLECTION_CURRENT, path, TAG_CHECKSUM, checksum
-            )
-            values_added.append([path, TAG_CHECKSUM, checksum, checksum])
-
-            # For history
-            history_maker.append([path])
-            history_maker.append(values_added)
-            self.project.undos.append(history_maker)
-            self.project.redos.clear()
-
-            # Databrowser updated
-
-            (
-                self.databrowser.table_data.scans_to_visualize
-            ) = self.project.session.get_documents_names(COLLECTION_CURRENT)
-
-            (
-                self.databrowser.table_data.scans_to_search
-            ) = self.project.session.get_documents_names(COLLECTION_CURRENT)
-            self.databrowser.table_data.add_columns()
-            self.databrowser.table_data.fill_headers()
-            self.databrowser.table_data.add_rows([path])
-            self.databrowser.reset_search_bar()
-            self.databrowser.frame_advanced_search.setHidden(True)
-            self.databrowser.advanced_search.rows = []
-            self.close()
         else:
-            self.msg = QMessageBox()
-            self.msg.setIcon(QMessageBox.Warning)
-            self.msg.setText("Invalid arguments")
-            self.msg.setInformativeText(
-                "The path must exist.\nThe path type can't be empty."
-            )
-            self.msg.setWindowTitle("Warning")
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.buttonClicked.connect(self.msg.close)
-            self.msg.show()
+            path_list = [path_list]
+
+        path_type_list = self.type_line_edit.text()
+
+        if path_type_list != "":
+            path_type_list = ast.literal_eval(path_type_list)
+
+        else:
+            path_type_list = [path_type_list]
+
+        for path, path_type in zip(path_list, path_type_list):
+            docInDb = [
+                os.path.basename(i)
+                for i in self.project.session.get_documents_names(
+                    COLLECTION_CURRENT
+                )
+            ]
+            self.project.unsavedModifications = True
+
+            if os.path.basename(path) in docInDb:
+                self.msg = QMessageBox()
+                self.msg.setIcon(QMessageBox.Warning)
+                self.msg.setText("- {0} -".format(os.path.basename(path)))
+                self.msg.setInformativeText(
+                    "The document '{0}' \n "
+                    "already exists in the Data Browser!".format(path)
+                )
+                self.msg.setWindowTitle("Warning: existing data!")
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.buttonClicked.connect(self.msg.close)
+                self.msg.show()
+
+            elif path != "" and os.path.exists(path) and path_type != "":
+                # For history
+                history_maker = []
+                history_maker.append("add_scans")
+
+                path = os.path.relpath(path)
+                filename = os.path.basename(path)
+                copy_path = os.path.join(
+                    self.project.folder, "data", "downloaded_data", filename
+                )
+                shutil.copy(path, copy_path)
+                with open(path, "rb") as scan_file:
+                    data = scan_file.read()
+                    checksum = hashlib.md5(data).hexdigest()
+                path = os.path.join("data", "downloaded_data", filename)
+                self.project.session.add_document(COLLECTION_CURRENT, path)
+                self.project.session.add_document(COLLECTION_INITIAL, path)
+                values_added = []
+                self.project.session.add_value(
+                    COLLECTION_INITIAL, path, TAG_TYPE, path_type
+                )
+                self.project.session.add_value(
+                    COLLECTION_CURRENT, path, TAG_TYPE, path_type
+                )
+                values_added.append([path, TAG_TYPE, path_type, path_type])
+                self.project.session.add_value(
+                    COLLECTION_INITIAL, path, TAG_CHECKSUM, checksum
+                )
+                self.project.session.add_value(
+                    COLLECTION_CURRENT, path, TAG_CHECKSUM, checksum
+                )
+                values_added.append([path, TAG_CHECKSUM, checksum, checksum])
+
+                # For history
+                history_maker.append([path])
+                history_maker.append(values_added)
+                self.project.undos.append(history_maker)
+                self.project.redos.clear()
+
+                # Databrowser updated
+
+                (
+                    self.databrowser.table_data.scans_to_visualize
+                ) = self.project.session.get_documents_names(
+                    COLLECTION_CURRENT
+                )
+
+                (
+                    self.databrowser.table_data.scans_to_search
+                ) = self.project.session.get_documents_names(
+                    COLLECTION_CURRENT
+                )
+                self.databrowser.table_data.add_columns()
+                self.databrowser.table_data.fill_headers()
+                self.databrowser.table_data.add_rows([path])
+                self.databrowser.reset_search_bar()
+                self.databrowser.frame_advanced_search.setHidden(True)
+                self.databrowser.advanced_search.rows = []
+                self.close()
+            else:
+                self.msg = QMessageBox()
+                self.msg.setIcon(QMessageBox.Warning)
+                self.msg.setText("Invalid arguments")
+                self.msg.setInformativeText(
+                    "The path must exist.\nThe path type can't be empty."
+                )
+                self.msg.setWindowTitle("Warning")
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.buttonClicked.connect(self.msg.close)
+                self.msg.show()
 
 
 class PopUpAddTag(QDialog):

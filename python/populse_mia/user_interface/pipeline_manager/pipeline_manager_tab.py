@@ -1659,6 +1659,9 @@ class PipelineManagerTab(QWidget):
             #           hard coded below)?
             # TODO: Are these tests compatible with remote run?
 
+            # FIXME: Make a requirement check for FreeSurfer:
+            # FreeSurfer
+
             # FSL:
             try:
                 if (

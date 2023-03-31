@@ -805,14 +805,14 @@ class TestMIADataBrowser(TestMIACase):
         self.assertEqual(add_path.msg.text(), "Invalid arguments")
 
         # Tries to add invalid document path
-        add_path.file_line_edit.setText(DOCUMENT_1 + "_")
-        add_path.type_line_edit.setText(TYPE_NII)
+        add_path.file_line_edit.setText(str([DOCUMENT_1 + "_"]))
+        add_path.type_line_edit.setText(str([TYPE_NII]))
         QTest.mouseClick(add_path.ok_button, Qt.LeftButton)
         self.assertEqual(add_path.msg.text(), "Invalid arguments")
 
         # Adds a valid document path
-        add_path.file_line_edit.setText(DOCUMENT_1)
-        add_path.type_line_edit.setText(TYPE_NII)
+        add_path.file_line_edit.setText(str([DOCUMENT_1]))
+        add_path.type_line_edit.setText(str([TYPE_NII]))
         QTest.mouseClick(add_path.ok_button, Qt.LeftButton)
 
         # Asserts that the document was added into the data browser
@@ -826,13 +826,15 @@ class TestMIADataBrowser(TestMIACase):
 
         # Mocks the execution of file dialog box and finds the file type
         for ext in ["nii", "mat", "txt"]:
-            QFileDialog.getOpenFileName = Mock(return_value=["file." + ext])
+            QFileDialog.getOpenFileNames = Mock(
+                return_value=(["file." + ext], "All Files (*)")
+            )
             add_path.file_to_choose()
 
         # Adds a document into the database and tries to save the same
         # one once again
         self.project.session.add_document(COLLECTION_CURRENT, DOCUMENT_1)
-        add_path.file_line_edit.setText(DOCUMENT_1)
+        add_path.file_line_edit.setText(str([DOCUMENT_1]))
         add_path.save_path()
 
     def test_add_tag(self):
@@ -1816,7 +1818,7 @@ class TestMIADataBrowser(TestMIACase):
 
         # Adds the document to the data browser
         addPath = PopUpAddPath(data_browser.project, data_browser)
-        addPath.file_line_edit.setText(DOCUMENT_1)
+        addPath.file_line_edit.setText(str([DOCUMENT_1]))
         addPath.save_path()
 
         # Selects the document in the data browser
