@@ -1306,7 +1306,7 @@ def verify_processes():
             if (
                 (isinstance(proc_content, dict))
                 and ("Versions" in proc_content)
-                and ("nipype" not in proc_content["Versions"])
+                and (proc_content["Versions"] is None)
             ) or (
                 (isinstance(proc_content, dict))
                 and ("Versions" in proc_content)
@@ -1356,7 +1356,7 @@ def verify_processes():
             if (
                 (isinstance(proc_content, dict))
                 and ("Versions" in proc_content)
-                and ("mia_processes" not in proc_content["Versions"])
+                and (proc_content["Versions"] is None)
             ) or (
                 (isinstance(proc_content, dict))
                 and ("Versions" in proc_content)
@@ -1406,7 +1406,7 @@ def verify_processes():
             if (
                 (isinstance(proc_content, dict))
                 and ("Versions" in proc_content)
-                and ("capsul" not in proc_content["Versions"])
+                and (proc_content["Versions"] is None)
             ) or (
                 (isinstance(proc_content, dict))
                 and ("Versions" in proc_content)
@@ -1550,11 +1550,21 @@ def verify_processes():
             final_pckgs["Paths"] = proc_content["Paths"]
 
         if (isinstance(proc_content, dict)) and ("Versions" in proc_content):
-            for item in proc_content["Versions"]:
-                if item not in final_pckgs["Versions"]:
-                    final_pckgs["Versions"][item] = proc_content["Versions"][
-                        item
-                    ]
+
+            if proc_content["Versions"] is None:
+
+                for k in ("nipype", "mia_processes", "capsul"):
+
+                    if k not in final_pckgs["Versions"]:
+                        final_pckgs["Versions"][k] = None
+
+            else:
+                for item in proc_content["Versions"]:
+
+                    if item not in final_pckgs["Versions"]:
+                        final_pckgs["Versions"][item] = proc_content[
+                            "Versions"][item
+                        ]
 
         # Try to keep the previous configuration before the update
         # of the packages
