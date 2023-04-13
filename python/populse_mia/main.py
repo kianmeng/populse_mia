@@ -1550,21 +1550,17 @@ def verify_processes():
             final_pckgs["Paths"] = proc_content["Paths"]
 
         if (isinstance(proc_content, dict)) and ("Versions" in proc_content):
-
             if proc_content["Versions"] is None:
-
                 for k in ("nipype", "mia_processes", "capsul"):
-
                     if k not in final_pckgs["Versions"]:
                         final_pckgs["Versions"][k] = None
 
             else:
                 for item in proc_content["Versions"]:
-
                     if item not in final_pckgs["Versions"]:
                         final_pckgs["Versions"][item] = proc_content[
-                            "Versions"][item
-                        ]
+                            "Versions"
+                        ][item]
 
         # Try to keep the previous configuration before the update
         # of the packages
