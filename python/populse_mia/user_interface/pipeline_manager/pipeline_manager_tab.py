@@ -1535,7 +1535,8 @@ class PipelineManagerTab(QWidget):
                 self.pipelineEditorTabs.get_current_filename()
             )
             if name == "":
-                name = "NoName"
+                pipeline = self.pipelineEditorTabs.get_current_pipeline()
+                name = [k for k, v in pipeline.nodes.items() if k != ''][0]
             print(
                 '\nError during initialisation of the "{0}" pipeline '
                 "...!\nTraceback:".format(name)
@@ -1585,11 +1586,9 @@ class PipelineManagerTab(QWidget):
         else:
             main_pipeline = False
 
-        # name = os.path.basename(
-        #    self.pipelineEditorTabs.get_current_filename())
         name = pipeline.name
-        if name == "Pipeline":
-            name = "NoName"
+        if name == "Pipeline" and len(pipeline.nodes) == 2:
+            name = [k for k, v in pipeline.nodes.items() if k != ''][0]
         self.main_window.statusBar().showMessage(
             'Pipeline "{0}" is getting initialized. '
             "Please wait.".format(name)
@@ -1620,7 +1619,6 @@ class PipelineManagerTab(QWidget):
                 ptype, name, str(error)
             )
             init_messages.append(mssg)
-            pass
 
         # retrieve node list
         self.update_node_list()
@@ -1641,10 +1639,11 @@ class PipelineManagerTab(QWidget):
             "global", message_list=req_messages
         )
 
-        if requirements is None:
-            print("Pipeline requirements are not met.")
+        if requirements is None or requirements == {}:
+            pipeline.check_requirements(message_list=req_messages)
+            print("\nPipeline requirements are not met:")
             print("\n".join(req_messages))
-            print("current configuration:")
+            print("\nCurrent configuration:")
             print(study_config.engine.settings.select_configurations("global"))
             init_result = False
             init_messages.append(
@@ -1658,7 +1657,6 @@ class PipelineManagerTab(QWidget):
             #           testing all modules (currently each module test is
             #           hard coded below)?
             # TODO: Are these tests compatible with remote run?
-
             # FIXME: Make a requirement check for FreeSurfer:
             # FreeSurfer
 
