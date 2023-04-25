@@ -1536,7 +1536,7 @@ class PipelineManagerTab(QWidget):
             )
             if name == "":
                 pipeline = self.pipelineEditorTabs.get_current_pipeline()
-                name = [k for k, v in pipeline.nodes.items() if k != ''][0]
+                name = [k for k, v in pipeline.nodes.items() if k != ""][0]
             print(
                 '\nError during initialisation of the "{0}" pipeline '
                 "...!\nTraceback:".format(name)
@@ -1588,7 +1588,7 @@ class PipelineManagerTab(QWidget):
 
         name = pipeline.name
         if name == "Pipeline" and len(pipeline.nodes) == 2:
-            name = [k for k, v in pipeline.nodes.items() if k != ''][0]
+            name = [k for k, v in pipeline.nodes.items() if k != ""][0]
         self.main_window.statusBar().showMessage(
             'Pipeline "{0}" is getting initialized. '
             "Please wait.".format(name)
