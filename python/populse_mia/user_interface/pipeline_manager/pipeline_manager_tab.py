@@ -1639,7 +1639,7 @@ class PipelineManagerTab(QWidget):
             "global", message_list=req_messages
         )
 
-        if requirements is None or requirements == {}:
+        if requirements is None:
             pipeline.check_requirements(message_list=req_messages)
             print("\nPipeline requirements are not met:")
             print("\n".join(req_messages))
