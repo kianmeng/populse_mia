@@ -1173,10 +1173,13 @@ class PipelineManagerTab(QWidget):
     def check_requirements(self, environment="global", message_list=None):
         """blabla"""
 
-        config = {}
+        config_pipeline = {}
         for node in self.node_list:
             if self.workflow is not None:
-                config.update(node.check_requirements(environment, message_list))
+                config_pipeline.update(
+                    {node: node.check_requirements(environment, message_list)}
+                )
+                # config.update(node.check_requirements(environment, message_list))
             # else:
             #     req = node.requirements()
             #     settings = node.pipeline.get_study_config().engine.settings
@@ -1186,7 +1189,7 @@ class PipelineManagerTab(QWidget):
             #         if module_name not in capsul_config:
             #             if module not in config:
             #                 config[module] = None
-        return config
+        return config_pipeline
 
     def cleanup_older_init(self):
         """Remove non-existent entries from the databrowser."""
@@ -1630,7 +1633,7 @@ class PipelineManagerTab(QWidget):
             init_messages.append(mssg)
 
         # retrieve node list
-        self.update_node_list(brick=pipeline) #########
+        self.update_node_list(brick=pipeline)  #########
 
         # check missing inputs
         if self.workflow is not None:
@@ -1674,216 +1677,226 @@ class PipelineManagerTab(QWidget):
             #           hard coded below)?
             # TODO: Are these tests compatible with remote run?
             # FIXME: Make a requirement check for FreeSurfer:
-            # FreeSurfer
+            for req_node in requirements:
+                # FreeSurfer
 
-            # FSL:
-            try:
-                if (
-                    requirements["capsul_engine"]["uses"].get(
-                        "capsul.engine.module.fsl"
-                    )
-                    is None
-                ):
-                    raise KeyError
-
-            except KeyError:
-                # The process don't need FSL
-                pass
-
-            else:
-                if "capsul.engine.module.fsl" in requirements:
-                    if not requirements["capsul.engine.module.fsl"].get(
-                        "directory", False
-                    ):
-                        init_result = False
-                        init_messages.append(
-                            "The pipeline requires FSL "
-                            "but it seems FSL is not "
-                            "configured in mia "
-                            "preferences."
+                # FSL:
+                try:
+                    if (
+                        requirements[req_node]["capsul_engine"]["uses"].get(
+                            "capsul.engine.module.fsl"
                         )
+                        is None
+                    ):
+                        raise KeyError
+
+                except KeyError:
+                    # The process don't need FSL
+                    pass
 
                 else:
-                    init_result = False
-                    init_messages.append(
-                        "The pipeline requires FSL but it "
-                        "seems FSL is not configured in "
-                        "mia preferences."
-                    )
-
-            # AFNI:
-            try:
-                if (
-                    requirements["capsul_engine"]["uses"].get(
-                        "capsul.engine.module.afni"
-                    )
-                    is None
-                ):
-                    raise KeyError
-
-            except KeyError:
-                # The process don't need AFNI
-                pass
-
-            else:
-                if "capsul.engine.module.afni" in requirements:
-                    if not requirements["capsul.engine.module.afni"].get(
-                        "directory", False
-                    ):
-                        init_result = False
-                        init_messages.append(
-                            "The pipeline requires AFNI "
-                            "but it seems AFNI is not "
-                            "configured in mia "
-                            "preferences."
-                        )
-
-                else:
-                    init_result = False
-                    init_messages.append(
-                        "The pipeline requires AFNI but it "
-                        "seems AFNI is not configured in "
-                        "mia preferences."
-                    )
-
-            # ANTS:
-            try:
-                if (
-                    requirements["capsul_engine"]["uses"].get(
-                        "capsul.engine.module.ants"
-                    )
-                    is None
-                ):
-                    raise KeyError
-
-            except KeyError:
-                # The process don't need ANTS
-                pass
-
-            else:
-                if "capsul.engine.module.ants" in requirements:
-                    if not requirements["capsul.engine.module.ants"].get(
-                        "directory", False
-                    ):
-                        init_result = False
-                        init_messages.append(
-                            "The pipeline requires ANTS "
-                            "but it seems ANTS is not "
-                            "configured in mia "
-                            "preferences."
-                        )
-
-                else:
-                    init_result = False
-                    init_messages.append(
-                        "The pipeline requires ANTS but it "
-                        "seems ANTS is not configured in "
-                        "mia preferences."
-                    )
-
-            # Matlab:
-            try:
-                if (
-                    requirements["capsul_engine"]["uses"].get(
-                        "capsul.engine.module.matlab"
-                    )
-                    is None
-                    or Config().get_use_spm_standalone()
-                ):
-                    raise KeyError
-
-            except KeyError:
-                # The process don't need matlab
-                pass
-
-            else:
-                if "capsul.engine.module.matlab" in requirements:
-                    if not requirements["capsul.engine.module.matlab"].get(
-                        "executable", False
-                    ):
-                        init_result = False
-                        init_messages.append(
-                            "The pipeline requires Matlab "
-                            "but it seems Matlab is not "
-                            "configured in mia "
-                            "preferences."
-                        )
-
-                else:
-                    init_result = False
-                    init_messages.append(
-                        "The pipeline requires Matlab but "
-                        "it seems Matlab is not "
-                        "configured in mia preferences."
-                    )
-
-            # SPM
-            try:
-                if (
-                    requirements["capsul_engine"]["uses"].get(
-                        "capsul.engine.module.spm"
-                    )
-                    is None
-                ):
-                    raise KeyError
-
-            except KeyError:
-                # The process don't need spm
-                pass
-
-            else:
-                if "capsul.engine.module.spm" in requirements:
-                    if not requirements["capsul.engine.module.spm"].get(
-                        "directory", False
-                    ):
-                        init_result = False
-                        init_messages.append(
-                            "The pipeline requires SPM "
-                            "but it seems SPM is not "
-                            "configured in mia "
-                            "preferences."
-                        )
-
-                    elif requirements["capsul.engine.module.spm"][
-                        "standalone"
-                    ]:
-                        if Config().get_matlab_standalone_path() is None:
+                    if "capsul.engine.module.fsl" in requirements[req_node]:
+                        if not requirements[req_node][
+                            "capsul.engine.module.fsl"
+                        ].get("directory", False):
                             init_result = False
                             init_messages.append(
-                                "The pipeline requires "
-                                "SPM but it seems that in "
-                                "mia preferences, SPM has "
-                                "been configured as "
-                                "standalone while matlab "
-                                "Runtime is not "
-                                "configured."
+                                "The {} requires FSL "
+                                "but it seems FSL is not "
+                                "configured in mia "
+                                "preferences.".format(req_node.context_name)
                             )
 
                     else:
-                        try:
-                            requirements["capsul.engine.module.matlab"].get(
-                                "executable"
-                            )
+                        init_result = False
+                        init_messages.append(
+                            "The {} requires FSL but it "
+                            "seems FSL is not configured in "
+                            "mia preferences.".format(req_node.context_name)
+                        )
 
-                        except KeyError:
-                            init_result = False
-                            init_messages.append(
-                                "The pipeline requires "
-                                "SPM but it seems that in "
-                                "mia preferences, SPM has "
-                                "been configured as "
-                                "non-standalone while "
-                                "matlab with license is "
-                                "not configured."
-                            )
+                # AFNI:
+                try:
+                    if (
+                        requirements[req_node]["capsul_engine"]["uses"].get(
+                            "capsul.engine.module.afni"
+                        )
+                        is None
+                    ):
+                        raise KeyError
+
+                except KeyError:
+                    # The process don't need AFNI
+                    pass
 
                 else:
-                    init_result = False
-                    init_messages.append(
-                        "The pipeline requires SPM but it "
-                        "seems SPM is not configured in "
-                        "mia preferences."
-                    )
+                    if "capsul.engine.module.afni" in requirements[req_node]:
+                        if not requirements[req_node][
+                            "capsul.engine.module.afni"
+                        ].get("directory", False):
+                            init_result = False
+                            init_messages.append(
+                                "The {} requires AFNI "
+                                "but it seems AFNI is not "
+                                "configured in mia "
+                                "preferences.".format(req_node.context_name)
+                            )
+
+                    else:
+                        init_result = False
+                        init_messages.append(
+                            "The {} requires AFNI but it "
+                            "seems AFNI is not configured in "
+                            "mia preferences.".format(req_node.context_name)
+                        )
+
+                # ANTS:
+                try:
+                    if (
+                        requirements[req_node]["capsul_engine"]["uses"].get(
+                            "capsul.engine.module.ants"
+                        )
+                        is None
+                    ):
+                        raise KeyError
+
+                except KeyError:
+                    # The process don't need ANTS
+                    pass
+
+                else:
+                    if "capsul.engine.module.ants" in requirements[req_node]:
+                        if not requirements[req_node][
+                            "capsul.engine.module.ants"
+                        ].get("directory", False):
+                            init_result = False
+                            init_messages.append(
+                                "The {} requires ANTS "
+                                "but it seems ANTS is not "
+                                "configured in mia "
+                                "preferences.".format(req_node.context_name)
+                            )
+
+                    else:
+                        init_result = False
+                        init_messages.append(
+                            "The {} requires ANTS but it "
+                            "seems ANTS is not configured in "
+                            "mia preferences.".format(req_node.context_name)
+                        )
+
+                # Matlab:
+                # TODO: I'm not sure the configuration test is complete! Wouldn't
+                #       the "executable" path be for matlab with license? Would it
+                #       be necessary to test the "mcr_directory" for the MCR? The
+                #       test seems to be bypassed if
+                #       Config().get_use_spm_standalone()
+                try:
+                    if (
+                        requirements[req_node]["capsul_engine"]["uses"].get(
+                            "capsul.engine.module.matlab"
+                        )
+                        is None
+                        or Config().get_use_spm_standalone()
+                    ):
+                        raise KeyError
+
+                except KeyError:
+                    # The process don't need matlab
+                    pass
+
+                else:
+                    if "capsul.engine.module.matlab" in requirements[req_node]:
+                        if not requirements[req_node][
+                            "capsul.engine.module.matlab"
+                        ].get("executable", False):
+                            init_result = False
+                            init_messages.append(
+                                "The {} requires Matlab "
+                                "but it seems Matlab is not "
+                                "configured in mia "
+                                "preferences.".format(req_node.context_name)
+                            )
+
+                    else:
+                        init_result = False
+                        init_messages.append(
+                            "The {} requires Matlab but "
+                            "it seems Matlab is not "
+                            "configured in mia preferences.".format(
+                                req_node.context_name
+                            )
+                        )
+
+                # SPM
+                try:
+                    if (
+                        requirements[req_node]["capsul_engine"]["uses"].get(
+                            "capsul.engine.module.spm"
+                        )
+                        is None
+                    ):
+                        raise KeyError
+
+                except KeyError:
+                    # The process don't need spm
+                    pass
+
+                else:
+                    if "capsul.engine.module.spm" in requirements[req_node]:
+                        if not requirements[req_node][
+                            "capsul.engine.module.spm"
+                        ].get("directory", False):
+                            init_result = False
+                            init_messages.append(
+                                "The {} requires SPM "
+                                "but it seems SPM is not "
+                                "configured in mia "
+                                "preferences.".format(req_node.context_name)
+                            )
+
+                        elif requirements[req_node][
+                            "capsul.engine.module.spm"
+                        ]["standalone"]:
+                            if Config().get_matlab_standalone_path() is None:
+                                init_result = False
+                                init_messages.append(
+                                    "The {} requires "
+                                    "SPM but it seems that in "
+                                    "mia preferences, SPM has "
+                                    "been configured as "
+                                    "standalone while matlab "
+                                    "Runtime is not "
+                                    "configured.".format(req_node.context_name)
+                                )
+
+                        else:
+                            try:
+                                requirements[req_node][
+                                    "capsul.engine.module.matlab"
+                                ].get("executable")
+
+                            except KeyError:
+                                init_result = False
+                                init_messages.append(
+                                    "The {} requires "
+                                    "SPM but it seems that in "
+                                    "mia preferences, SPM has "
+                                    "been configured as "
+                                    "non-standalone while "
+                                    "matlab with license is "
+                                    "not configured.".format(
+                                        req_node.context_name
+                                    )
+                                )
+
+                    else:
+                        init_result = False
+                        init_messages.append(
+                            "The {} requires SPM but it "
+                            "seems SPM is not configured in "
+                            "mia preferences.".format(req_node.context_name)
+                        )
 
         # Check that completion for output parameters is fine (for each job)
         if self.workflow is not None:
@@ -3149,8 +3162,6 @@ class PipelineManagerTab(QWidget):
         #                 if not isinstance(node, Pipeline):
         #                     if node not in self.node_list:
         #                         self.node_list.append(node)
-
-
 
     def updateProcessLibrary(self, filename):
         """
