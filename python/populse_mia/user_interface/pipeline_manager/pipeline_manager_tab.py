@@ -1176,14 +1176,25 @@ class PipelineManagerTab(QWidget):
         config_pipeline = {}
         for node in self.node_list:
             if self.workflow is not None:
+                # config_pipeline.update(
+                #    {node: node.check_requirements(environment, message_list)}
+                # )
+                # config.update(node.check_requirements(environment,
+                #                                       message_list))
+                req = node.requirements()
+                settings = node.get_study_config().engine.settings
                 config_pipeline.update(
-                    {node: node.check_requirements(environment, message_list)}
+                    {
+                        node: settings.select_configurations(
+                            environment, uses=req
+                        )
+                    }
                 )
-                # config.update(node.check_requirements(environment, message_list))
             # else:
             #     req = node.requirements()
-            #     settings = node.pipeline.get_study_config().engine.settings
-            #     capsul_config = settings.select_configurations(environment, uses=req)
+            #     settings = node.get_study_config().engine.settings
+            #     capsul_config = settings.select_configurations(environment,
+            #                                                    uses=req)
             #     for module in req:
             #         module_name = settings.module_name(module)
             #         if module_name not in capsul_config:
@@ -1633,7 +1644,7 @@ class PipelineManagerTab(QWidget):
             init_messages.append(mssg)
 
         # retrieve node list
-        self.update_node_list(brick=pipeline)  #########
+        self.update_node_list(brick=pipeline)
 
         # check missing inputs
         if self.workflow is not None:
@@ -1786,18 +1797,13 @@ class PipelineManagerTab(QWidget):
                         )
 
                 # Matlab:
-                # TODO: I'm not sure the configuration test is complete! Wouldn't
-                #       the "executable" path be for matlab with license? Would it
-                #       be necessary to test the "mcr_directory" for the MCR? The
-                #       test seems to be bypassed if
-                #       Config().get_use_spm_standalone()
                 try:
                     if (
                         requirements[req_node]["capsul_engine"]["uses"].get(
                             "capsul.engine.module.matlab"
                         )
                         is None
-                        or Config().get_use_spm_standalone()
+                        # or Config().get_use_spm_standalone()
                     ):
                         raise KeyError
 
@@ -1807,13 +1813,29 @@ class PipelineManagerTab(QWidget):
 
                 else:
                     if "capsul.engine.module.matlab" in requirements[req_node]:
-                        if not requirements[req_node][
-                            "capsul.engine.module.matlab"
-                        ].get("executable", False):
+                        if Config().get_use_spm() and not requirements[
+                            req_node
+                        ]["capsul.engine.module.matlab"].get(
+                            "executable", False
+                        ):
                             init_result = False
                             init_messages.append(
-                                "The {} requires Matlab "
+                                "The {} requires Matlab"
                                 "but it seems Matlab is not "
+                                "configured in mia "
+                                "preferences.".format(req_node.context_name)
+                            )
+
+                        if (
+                            Config().get_use_spm_standalone()
+                            and not requirements[req_node][
+                                "capsul.engine.module.matlab"
+                            ].get("mcr_directory", False)
+                        ):
+                            init_result = False
+                            init_messages.append(
+                                "The {} requires Matlab MCR"
+                                "but it seems Matlab MCR is not "
                                 "configured in mia "
                                 "preferences.".format(req_node.context_name)
                             )
@@ -1858,7 +1880,8 @@ class PipelineManagerTab(QWidget):
                         elif requirements[req_node][
                             "capsul.engine.module.spm"
                         ]["standalone"]:
-                            if Config().get_matlab_standalone_path() is None:
+                            # if Config().get_matlab_standalone_path() is None:
+                            if not Config().get_use_matlab_standalone():
                                 init_result = False
                                 init_messages.append(
                                     "The {} requires "
@@ -1866,7 +1889,7 @@ class PipelineManagerTab(QWidget):
                                     "mia preferences, SPM has "
                                     "been configured as "
                                     "standalone while matlab "
-                                    "Runtime is not "
+                                    "MCR is not "
                                     "configured.".format(req_node.context_name)
                                 )
 
@@ -3158,7 +3181,8 @@ class PipelineManagerTab(QWidget):
         #             print(key, '->', node)
         #             if key == '':
         #                 continue
-        #             if pipeline_tools.is_node_enabled(brick.process, key, node):
+        #             if pipeline_tools.is_node_enabled(brick.process,
+        #                                               key, node):
         #                 if not isinstance(node, Pipeline):
         #                     if node not in self.node_list:
         #                         self.node_list.append(node)
