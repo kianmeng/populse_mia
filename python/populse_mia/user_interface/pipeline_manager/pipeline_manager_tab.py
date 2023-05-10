@@ -130,8 +130,10 @@ class PipelineManagerTab(QWidget):
         - _show_preview:
         - add_plug_value_to_database: add the plug value to the database.
         - add_process_to_preview: add a process to the pipeline
-        - build_iterated_pipeline:
-        - cleanup_older_init:
+        - build_iterated_pipeline: build a new pipeline with an iteration node
+        - check_requirements: return the configuration of a pipeline
+          as required
+        - cleanup_older_init: remove non-existent entries from the databrowser
         - complete_pipeline_parameters:
         - controller_value_changed: update history when a pipeline node is
           changed
@@ -746,11 +748,11 @@ class PipelineManagerTab(QWidget):
                 # ambiguous inputs -> output
                 # ask the user, or use previously setup answers.
 
-                # FIXME:
-                # There is a GUI dialog here, involving user interaction.
-                # This should probably be avoided here in a processing loop.
-                # Some pipelines, especially with iterations, may ask many many
-                # questions to users. These should be worked on earlier.
+                # FIXME: There is a GUI dialog here, involving user
+                #        interaction. This should probably be avoided here in
+                #        a processing loop. Some pipelines, especially with
+                #        iterations, may ask many many questions to users.
+                #        These should be worked on earlier.
 
                 if node_name in self.key:
                     param = self.key[node_name]
@@ -1075,8 +1077,8 @@ class PipelineManagerTab(QWidget):
                     link[2].get_trait(link[1]).forbid_completion = True
 
             if not isinstance(pipeline, Pipeline):
-                # "pipeline" is actally a single process (or should, if it
-                # is not a # pipeline). Get it into a pipeine (with a
+                # "pipeline" is actually a single process (or should, if it
+                # is not a # pipeline). Get it into a pipeline (with a
                 # single node) to  make the workflow.
                 new_pipeline = Pipeline()
                 new_pipeline.set_study_config(pipeline.study_config)
@@ -1170,36 +1172,18 @@ class PipelineManagerTab(QWidget):
         # compl = ProcessCompletionEngine.get_completion_engine(it_pipeline)
         return it_pipeline
 
-    def check_requirements(self, environment="global", message_list=None):
-        """blabla"""
+    def check_requirements(self, environment="global"):
+        """Return the configuration of a pipeline as required."""
 
         config_pipeline = {}
+
         for node in self.node_list:
-            if self.workflow is not None:
-                # config_pipeline.update(
-                #    {node: node.check_requirements(environment, message_list)}
-                # )
-                # config.update(node.check_requirements(environment,
-                #                                       message_list))
-                req = node.requirements()
-                settings = node.get_study_config().engine.settings
-                config_pipeline.update(
-                    {
-                        node: settings.select_configurations(
-                            environment, uses=req
-                        )
-                    }
-                )
-            # else:
-            #     req = node.requirements()
-            #     settings = node.get_study_config().engine.settings
-            #     capsul_config = settings.select_configurations(environment,
-            #                                                    uses=req)
-            #     for module in req:
-            #         module_name = settings.module_name(module)
-            #         if module_name not in capsul_config:
-            #             if module not in config:
-            #                 config[module] = None
+            req = node.requirements()
+            settings = node.get_study_config().engine.settings
+            config_pipeline.update(
+                {node: settings.select_configurations(environment, uses=req)}
+            )
+
         return config_pipeline
 
     def cleanup_older_init(self):
@@ -1494,9 +1478,15 @@ class PipelineManagerTab(QWidget):
         """check on missing parameters for
         each job"""
 
-        missing_inputs = []
+        missing_mandatory_param = []
 
         for node in self.node_list:
+            if node.context_name.split(".")[0] == "Pipeline":
+                node_name = ".".join(node.context_name.split(".")[1:])
+
+            else:
+                node_name = node.context_name
+
             job = None
 
             for item in node.get_missing_mandatory_parameters():
@@ -1531,11 +1521,11 @@ class PipelineManagerTab(QWidget):
                 # fmt: on
 
                 else:
-                    item_name = "%s.%s" % (node.context_name, item)
+                    item_name = "%s.%s" % (node_name, item)
 
-                missing_inputs.append(item_name)
+                missing_mandatory_param.append(item_name)
 
-        return missing_inputs
+        return missing_mandatory_param
 
     def initialize(self):
         """Clean previous initialization then initialize the current
@@ -1616,6 +1606,7 @@ class PipelineManagerTab(QWidget):
             'Pipeline "{0}" is getting initialized. '
             "Please wait.".format(name)
         )
+        QApplication.processEvents()
         init_result = True
 
         # complete config for completion
@@ -1628,46 +1619,48 @@ class PipelineManagerTab(QWidget):
 
         # completion / retrieve workflow
         try:
-            print("Completion / workflow...")
-            print("pipeline:", pipeline)
+            print(
+                "Workflow generation / completion for the "
+                "{} pipeline...".format(name)
+            )
             self.workflow = workflow_from_pipeline(
                 pipeline, check_requirements=False, complete_parameters=True
             )
-            print("\nWorkflow done.\n")
+            print("\nWorkflow done!\n")
 
-        except (TypeError, ValueError) as error:
+        except Exception as e:
             init_result = False
-            ptype = "pipeline"
-            mssg = ("In {0} {1}, initialization error: " "{2}").format(
-                ptype, name, str(error)
+            mssg = (
+                "Error when building the workflow for the {0} "
+                "pipeline:\n{1}  {2}: {3}\n".format(
+                    name,
+                    "".join(traceback.format_tb(e.__traceback__)),
+                    e.__class__.__name__,
+                    e,
+                )
             )
+
             init_messages.append(mssg)
 
-        # retrieve node list
-        self.update_node_list(brick=pipeline)
-
-        # check missing inputs
         if self.workflow is not None:
-            missing_inputs = self.get_missing_mandatory_parameters()
+            # retrieve node list
+            self.update_node_list(brick=pipeline)
+            # check missing mandatory parameters
+            missing_mandat_param = self.get_missing_mandatory_parameters()
+            # check requirements
+            requirements = self.check_requirements()
 
         else:
-            missing_inputs = None
+            missing_mandat_param = []
+            requirements = None
 
-        if missing_inputs is not None and len(missing_inputs) != 0:
-            ptype = "pipeline"
-            mssg = ("In {0} {1}, missing mandatory " "parameters: {2}").format(
-                ptype, name, ", ".join(missing_inputs)
+        if len(missing_mandat_param) != 0:
+            mssg = (
+                "Missing mandatory parameters in pipeline {0}:\n  "
+                "{1}\n".format(name, "\n  ".join(missing_mandat_param))
             )
             init_messages.append(mssg)
             init_result = False
-
-        # check requirements
-        # requirements is None if requirement are not met
-        # requirement is {} if no requirement defined in the process
-        # requirement is
-        requirements = self.check_requirements(
-            "global", message_list=req_messages
-        )
 
         if requirements is None:
             pipeline.check_requirements(message_list=req_messages)
@@ -1676,19 +1669,25 @@ class PipelineManagerTab(QWidget):
             print("\nCurrent configuration:")
             print(study_config.engine.settings.select_configurations("global"))
             init_result = False
-            init_messages.append(
-                "The pipeline requirements are not met. "
-                "Please see the standard output for more "
-                "information."
-            )
+            req_messages = [
+                "Please see the standard output for more " "information.\n"
+            ]
 
         else:
-            # QUESTION: Would it be better to write a general method for
-            #           testing all modules (currently each module test is
-            #           hard coded below)?
-            # TODO: Are these tests compatible with remote run?
+            # FIXME: Would it be better to write a general method for
+            #        testing all modules (currently each module test is
+            #        hard coded below)?
+            # FIXME: Are these tests compatible with remote run?
             # FIXME: Make a requirement check for FreeSurfer:
             for req_node in requirements:
+                if req_node.context_name.split(".")[0] == "Pipeline":
+                    req_node_name = ".".join(
+                        req_node.context_name.split(".")[1:]
+                    )
+
+                else:
+                    req_node_name = req_node.context_name
+
                 # FreeSurfer
 
                 # FSL:
@@ -1711,19 +1710,19 @@ class PipelineManagerTab(QWidget):
                             "capsul.engine.module.fsl"
                         ].get("directory", False):
                             init_result = False
-                            init_messages.append(
+                            req_messages.append(
                                 "The {} requires FSL "
                                 "but it seems FSL is not "
                                 "configured in mia "
-                                "preferences.".format(req_node.context_name)
+                                "preferences.".format(req_node_name)
                             )
 
                     else:
                         init_result = False
-                        init_messages.append(
+                        req_messages.append(
                             "The {} requires FSL but it "
                             "seems FSL is not configured in "
-                            "mia preferences.".format(req_node.context_name)
+                            "mia preferences.".format(req_node_name)
                         )
 
                 # AFNI:
@@ -1746,19 +1745,19 @@ class PipelineManagerTab(QWidget):
                             "capsul.engine.module.afni"
                         ].get("directory", False):
                             init_result = False
-                            init_messages.append(
+                            req_messages.append(
                                 "The {} requires AFNI "
                                 "but it seems AFNI is not "
                                 "configured in mia "
-                                "preferences.".format(req_node.context_name)
+                                "preferences.".format(req_node_name)
                             )
 
                     else:
                         init_result = False
-                        init_messages.append(
+                        req_messages.append(
                             "The {} requires AFNI but it "
                             "seems AFNI is not configured in "
-                            "mia preferences.".format(req_node.context_name)
+                            "mia preferences.".format(req_node_name)
                         )
 
                 # ANTS:
@@ -1781,19 +1780,19 @@ class PipelineManagerTab(QWidget):
                             "capsul.engine.module.ants"
                         ].get("directory", False):
                             init_result = False
-                            init_messages.append(
+                            req_messages.append(
                                 "The {} requires ANTS "
                                 "but it seems ANTS is not "
                                 "configured in mia "
-                                "preferences.".format(req_node.context_name)
+                                "preferences.".format(req_node_name)
                             )
 
                     else:
                         init_result = False
-                        init_messages.append(
+                        req_messages.append(
                             "The {} requires ANTS but it "
                             "seems ANTS is not configured in "
-                            "mia preferences.".format(req_node.context_name)
+                            "mia preferences.".format(req_node_name)
                         )
 
                 # Matlab:
@@ -1819,11 +1818,11 @@ class PipelineManagerTab(QWidget):
                             "executable", False
                         ):
                             init_result = False
-                            init_messages.append(
+                            req_messages.append(
                                 "The {} requires Matlab"
                                 "but it seems Matlab is not "
                                 "configured in mia "
-                                "preferences.".format(req_node.context_name)
+                                "preferences.".format(req_node_name)
                             )
 
                         if (
@@ -1833,20 +1832,20 @@ class PipelineManagerTab(QWidget):
                             ].get("mcr_directory", False)
                         ):
                             init_result = False
-                            init_messages.append(
+                            req_messages.append(
                                 "The {} requires Matlab MCR"
                                 "but it seems Matlab MCR is not "
                                 "configured in mia "
-                                "preferences.".format(req_node.context_name)
+                                "preferences.".format(req_node_name)
                             )
 
                     else:
                         init_result = False
-                        init_messages.append(
+                        req_messages.append(
                             "The {} requires Matlab but "
                             "it seems Matlab is not "
                             "configured in mia preferences.".format(
-                                req_node.context_name
+                                req_node_name
                             )
                         )
 
@@ -1870,11 +1869,11 @@ class PipelineManagerTab(QWidget):
                             "capsul.engine.module.spm"
                         ].get("directory", False):
                             init_result = False
-                            init_messages.append(
+                            req_messages.append(
                                 "The {} requires SPM "
                                 "but it seems SPM is not "
                                 "configured in mia "
-                                "preferences.".format(req_node.context_name)
+                                "preferences.".format(req_node_name)
                             )
 
                         elif requirements[req_node][
@@ -1883,14 +1882,14 @@ class PipelineManagerTab(QWidget):
                             # if Config().get_matlab_standalone_path() is None:
                             if not Config().get_use_matlab_standalone():
                                 init_result = False
-                                init_messages.append(
+                                req_messages.append(
                                     "The {} requires "
                                     "SPM but it seems that in "
                                     "mia preferences, SPM has "
                                     "been configured as "
                                     "standalone while matlab "
                                     "MCR is not "
-                                    "configured.".format(req_node.context_name)
+                                    "configured.".format(req_node_name)
                                 )
 
                         else:
@@ -1901,28 +1900,34 @@ class PipelineManagerTab(QWidget):
 
                             except KeyError:
                                 init_result = False
-                                init_messages.append(
+                                req_messages.append(
                                     "The {} requires "
                                     "SPM but it seems that in "
                                     "mia preferences, SPM has "
                                     "been configured as "
                                     "non-standalone while "
                                     "matlab with license is "
-                                    "not configured.".format(
-                                        req_node.context_name
-                                    )
+                                    "not configured.".format(req_node_name)
                                 )
 
                     else:
                         init_result = False
-                        init_messages.append(
+                        req_messages.append(
                             "The {} requires SPM but it "
                             "seems SPM is not configured in "
-                            "mia preferences.".format(req_node.context_name)
+                            "mia preferences.".format(req_node_name)
                         )
+
+        if len(req_messages) != 0:
+            mssg = (
+                "The pipeline requirements are not met for pipeline {0}:\n"
+                "  {1}\n".format(name, "\n  ".join(req_messages))
+            )
+            init_messages.append(mssg)
 
         # Check that completion for output parameters is fine (for each job)
         if self.workflow is not None:
+            missing_out_param = []
             for job in self.workflow.jobs:
                 if hasattr(job, "process"):
                     node = job.process()
@@ -1946,11 +1951,18 @@ class PipelineManagerTab(QWidget):
                         else:
                             node_name = node.context_name
 
-                        init_messages.append(
-                            "It seems that mandatory output parameter(s) "
-                            " has not been automatically set for the "
-                            '"{0}" brick.'.format(node_name)
-                        )
+                        missing_out_param.append(node_name)
+
+        else:
+            missing_out_param = []
+
+        if len(missing_out_param) != 0:
+            mssg = (
+                "Missing mandatory output parameter(s) for the "
+                "following brick(s) in the {0} pipeline:\n  "
+                "{1}\n".format(name, "\n  ".join(missing_out_param))
+            )
+            init_messages.append(mssg)
 
         if init_result:
             # add pipeline to the history collection
@@ -2087,20 +2099,22 @@ class PipelineManagerTab(QWidget):
 
             if not init_result:
                 if init_messages:
-                    message = "The pipeline could not be initialised properly:"
+                    message = (
+                        "The pipeline could not be initialized " "properly:\n"
+                    )
 
                     for mssg in init_messages:
                         message = message + "\n- " + mssg
 
                 else:
                     message = (
-                        "The pipeline could not be initialised "
+                        "The pipeline could not be initialized "
                         "correctly, for an unknown reason!"
                     )
 
                 lineCnt = message.count("\n")
                 self.msg = QMessageBox()
-                self.msg.setWindowTitle("MIA configuration warning!")
+                self.msg.setWindowTitle("Pipeline initialization warning!")
 
                 if lineCnt > 10:
                     scroll = QtWidgets.QScrollArea()
@@ -3154,15 +3168,14 @@ class PipelineManagerTab(QWidget):
             job.inheritance_dict = new_inheritance_dict
 
     def update_node_list(self, brick=None):
-        """
-        Update the list of nodes in workflow
-        """
-        if self.workflow is not None:
-            for job in self.workflow.jobs:
-                if hasattr(job, "process"):
-                    node = job.process()
-                    if node not in self.node_list:
-                        self.node_list.append(node)
+        """Update the list of nodes in workflow"""
+
+        for job in self.workflow.jobs:
+            if hasattr(job, "process"):
+                node = job.process()
+
+                if node not in self.node_list:
+                    self.node_list.append(node)
         # elif brick is not None:
         #     if hasattr(brick, "nodes"):
         #         from capsul.pipeline import pipeline_tools
@@ -3610,8 +3623,6 @@ class RunWorker(QThread):
             print(
                 "\n{0} has not run correctly:\n{1}\n".format(pipeline.name, e)
             )
-            import traceback
-
             traceback.print_exc()
 
         del self.pipeline_manager

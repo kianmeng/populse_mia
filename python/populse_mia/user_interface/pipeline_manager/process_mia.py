@@ -409,10 +409,7 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
                 "\n. {0} ({1}) MIA node ...".format(
                     node_name,
                     ".".join(
-                        (
-                            self.process.__module__,
-                            self.process.__class__.__name__,
-                        )
+                        in_process.__module__, in_process.__class__.__name__
                     ),
                 )
             )
@@ -794,7 +791,9 @@ class ProcessMIA(Process):
         ):
             print(
                 "\nDuring the {0} process initialisation, some possible "
-                "problems were detected:".format(self)
+                "problems were detected:".format(
+                    self.context_name.rsplit(".", 1)[-1]
+                )
             )
 
             if self.requirement is None:
