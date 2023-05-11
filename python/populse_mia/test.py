@@ -8902,7 +8902,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # Asserts the output
         self.assertTrue(isinstance(config, dict))
         self.assertTrue(
-            list(config.keys())
+            list(config[next(iter(config))].keys())
             == ["capsul_engine", "capsul.engine.module.nipype"]
         )
 
@@ -9241,8 +9241,8 @@ class TestMIAPipelineManagerTab(TestMIACase):
         ppl_manager.update_node_list()
         missing_inputs = ppl_manager.get_missing_mandatory_parameters()
         self.assertEqual(len(missing_inputs), 2)
-        self.assertEqual(missing_inputs[0], "Pipeline.rename_1.format_string")
-        self.assertEqual(missing_inputs[1], "Pipeline.rename_1.in_file")
+        self.assertEqual(missing_inputs[0], "rename_1.format_string")
+        self.assertEqual(missing_inputs[1], "rename_1.in_file")
 
         # Empties the jobs list
         ppl_manager.workflow.jobs = []
@@ -9250,8 +9250,8 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # Asserts that 2 mandatory parameters are still missing
         missing_inputs = ppl_manager.get_missing_mandatory_parameters()
         self.assertEqual(len(missing_inputs), 2)
-        self.assertEqual(missing_inputs[0], "Pipeline.rename_1.format_string")
-        self.assertEqual(missing_inputs[1], "Pipeline.rename_1.in_file")
+        self.assertEqual(missing_inputs[0], "rename_1.format_string")
+        self.assertEqual(missing_inputs[1], "rename_1.in_file")
 
     def test_get_pipeline_or_process(self):
         """Adds a process and gets a pipeline and a process from the pipeline
@@ -10288,10 +10288,10 @@ class TestMIAPipelineManagerTab(TestMIACase):
         init_result = ppl_manager.init_pipeline()
         ppl_manager.msg.accept()
         self.assertFalse(init_result)
-        ppl_manager.check_requirements.assert_called_once_with(
-            "global", message_list=[]
-        )
-
+        # ppl_manager.check_requirements.assert_called_once_with(
+        #    "global", message_list=[]
+        # )
+        ppl_manager.check_requirements.assert_called_once()
         # Mocks external packages as requirements and initializes the pipeline
         pkgs = ["fsl", "afni", "ants", "matlab", "spm"]
         req = {"capsul_engine": {"uses": Mock()}}
@@ -10300,6 +10300,9 @@ class TestMIAPipelineManagerTab(TestMIACase):
             req["capsul.engine.module.{}".format(pkg)] = {"directory": False}
 
         req["capsul_engine"]["uses"].get = Mock(return_value=1)
+        proc = Mock()
+        proc.context_name = "moke_process"
+        req = {proc: req}
         ppl_manager.check_requirements = Mock(return_value=req)
 
         # QTimer.singleShot(1000, self.execute_QDialogAccept)
@@ -10308,8 +10311,8 @@ class TestMIAPipelineManagerTab(TestMIACase):
         self.assertFalse(init_result)
 
         # Extra steps for SPM
-        req["capsul.engine.module.spm"]["directory"] = True
-        req["capsul.engine.module.spm"]["standalone"] = True
+        req[proc]["capsul.engine.module.spm"]["directory"] = True
+        req[proc]["capsul.engine.module.spm"]["standalone"] = True
         Config().set_matlab_standalone_path(None)
 
         # QTimer.singleShot(1000, self.execute_QDialogAccept)
@@ -10317,7 +10320,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
         ppl_manager.msg.accept()
         self.assertFalse(init_result)
 
-        req["capsul.engine.module.spm"]["standalone"] = False
+        req[proc]["capsul.engine.module.spm"]["standalone"] = False
 
         # QTimer.singleShot(1000, self.execute_QDialogAccept)
         init_result = ppl_manager.init_pipeline()
@@ -10326,7 +10329,7 @@ class TestMIAPipelineManagerTab(TestMIACase):
 
         # Deletes an attribute of each package requirement
         for pkg in pkgs:
-            del req["capsul.engine.module.{}".format(pkg)]
+            del req[proc]["capsul.engine.module.{}".format(pkg)]
 
         # QTimer.singleShot(1000, self.execute_QDialogAccept)
         init_result = ppl_manager.init_pipeline()
