@@ -409,7 +409,7 @@ class MIAProcessCompletionEngine(ProcessCompletionEngine):
                 "\n. {0} ({1}) MIA node ...".format(
                     node_name,
                     ".".join(
-                        in_process.__module__, in_process.__class__.__name__
+                        [in_process.__module__, in_process.__class__.__name__]
                     ),
                 )
             )
