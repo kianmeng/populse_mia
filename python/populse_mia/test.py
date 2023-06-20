@@ -122,9 +122,7 @@ if (
 
     # Adding mia_processes:
     if os.path.isdir(os.path.join(root_dev_dir, "mia_processes")):
-        mia_processes_dev_dir = os.path.join(
-            root_dev_dir, "mia_processes", "python"
-        )
+        mia_processes_dev_dir = os.path.join(root_dev_dir, "mia_processes")
         print(
             "- Using mia_processes package from {} "
             "...".format(mia_processes_dev_dir)

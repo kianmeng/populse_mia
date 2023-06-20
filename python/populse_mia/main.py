@@ -211,7 +211,7 @@ if (
     ):
         i += 1
         mia_processes_dev_dir = os.path.join(
-            root_dev_dir, populse_bdir, "mia_processes", branch, "python"
+            root_dev_dir, populse_bdir, "mia_processes", branch
         )
         print(
             "  . Using mia_processes package from {} "
@@ -895,7 +895,7 @@ def main():
                 os.path.join("populse_mia", "python"),
                 "capsul",
                 os.path.join("populse_db", "python"),
-                os.path.join("mia_processes", "python"),
+                "mia_processes",
                 os.path.join("soma-base", "python"),
                 os.path.join("soma-workflow", "python"),
                 os.path.join("populse_mia", "processes"),
