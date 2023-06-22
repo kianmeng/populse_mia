@@ -2697,10 +2697,14 @@ class PipelineManagerTab(QWidget):
         filename = self.pipelineEditorTabs.get_current_filename()
 
         # save
-        if filename and not uncheck:
+        if (
+            filename
+            and not uncheck
+            and os.path.join("mia_processes", "mia_processes") not in filename
+        ):
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
-            msg.setWindowTitle("populse_mia - " "Save pipeline Warning!")
+            msg.setWindowTitle("populse_mia - Save pipeline Warning!")
             msg.setText(
                 "The following module will be overwritten:\n\n"
                 "{}\n\n"
@@ -2727,7 +2731,10 @@ class PipelineManagerTab(QWidget):
                     )
                 )
 
-        elif filename:
+        elif (
+            filename
+            and os.path.join("mia_processes", "mia_processes") not in filename
+        ):
             self.pipelineEditorTabs.save_pipeline(new_file_name=filename)
             self.main_window.statusBar().showMessage(
                 "The '{}' pipeline has been "

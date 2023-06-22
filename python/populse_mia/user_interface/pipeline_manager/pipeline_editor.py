@@ -956,7 +956,10 @@ class PipelineEditor(PipelineDeveloperView):
 
         config = Config()
 
-        if not filename:
+        if (
+            not filename
+            or os.path.join("mia_processes", "mia_processes") in filename
+        ):
             pipeline = self.scene.pipeline
             folder = os.path.abspath(
                 os.path.join(
