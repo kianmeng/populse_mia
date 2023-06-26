@@ -1652,7 +1652,7 @@ class PipelineManagerTab(QWidget):
 
         else:
             missing_mandat_param = []
-            requirements = None
+            requirements = {}
 
         if len(missing_mandat_param) != 0:
             mssg = (
@@ -1662,12 +1662,14 @@ class PipelineManagerTab(QWidget):
             init_messages.append(mssg)
             init_result = False
 
-        if requirements is None:
+        if requirements == {}:
             pipeline.check_requirements(message_list=req_messages)
             print("\nPipeline requirements are not met:")
             print("\n".join(req_messages))
             print("\nCurrent configuration:")
-            print(study_config.engine.settings.select_configurations("global"))
+            # print(study_config.engine.settings.select_configurations(
+            #     "global"))
+            print(study_config.engine.settings.export_config_dict("global"))
             init_result = False
             req_messages = [
                 "Please see the standard output for more " "information.\n"

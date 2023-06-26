@@ -10281,8 +10281,8 @@ class TestMIAPipelineManagerTab(TestMIACase):
         # init_result = ppl_manager.init_pipeline(pipeline=ppl)
         # ppl_manager.msg.accept()
 
-        # Mocks null requirements and initializes the pipeline
-        ppl_manager.check_requirements = Mock(return_value=None)
+        # Mocks requirements to {} and initializes the pipeline
+        ppl_manager.check_requirements = Mock(return_value={})
         init_result = ppl_manager.init_pipeline()
         ppl_manager.msg.accept()
         self.assertFalse(init_result)
