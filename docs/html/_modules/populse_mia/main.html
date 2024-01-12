@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>populse_mia.main &#8212; populse_mia 2.5.2-dev+5f005d4e documentation</title>
+    <title>populse_mia.main &#8212; populse_mia 2.5.3-dev+a1a99eaf documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=f63d8bfa" />
     <link rel="stylesheet" type="text/css" href="../../_static/haiku.css?v=e491ac2d" />
-    <script src="../../_static/documentation_options.js?v=52014ebe"></script>
+    <script src="../../_static/documentation_options.js?v=848ce3e1"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
@@ -16,7 +16,7 @@
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="../../index.html">
-          <span>populse_mia 2.5.2-dev+5f005d4e documentation</span></a></h1>
+          <span>populse_mia 2.5.3-dev+a1a99eaf documentation</span></a></h1>
         <h2 class="heading"><span>populse_mia.main</span></h2>
       </div>
       <div class="topnav" role="navigation" aria-label="top navigation">
@@ -290,16 +290,39 @@
 
         <span class="k">del</span> <span class="n">root_dev_dir</span>
 
-    <span class="k">elif</span> <span class="s2">&quot;CASA_DISTRO&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
-        <span class="c1"># If the casa distro development environment is detected,</span>
-        <span class="c1"># developer mode is activated.</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MIA_DEV_MODE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
-        <span class="n">DEV_MODE</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># elif &quot;CASA_DISTRO&quot; in os.environ:</span>
+    <span class="c1">#     # If the casa distro development environment is detected,</span>
+    <span class="c1">#     # developer mode is activated.</span>
+    <span class="c1">#     os.environ[&quot;MIA_DEV_MODE&quot;] = &quot;1&quot;</span>
+    <span class="c1">#     DEV_MODE = True</span>
 
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># &quot;user&quot; mode</span>
         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MIA_DEV_MODE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
         <span class="n">DEV_MODE</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">- Mia in &quot;user&quot; mode&#39;</span><span class="p">)</span>
+        <span class="c1"># Where do we import the modules from?</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;populse_mia&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;capsul&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;soma&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;soma_workflow&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;populse_db&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;mia_processes&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+                <span class="n">mod</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mod</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;  . Using </span><span class="si">{0}</span><span class="s2"> package from </span><span class="si">{1}</span><span class="s2"> ...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">mod</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">mod</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
 
     <span class="c1"># Check if nipype, mia_processes and capsul are available on the station.</span>
     <span class="c1"># If not available ask the user to install them</span>
