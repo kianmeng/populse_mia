@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Pre-requirements for virtualization using Brainvisa - Linux &#8212; populse_mia 2.5.3-dev+03d533b8 documentation</title>
+    <title>Pre-requirements for virtualization using Brainvisa - Linux &#8212; populse_mia 2.5.3-dev+e9ccb936 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=f63d8bfa" />
     <link rel="stylesheet" type="text/css" href="../_static/haiku.css?v=dfa0e015" />
-    <script src="../_static/documentation_options.js?v=9ebd5e4c"></script>
+    <script src="../_static/documentation_options.js?v=cfe19ba0"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
   </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="../index.html">
-          <span>populse_mia 2.5.3-dev+03d533b8 documentation</span></a></h1>
+          <span>populse_mia 2.5.3-dev+e9ccb936 documentation</span></a></h1>
         <h2 class="heading"><span>Pre-requirements for virtualization using Brainvisa - Linux</span></h2>
       </div>
       <div class="topnav" role="navigation" aria-label="top navigation">
@@ -72,7 +72,7 @@ Description<span class="w">  </span>:<span class="w"> </span>Singularity<span cl
 </pre></div>
 </div>
 <p>If Singularity is not already installed:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>%<span class="w"> </span>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>singularity
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>%<span class="w"> </span>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>singularity<span class="w">  </span><span class="c1"># sudo dnf install singularity-ce, for recent versions of singularity</span>
 </pre></div>
 </div>
 <p><strong>Ubuntu</strong></p>
@@ -103,6 +103,10 @@ For example download singularity-ce_3.8.3~ubuntu-20.04_amd64.deb then :</p>
 </div>
 <p>Optionally, you can launch the graphical configuration interface, e.g. to define mounting points, etc:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bv
+</pre></div>
+</div>
+<p>Build from the container terminal (after <cite>bv bash</cite>) or outside the container:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bv_maker
 </pre></div>
 </div>
 <p>Then open an interactive shell in the container:</p>
