@@ -1,22 +1,23 @@
+
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../../">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>populse_mia.main &#8212; populse_mia 2.5.3-dev+03d533b8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=f63d8bfa" />
-    <link rel="stylesheet" type="text/css" href="../../_static/haiku.css?v=dfa0e015" />
-    <script src="../../_static/documentation_options.js?v=9ebd5e4c"></script>
-    <script src="../../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <title>populse_mia.main &#8212; populse_mia 2.5.3-dev+22288fd0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/haiku.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({startOnLoad:true});</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="../../index.html">
-          <span>populse_mia 2.5.3-dev+03d533b8 documentation</span></a></h1>
+          <span>populse_mia 2.5.3-dev+22288fd0 documentation</span></a></h1>
         <h2 class="heading"><span>populse_mia.main</span></h2>
       </div>
       <div class="topnav" role="navigation" aria-label="top navigation">
@@ -62,9 +63,7 @@
 <span class="c1"># main_window = None</span>
 
 
-<div class="viewcode-block" id="main">
-<a class="viewcode-back" href="../../populse_mia.html#populse_mia.main.main">[docs]</a>
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../populse_mia.html#populse_mia.main.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Make basic configuration check, then actual launch of Mia.</span>
 
 <span class="sd">    Checks if Mia is called from the site/dist packages (`user mode`) or from a</span>
@@ -85,6 +84,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">pypath</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">package_not_found</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="c1"># Disables any etelemetry check.</span>
     <span class="k">if</span> <span class="s2">&quot;NO_ET&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
@@ -163,11 +163,13 @@
             <span class="k">del</span> <span class="n">capsul_dev_dir</span>
 
         <span class="k">else</span><span class="p">:</span>
+
             <span class="k">try</span><span class="p">:</span>
                 <span class="kn">import</span> <span class="nn">capsul</span>
 
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">pass</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  . capsul package was not found!...&quot;</span><span class="p">)</span>
+                <span class="n">package_not_found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;capsul&quot;</span><span class="p">)</span>
 
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">capsul_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">capsul</span><span class="o">.</span><span class="vm">__file__</span><span class="p">))</span>
@@ -189,12 +191,19 @@
             <span class="k">del</span> <span class="n">soma_b_dev_dir</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">soma</span>
 
-            <span class="n">soma_b_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">soma</span><span class="o">.</span><span class="vm">__file__</span><span class="p">))</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  . Using soma package from </span><span class="si">{}</span><span class="s2"> ...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">soma_b_dir</span><span class="p">))</span>
-            <span class="k">del</span> <span class="n">soma_b_dir</span>
-            <span class="k">del</span> <span class="n">soma</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">soma</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  . soma package was not found!...&quot;</span><span class="p">)</span>
+                <span class="n">package_not_found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;soma&quot;</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">soma_b_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">soma</span><span class="o">.</span><span class="vm">__file__</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  . Using soma package from </span><span class="si">{}</span><span class="s2"> ...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">soma_b_dir</span><span class="p">))</span>
+                <span class="k">del</span> <span class="n">soma_b_dir</span>
+                <span class="k">del</span> <span class="n">soma</span>
 
         <span class="c1"># Adding soma_workflow:</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span>
@@ -213,16 +222,25 @@
             <span class="k">del</span> <span class="n">soma_w_dev_dir</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">soma_workflow</span>
 
-            <span class="n">soma_w_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">soma_workflow</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span>
-                <span class="s2">&quot;  . Using soma_worflow package from </span><span class="si">{}</span><span class="s2"> ...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">soma_w_dir</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="k">del</span> <span class="n">soma_w_dir</span>
-            <span class="k">del</span> <span class="n">soma_workflow</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">soma_workflow</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  . soma_workflow package was not found!...&quot;</span><span class="p">)</span>
+                <span class="n">package_not_found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;soma_workflow&quot;</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">soma_w_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">soma_workflow</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;  . Using soma_worflow package from </span><span class="si">{}</span><span class="s2"> ...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">soma_w_dir</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">del</span> <span class="n">soma_w_dir</span>
+                <span class="k">del</span> <span class="n">soma_workflow</span>
 
         <span class="c1"># Adding populse_db:</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span>
@@ -241,18 +259,25 @@
             <span class="k">del</span> <span class="n">populse_db_dev_dir</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">populse_db</span>
 
-            <span class="n">populse_db_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">populse_db</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span>
-                <span class="s2">&quot;  . Using populse_db package from </span><span class="si">{}</span><span class="s2"> ...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">populse_db_dir</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">populse_db</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  . populse_db package was not found!...&quot;</span><span class="p">)</span>
+                <span class="n">package_not_found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;populse_db&quot;</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">populse_db_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">populse_db</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
                 <span class="p">)</span>
-            <span class="p">)</span>
-            <span class="k">del</span> <span class="n">populse_db_dir</span>
-            <span class="k">del</span> <span class="n">populse_db</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;  . Using populse_db package from </span><span class="si">{}</span><span class="s2"> ...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">populse_db_dir</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">del</span> <span class="n">populse_db_dir</span>
+                <span class="k">del</span> <span class="n">populse_db</span>
 
         <span class="c1"># Adding mia_processes:</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span>
@@ -269,13 +294,18 @@
             <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">mia_processes_dev_dir</span><span class="p">)</span>
             <span class="n">pypath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mia_processes_dev_dir</span><span class="p">)</span>
             <span class="k">del</span> <span class="n">mia_processes_dev_dir</span>
+            <span class="kn">from</span> <span class="nn">mia_processes</span> <span class="kn">import</span> <span class="n">info</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    mia_processes version: </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
+
             <span class="k">try</span><span class="p">:</span>
                 <span class="kn">import</span> <span class="nn">mia_processes</span>
 
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">pass</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  . mia_processes package was not found!...&quot;</span><span class="p">)</span>
+                <span class="n">package_not_found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;mia_processes&quot;</span><span class="p">)</span>
 
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">mia_processes_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span>
@@ -289,6 +319,14 @@
                 <span class="k">del</span> <span class="n">mia_processes</span>
 
         <span class="k">del</span> <span class="n">root_dev_dir</span>
+
+        <span class="k">if</span> <span class="n">package_not_found</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Mia cannot be started because the following packages &quot;</span>
+                <span class="s2">&quot;were not found:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="n">package</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">package</span> <span class="ow">in</span> <span class="n">package_not_found</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># elif &quot;CASA_DISTRO&quot; in os.environ:</span>
     <span class="c1">#     # If the casa distro development environment is detected,</span>
@@ -421,7 +459,6 @@
         <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span></div>
 
 
-
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="c1"># this will only be executed when this module is run directly</span>
     <span class="n">main</span><span class="p">()</span>
@@ -437,8 +474,8 @@
       </div>
 
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2022, populse.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+        &#169; Copyright 2022, populse.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
     </div>
   </body>
 </html>
