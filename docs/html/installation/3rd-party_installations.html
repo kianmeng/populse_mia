@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Populse_mia’s third-party softwares installations &#8212; populse_mia 2.5.3-dev+e9ccb936 documentation</title>
+    <title>Populse_mia’s third-party softwares installations &#8212; populse_mia 2.5.3-dev+8df21519 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=f63d8bfa" />
     <link rel="stylesheet" type="text/css" href="../_static/haiku.css?v=dfa0e015" />
-    <script src="../_static/documentation_options.js?v=cfe19ba0"></script>
+    <script src="../_static/documentation_options.js?v=a63cd5fa"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
   </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="../index.html">
-          <span>populse_mia 2.5.3-dev+e9ccb936 documentation</span></a></h1>
+          <span>populse_mia 2.5.3-dev+8df21519 documentation</span></a></h1>
         <h2 class="heading"><span>Populse_mia’s third-party softwares installations</span></h2>
       </div>
       <div class="topnav" role="navigation" aria-label="top navigation">
@@ -213,9 +213,32 @@ source $FREESURFER_HOME/SetUpFreeSurfer.csh&gt;/dev/null
 </section>
 <section id="installation-of-mrtrix">
 <h2>Installation of <a class="reference external" href="https://www.mrtrix.org/">MRtrix</a><a class="headerlink" href="#installation-of-mrtrix" title="Link to this heading">¶</a></h2>
+<p>The following instruction resume how to build MRTrix3 from source on Linux.
+Further details are available on the <a class="reference external" href="https://mrtrix.readthedocs.io/en/latest/installation/build_from_source.html">MRtrix’s documentation</a></p>
 <blockquote>
-<div><ul class="simple">
-<li><p><a class="reference external" href="https://www.mrtrix.org/download/">WIP!</a></p></li>
+<div><ul>
+<li><p>python and python-is-python3 should be installed</p></li>
+<li><p>Install others dependencies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">git</span> <span class="n">g</span><span class="o">++</span> <span class="n">libeigen3</span><span class="o">-</span><span class="n">dev</span> <span class="n">zlib1g</span><span class="o">-</span><span class="n">dev</span> <span class="n">libqt5opengl5</span><span class="o">-</span><span class="n">dev</span> <span class="n">libqt5svg5</span><span class="o">-</span><span class="n">dev</span> <span class="n">libgl1</span><span class="o">-</span><span class="n">mesa</span><span class="o">-</span><span class="n">dev</span> <span class="n">libfftw3</span><span class="o">-</span><span class="n">dev</span> <span class="n">libtiff5</span><span class="o">-</span><span class="n">dev</span> <span class="n">libpng</span><span class="o">-</span><span class="n">dev</span>
+</pre></div>
+</div>
+</li>
+<li><p>Clone the MRTrix3 repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">MRtrix3</span><span class="o">/</span><span class="n">mrtrix3</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</li>
+<li><p>Configure the MRtrix3 install (in the new mrtrix3 directory):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">mrtrix3</span>
+<span class="o">./</span><span class="n">configure</span>
+</pre></div>
+</div>
+</li>
+<li><p>Build MRtrix3:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">build</span>
+</pre></div>
+</div>
+</li>
 </ul>
 </div></blockquote>
 </section>

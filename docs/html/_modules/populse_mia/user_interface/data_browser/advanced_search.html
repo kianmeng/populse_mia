@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../../../../">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>populse_mia.user_interface.data_browser.advanced_search &#8212; populse_mia 2.5.3-dev+03d533b8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=f63d8bfa" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/haiku.css?v=dfa0e015" />
-    <script src="../../../../_static/documentation_options.js?v=9ebd5e4c"></script>
-    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <title>populse_mia.user_interface.data_browser.advanced_search &#8212; populse_mia 2.5.3-dev+8df21519 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=659b1fac" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/haiku.css?v=d31ea6cb" />
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=a516deaa"></script>
+    <script src="../../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({startOnLoad:true});</script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="../../../../index.html">
-          <span>populse_mia 2.5.3-dev+03d533b8 documentation</span></a></h1>
+          <span>populse_mia 2.5.3-dev+8df21519 documentation</span></a></h1>
         <h2 class="heading"><span>populse_mia.user_interface.data_browser.advanced_search</span></h2>
       </div>
       <div class="topnav" role="navigation" aria-label="top navigation">
@@ -77,9 +77,7 @@
 <span class="kn">from</span> <span class="nn">populse_mia.user_interface.pop_ups</span> <span class="kn">import</span> <span class="n">ClickableLabel</span>
 
 
-<div class="viewcode-block" id="AdvancedSearch">
-<a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch">[docs]</a>
-<span class="k">class</span> <span class="nc">AdvancedSearch</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+<div class="viewcode-block" id="AdvancedSearch"><a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch">[docs]</a><span class="k">class</span> <span class="nc">AdvancedSearch</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class that manages the widget of the advanced search</span>
 
 <span class="sd">    The advanced search creates a complex query to the database and is a</span>
@@ -114,9 +112,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AdvancedSearch.__init__">
-<a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="AdvancedSearch.__init__"><a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">project</span><span class="p">,</span>
         <span class="n">data_browser</span><span class="p">,</span>
@@ -152,10 +148,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">search</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Search&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="o">.</span><span class="n">setFixedWidth</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="AdvancedSearch.add_search_bar">
-<a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.add_search_bar">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_search_bar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AdvancedSearch.add_search_bar"><a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.add_search_bar">[docs]</a>    <span class="k">def</span> <span class="nf">add_search_bar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create and define the advanced research bar.&quot;&quot;&quot;</span>
         <span class="n">row_layout</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -234,10 +227,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">displayConditionRules</span><span class="p">(</span><span class="n">field_choice</span><span class="p">,</span> <span class="n">condition_choice</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="AdvancedSearch.apply_filter">
-<a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.apply_filter">[docs]</a>
-    <span class="k">def</span> <span class="nf">apply_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="p">):</span>
+<div class="viewcode-block" id="AdvancedSearch.apply_filter"><a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.apply_filter">[docs]</a>    <span class="k">def</span> <span class="nf">apply_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply an opened filter to update the table.</span>
 
 <span class="sd">        :param filter: Filter object opened to apply</span>
@@ -320,7 +310,6 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">dataBrowser</span><span class="o">.</span><span class="n">table_data</span><span class="o">.</span><span class="n">update_visualized_rows</span><span class="p">(</span><span class="n">old_rows</span><span class="p">)</span></div>
 
-
     <span class="c1"># def clearLayout(self, layout):</span>
     <span class="c1">#     &quot;&quot;&quot;</span>
     <span class="c1">#     Called to clear a layout</span>
@@ -339,9 +328,7 @@
     <span class="c1">#             else:</span>
     <span class="c1">#                 self.clearLayout(item.layout())</span>
 
-<div class="viewcode-block" id="AdvancedSearch.displayConditionRules">
-<a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.displayConditionRules">[docs]</a>
-    <span class="k">def</span> <span class="nf">displayConditionRules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">condition</span><span class="p">):</span>
+<div class="viewcode-block" id="AdvancedSearch.displayConditionRules"><a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.displayConditionRules">[docs]</a>    <span class="k">def</span> <span class="nf">displayConditionRules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">condition</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the list of condition choices, depending on the tag type</span>
 
 <span class="sd">        :param field: field</span>
@@ -381,10 +368,7 @@
 
         <span class="n">condition</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="AdvancedSearch.displayValueRules">
-<a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.displayValueRules">[docs]</a>
-    <span class="k">def</span> <span class="nf">displayValueRules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">choice</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="AdvancedSearch.displayValueRules"><a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.displayValueRules">[docs]</a>    <span class="k">def</span> <span class="nf">displayValueRules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">choice</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the placeholder text. when the condition choice is</span>
 <span class="sd">        changed.</span>
 
@@ -413,10 +397,7 @@
             <span class="n">value</span><span class="o">.</span><span class="n">setDisabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">value</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="AdvancedSearch.get_filters">
-<a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.get_filters">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">replace_all_by_fields</span><span class="p">):</span>
+<div class="viewcode-block" id="AdvancedSearch.get_filters"><a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.get_filters">[docs]</a>    <span class="k">def</span> <span class="nf">get_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">replace_all_by_fields</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the filters in a list</span>
 
 <span class="sd">        :param replace_all_by_fields: to replace All visualized tags by the</span>
@@ -480,10 +461,7 @@
 
         <span class="k">return</span> <span class="n">fields</span><span class="p">,</span> <span class="n">conditions</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">nots</span></div>
 
-
-<div class="viewcode-block" id="AdvancedSearch.launch_search">
-<a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.launch_search">[docs]</a>
-    <span class="k">def</span> <span class="nf">launch_search</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AdvancedSearch.launch_search"><a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.launch_search">[docs]</a>    <span class="k">def</span> <span class="nf">launch_search</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Start the search and update the table&quot;&quot;&quot;</span>
 
         <span class="c1"># Filters gotten</span>
@@ -534,10 +512,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dataBrowser</span><span class="o">.</span><span class="n">table_data</span><span class="o">.</span><span class="n">scans_to_search</span> <span class="o">=</span> <span class="n">result_names</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataBrowser</span><span class="o">.</span><span class="n">table_data</span><span class="o">.</span><span class="n">update_visualized_rows</span><span class="p">(</span><span class="n">old_scans_list</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="AdvancedSearch.prepare_filters">
-<a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.prepare_filters">[docs]</a>
-    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="AdvancedSearch.prepare_filters"><a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.prepare_filters">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">prepare_filters</span><span class="p">(</span><span class="n">links</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">conditions</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">nots</span><span class="p">,</span> <span class="n">scans</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare the str representation of the filter</span>
 
@@ -641,10 +616,7 @@
 
         <span class="k">return</span> <span class="n">final_query</span></div>
 
-
-<div class="viewcode-block" id="AdvancedSearch.refresh_search">
-<a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.refresh_search">[docs]</a>
-    <span class="k">def</span> <span class="nf">refresh_search</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AdvancedSearch.refresh_search"><a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.refresh_search">[docs]</a>    <span class="k">def</span> <span class="nf">refresh_search</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Refresh the widget</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -685,10 +657,7 @@
         <span class="n">master_layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">search_layout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">master_layout</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="AdvancedSearch.remove_row">
-<a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.remove_row">[docs]</a>
-    <span class="k">def</span> <span class="nf">remove_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_layout</span><span class="p">):</span>
+<div class="viewcode-block" id="AdvancedSearch.remove_row"><a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.remove_row">[docs]</a>    <span class="k">def</span> <span class="nf">remove_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_layout</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove a row</span>
 
 <span class="sd">        :param row_layout: Row to remove</span>
@@ -708,10 +677,7 @@
         <span class="c1"># We refresh the view</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">refresh_search</span><span class="p">()</span></div>
 
-
-<div class="viewcode-block" id="AdvancedSearch.rows_borders_added">
-<a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.rows_borders_added">[docs]</a>
-    <span class="k">def</span> <span class="nf">rows_borders_added</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">links</span><span class="p">):</span>
+<div class="viewcode-block" id="AdvancedSearch.rows_borders_added"><a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.rows_borders_added">[docs]</a>    <span class="k">def</span> <span class="nf">rows_borders_added</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">links</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add the links and the added row to the good rows</span>
 
 <span class="sd">        :param links: Old links to reput</span>
@@ -740,10 +706,7 @@
                 <span class="n">link_choice</span><span class="o">.</span><span class="n">setCurrentText</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
             <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">link_choice</span></div>
 
-
-<div class="viewcode-block" id="AdvancedSearch.rows_borders_removed">
-<a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.rows_borders_removed">[docs]</a>
-    <span class="k">def</span> <span class="nf">rows_borders_removed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AdvancedSearch.rows_borders_removed"><a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.rows_borders_removed">[docs]</a>    <span class="k">def</span> <span class="nf">rows_borders_removed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Link and add row removed from every row&quot;&quot;&quot;</span>
 
         <span class="c1"># We remove all the links and the add rows</span>
@@ -759,7 +722,6 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-
     <span class="c1"># def rowsContainsWidget(self, widget):</span>
     <span class="c1">#     &quot;&quot;&quot;Check if the widget is still used</span>
     <span class="c1">#</span>
@@ -771,15 +733,11 @@
     <span class="c1">#             return True</span>
     <span class="c1">#     return False</span>
 
-<div class="viewcode-block" id="AdvancedSearch.show_search">
-<a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.show_search">[docs]</a>
-    <span class="k">def</span> <span class="nf">show_search</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AdvancedSearch.show_search"><a class="viewcode-back" href="../../../../populse_mia.user_interface.data_browser.html#populse_mia.user_interface.data_browser.advanced_search.AdvancedSearch.show_search">[docs]</a>    <span class="k">def</span> <span class="nf">show_search</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset the rows when the Advanced Search button is clicked&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_search_bar</span><span class="p">()</span></div>
-</div>
-
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_search_bar</span><span class="p">()</span></div></div>
 </pre></div>
 
       </div>
@@ -793,7 +751,7 @@
 
     <div class="footer" role="contentinfo">
     &#169; Copyright 2022, populse.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>
